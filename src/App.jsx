@@ -47,7 +47,7 @@ function App() {
 
   return (
     <RootContext.Provider value={rootValue}>
-      {isAuthorized ? <AppContainer /> : <AuthContainer />}
+      {isAuthorized ? <AppContainer/> : <AuthContainer />}
     </RootContext.Provider>
   )
 }

@@ -1,7 +1,9 @@
-import {Button} from 'react-bootstrap'
-import {useContext, useState} from 'react'
-import {RootContext} from '../utils/context.js'
+import { Button } from 'react-bootstrap'
+import { useContext, useState } from 'react'
+import { RootContext } from '../utils/context.js'
 import requester from '../utils/requester.js'
+import Logo from '../assets/logo.png'
+
 
 export default function AuthContainer() {
   const root = useContext(RootContext)
@@ -51,17 +53,59 @@ export default function AuthContainer() {
 
   return (
     <>
-      <input
-        placeholder={'login'}
-        value={login}
-        onChange={(e) => setLogin(e.target.value)}
-      />
-      <input
-        placeholder={'pass'}
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <Button onClick={() => signIn()}>Sign in</Button>
+      <div className="main_div" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center',height: '100vh'}}>
+        <div className='card' style={{background: 'rgba(8, 14, 44, 0.5)' }}>
+          <div className="cont" style={{ display: 'flex', height: '60vh', width: '100%',}}>
+
+            <div className="cont2" style={{ height: 'auto', width: '460px', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '5px 15px' }}>
+
+              <div className="login" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center',gap:'5px' }}>
+                <img src={Logo} alt="" />
+                <h1 style={{ color: 'white', textAlign: 'center' }}>WelCome to Kerben</h1>
+                <div>
+                  <label
+                  className='email'
+                    style={{ color: 'white' }}
+                    htmlFor=""
+                  >Email
+                  </label>
+                </div>
+
+
+                <input
+                  className="log"
+                  placeholder="Your email"
+                  type="text"
+                  onChange={(e) => setLogin(e.target.value)}
+                  style={loading ? { border: "2px solid red" } : null}
+                />
+                <label
+                className='password'
+                  style={{ color: 'white' }}
+                  htmlFor=""
+                >Password</label>
+                <input
+                  className="log"
+                  placeholder="Your password"
+                  onChange={(e) => setPassword(e.target.value)}
+                  onKeyDown={(e) => KeyEnter(e.code)}
+                  type="password"
+                  style={loading ? { border: "2px solid red" } : { border: "2px solid black" }}
+                />
+
+                <Button
+                  style={{ backgroundColor: 'violet', color: 'white', width: '100%', fontSize: '18px' }}
+                  onClick={() => signIn()}
+                >Sign in
+                </Button>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+
+      </div>
     </>
   )
 }
