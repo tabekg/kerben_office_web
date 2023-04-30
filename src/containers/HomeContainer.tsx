@@ -5,6 +5,7 @@ import requester from '../utils/requester'
 
 export default function HomeContainer() {
   const [drivers, setDrivers] = useState([])
+  const [selectedDriver, setSelectedDriver] = useState(0)
 
   const timeoutId = useRef(-1)
 
@@ -47,7 +48,11 @@ export default function HomeContainer() {
                 g.payload &&
                 g.payload[0]?.timestamp > new Date().getTime() - 30000
               return (
-                <div key={i} className={'driver-list-item'}>
+                <div
+                  key={i}
+                  className={'driver-list-item'}
+                  onClick={() => setSelectedDriver(g.id)}
+                >
                   <div>
                     <div style={{fontSize: 24}}>{g.full_name}</div>
                     {g.payload ? (
@@ -76,7 +81,13 @@ export default function HomeContainer() {
           </div>
         </Col>
         <Col lg={9} md={8} sm={12}>
-          <MapComponent markers={drivers} />
+          <MapComponent
+            // @ts-ignore
+            selectedDriver={(drivers || []).find(
+              (g) => g.id === selectedDriver
+            )}
+            markers={drivers}
+          />
         </Col>
       </Row>
     </>

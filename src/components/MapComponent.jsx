@@ -14,7 +14,7 @@ const MapComponent = compose(
 )((props) => {
   return (
     <>
-      <GoogleMap defaultZoom={13} defaultCenter={{lat: 40.5283, lng: 72.7985}}>
+      <GoogleMap defaultZoom={6} defaultCenter={{lat: 40.5283, lng: 72.7985}}>
         {props.markers.map((g, i) => {
           if (!g.payload) {
             return
