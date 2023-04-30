@@ -77,12 +77,14 @@ body {
 }
 
 .form {
+    overflow: hidden;
+    overflow-y: scroll;
     width: 60%;
     height: 60%;
     background-color: white;
     border-radius: 20px;
     box-shadow: 0px 0px 20px gray;
-
+    margin-left: 20px;
 }
 
 .block {
@@ -110,14 +112,14 @@ body {
 }
 
 
-input {
-    background-color: darkcyan;
-    font-size: 20px;
-    color: white;
-    width: 300px;
-    margin-left: 20px;
-    padding-left: 10px;
-}
+/*input {*/
+/*    background-color: darkcyan;*/
+/*    font-size: 20px;*/
+/*    color: white;*/
+/*    width: 300px;*/
+/*    margin-left: 20px;*/
+/*    padding-left: 10px;*/
+/*}*/
 
 .button1 {
     margin-top: 20px;
@@ -127,7 +129,7 @@ input {
     background-color: darkcyan;
     align-items: center;
     font-size: 20px;
-    transition: 2s;
+    transition: 0.2s;
     color: white;
 }
 
@@ -189,6 +191,8 @@ ol{
     background-color: #1abc9c;
     height: 550px;
     overflow-y: scroll;
+
+    overflow-x: hidden ;
     margin-top: 20px;
 }
 
@@ -238,4 +242,12 @@ li.completed {
 .cont2{
     display: flex;
     justify-content: space-between;
+}
+::-webkit-scrollbar{
+    width: 8px;
+}
+::-webkit-scrollbar-thumb{
+    background:linear-gradient(to top,transparent,  white, aqua ,darkcyan 65%);
+    border-radius: 5px;
+
 }
