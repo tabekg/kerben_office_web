@@ -258,3 +258,30 @@ li.completed {
     background-color: greenyellow;
     border-radius: 50%;
 }
+
+.log {
+    width: 100%;
+    padding: 10px 15px;
+    margin: 15px;
+}
+
+body{
+    background-image: url('https://etimg.etb2bimg.com/photo/90424361.cms');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.login{
+    position: relative;
+}
+label{
+    position: absolute;
+}
+.email{
+    top: 36%;
+    left: 0;
+}
+.password{
+    top: 59%;
+    left: 0;
+}
