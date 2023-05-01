@@ -1,4 +1,3 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css'
 import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
@@ -11,8 +10,6 @@ import {VscChromeClose} from "react-icons/vsc";
 import React, {useState} from 'react';
 import Button from 'react-bootstrap/Button';
 import Color from "./Color.jsx";
-
-
 function App() {
     const [showBlock, setShowBlock] = useState(false);
     const [todos, setTodos] = useState([]);
@@ -23,27 +20,19 @@ function App() {
     const close = () => {
         setShowBlock(false);
     };
-
     function handleAddTodo() {
         if (inputText === '') return;
         setTodos([...todos, {text: inputText, completed: false}]);
         setInputText('');
     }
-
     function handleDeleteTodo(index) {
         const newTodos = [...todos];
         newTodos.splice(index, 1);
         setTodos(newTodos);
     }
-
     function handleChangeInputText(event) {
         setInputText(event.target.value);
     }
-
-
-
-
-
     return (<>
         <div className="cont">
             <Navbar bg="light" expand="lg">
@@ -54,8 +43,7 @@ function App() {
                         <Nav
                             className="me-auto my-2 my-lg-0"
                             style={{maxHeight: '100px'}}
-                            navbarScroll
-                        >
+                            navbarScroll>
                             <Nav.Link href="#action1"></Nav.Link>
                         </Nav>
                         <Form className="d-flex">
@@ -77,7 +65,6 @@ function App() {
                 onClick={() => handleToggleComplete(index)}
             >
               {todo.text}
-
             </span>
                                 <Color/>
                                 {/*<button onClick={() => handleDeleteTodo(index)}>Удалить</button>*/}
@@ -98,7 +85,6 @@ function App() {
                     </div>
                     <div className="map"></div>
                 </div>
-
             </div>
             <div>
                 {showBlock && <div className="addman">
@@ -110,8 +96,6 @@ function App() {
                             <div className="input">
                                 <form>
                                     <div className="space-y-12">
-
-
                                         <div className="border-b border-gray-900/10 pb-12">
                                             <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                                                 <div className=" text-center sm:col-span-3">
@@ -130,7 +114,6 @@ function App() {
                                                                   sm:text-sm sm:leading-6"
                                                             type="text"/></div>
                                                 </div>
-
                                                 <div className=" text-center sm:col-span-3">
                                                     <label htmlFor="last-name"
                                                            className="block text-sm font-medium leading-6 text-gray-900">Пароль</label>
@@ -145,7 +128,6 @@ function App() {
                                                                   sm:text-sm sm:leading-6"/>
                                                     </div>
                                                 </div>
-
                                                 <div className=" text-center sm:col-span-4">
                                                     <label htmlFor="email"
                                                            className="block text-sm font-medium leading-6 text-gray-900">Фамилия и имя</label>
@@ -154,19 +136,13 @@ function App() {
                                                                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"/>
                                                     </div>
                                                 </div>
-
-
                                             </div>
                                         </div>
-
-
                                     </div>
-
                                     <div className="mt-6 flex items-center justify-end gap-x-6"></div>
                                 </form>
                             </div>
                             <div className="input">
-
                             </div>
                         </div>
                         <div className="name1">
@@ -175,7 +151,6 @@ function App() {
                                     handleAddTodo();
                                     close();
                                 }}
-
                                 className={'button1 mb-5 '}>Добавить
                             </button>
                         </div>
