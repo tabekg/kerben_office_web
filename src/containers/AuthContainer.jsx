@@ -10,8 +10,8 @@ export default function AuthContainer() {
 
   const [login, setLogin] = useState('')
   const [password, setPassword] = useState('')
-
   const [loading, setLoading] = useState(false)
+
 
   const signIn = () => {
     if (loading) {
@@ -53,18 +53,18 @@ export default function AuthContainer() {
 
   return (
     <>
-      <div className="main_div" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center',height: '100vh'}}>
-        <div className='card' style={{background: 'rgba(8, 14, 44, 0.5)' }}>
-          <div className="cont" style={{ display: 'flex', height: '60vh', width: '100%',}}>
+      <div className="main_div" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <div className='card' style={{ background: 'rgba(8, 14, 44, 0.5)' }}>
+          <div className="cont" style={{ display: 'flex', height: '60vh', width: '100%', }}>
 
             <div className="cont2" style={{ height: 'auto', width: '460px', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '5px 15px' }}>
 
-              <div className="login" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center',gap:'5px' }}>
+              <div className="login" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '5px' }}>
                 <img src={Logo} alt="" />
                 <h1 style={{ color: 'white', textAlign: 'center' }}>WelCome to Kerben</h1>
                 <div>
                   <label
-                  className='email'
+                    className='email'
                     style={{ color: 'white' }}
                     htmlFor=""
                   >Email
@@ -80,7 +80,7 @@ export default function AuthContainer() {
                   style={loading ? { border: "2px solid red" } : null}
                 />
                 <label
-                className='password'
+                  className='password'
                   style={{ color: 'white' }}
                   htmlFor=""
                 >Password</label>
