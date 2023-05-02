@@ -2,6 +2,7 @@ import {Col, Row} from 'react-bootstrap'
 import MapComponent from '../components/MapComponent'
 import {useEffect, useRef, useState} from 'react'
 import requester from '../utils/requester'
+import moment from 'moment'
 
 export default function HomeContainer() {
   const [drivers, setDrivers] = useState([])
@@ -42,7 +43,7 @@ export default function HomeContainer() {
           backgroundColor: 'white',
         }}
       >
-        <Col lg={3} md={4} sm={12}>
+        <Col lg={2} md={4} sm={12}>
           <div className={'driver-list'}>
             {drivers.map((g, i) => {
               const isOnline =
@@ -57,7 +58,9 @@ export default function HomeContainer() {
                   <div>
                     <div style={{fontSize: 24}}>{g.full_name}</div>
                     {g.payload ? (
-                      <div>{new Date(g.payload[0].timestamp).toString()}</div>
+                      <div>
+                        {moment(new Date(g.payload[0].timestamp)).fromNow()}
+                      </div>
                     ) : null}
                   </div>
                   <div
@@ -81,7 +84,7 @@ export default function HomeContainer() {
             </div>
           </div>
         </Col>
-        <Col lg={9} md={8} sm={12}>
+        <Col lg={10} md={8} sm={12}>
           <MapComponent
             // @ts-ignore
             selectedDriver={(drivers || []).find(
