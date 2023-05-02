@@ -1,9 +1,8 @@
-import { Button } from 'react-bootstrap'
-import { useContext, useState } from 'react'
-import { RootContext } from '../utils/context.js'
+import {Button, Card, Col, Form, Row} from 'react-bootstrap'
+import {useContext, useState} from 'react'
+import {RootContext} from '../utils/context.js'
 import requester from '../utils/requester.js'
 import Logo from '../assets/logo.png'
-
 
 export default function AuthContainer() {
   const root = useContext(RootContext)
@@ -11,7 +10,6 @@ export default function AuthContainer() {
   const [login, setLogin] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
-
 
   const signIn = () => {
     if (loading) {
@@ -52,60 +50,63 @@ export default function AuthContainer() {
   }
 
   return (
-    <>
-      <div className="main_div" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <div className='card' style={{ background: 'rgba(8, 14, 44, 0.5)' }}>
-          <div className="cont" style={{ display: 'flex', height: '60vh', width: '100%', }}>
-
-            <div className="cont2" style={{ height: 'auto', width: '460px', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '5px 15px' }}>
-
-              <div className="login" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '5px' }}>
-                <img src={Logo} alt="" />
-                <h1 style={{ color: 'white', textAlign: 'center' }}>WelCome to Kerben</h1>
-                <div>
-                  <label
-                    className='email'
-                    style={{ color: 'white' }}
-                    htmlFor=""
-                  >Email
-                  </label>
-                </div>
-
-
-                <input
-                  className="log"
-                  placeholder="Your email"
-                  type="text"
-                  onChange={(e) => setLogin(e.target.value)}
-                  style={loading ? { border: "2px solid red" } : null}
-                />
-                <label
-                  className='password'
-                  style={{ color: 'white' }}
-                  htmlFor=""
-                >Password</label>
-                <input
-                  className="log"
-                  placeholder="Your password"
-                  onChange={(e) => setPassword(e.target.value)}
-                  onKeyDown={(e) => KeyEnter(e.code)}
-                  type="password"
-                  style={loading ? { border: "2px solid red" } : { border: "2px solid black" }}
-                />
-
-                <Button
-                  style={{ backgroundColor: 'violet', color: 'white', width: '100%', fontSize: '18px' }}
-                  onClick={() => signIn()}
-                >Sign in
-                </Button>
-              </div>
-
+    <Row style={{height: '100vh'}}>
+      <div className={'d-flex justify-content-center align-items-center'}>
+        <Col xl={3} xxl={3} lg={3} md={4} sm={10} xs={12}>
+          <Card
+            style={{
+              background: 'rgba(8, 14, 44, 0.8)',
+              boxShadow: '0 0 10px rgba(255, 255, 255, 0.5)',
+            }}
+            className={'p-5'}
+          >
+            <div
+              className={
+                'd-flex justify-content-center align-items-center mb-3'
+              }
+            >
+              <img src={Logo} alt='Logo Kerben' />
             </div>
+            <h1 className={'text-white text-center mb-4'}>
+              Добро пожаловать в Кербен
+            </h1>
 
-          </div>
-        </div>
+            <Form.Group className='mb-3' controlId='login'>
+              <Form.Label className={'text-white'}>Ваш логин</Form.Label>
+              <Form.Control
+                className={'w-100'}
+                type='text'
+                onChange={(e) => setLogin(e.target.value)}
+                value={login}
+                disabled={loading}
+                placeholder='Ваш логин'
+              />
+            </Form.Group>
 
+            <Form.Group className='mb-5' controlId='password'>
+              <Form.Label className={'text-white'}>Ваш пароль</Form.Label>
+              <Form.Control
+                className={'w-100'}
+                type='password'
+                placeholder='Ваш пароль'
+                onChange={(e) => setPassword(e.target.value)}
+                value={password}
+                disabled={loading}
+              />
+            </Form.Group>
+
+            <div className={'d-flex justify-content-center align-items-center'}>
+              <Button
+                disabled={loading}
+                onClick={() => signIn()}
+                className={'px-5'}
+              >
+                {loading ? 'Подождите...' : 'Войти'}
+              </Button>
+            </div>
+          </Card>
+        </Col>
       </div>
-    </>
+    </Row>
   )
 }

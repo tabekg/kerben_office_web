@@ -39,6 +39,7 @@ export default function HomeContainer() {
         style={{
           flexGrow: 1,
           gap: 0,
+          backgroundColor: 'white',
         }}
       >
         <Col lg={3} md={4} sm={12}>

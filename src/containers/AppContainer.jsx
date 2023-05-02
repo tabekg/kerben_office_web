@@ -1,4 +1,4 @@
-import HomeContainer from './HomeContainer'
+import HomeContainer from './HomeContainer.jsx'
 import {Container, Nav, Navbar, NavDropdown} from 'react-bootstrap'
 
 export default function AppContainer() {
