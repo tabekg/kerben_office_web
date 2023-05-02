@@ -98,7 +98,7 @@ export default function AuthContainer() {
                   style={{ backgroundColor: 'violet', color: 'white', width: '100%', fontSize: '18px' }}
                   onClick={() => signIn()}
                 >
-                  {loading === true ? <Spinner as="span" animation="grow" size="sm" role="status" aria-hidden="true"   />}
+                 
                 </Button>
               </div>
 
