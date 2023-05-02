@@ -3,6 +3,7 @@ import { useContext, useState } from 'react'
 import { RootContext } from '../utils/context.js'
 import requester from '../utils/requester.js'
 import Logo from '../assets/logo.png'
+import Spinner from 'react-bootstrap/Spinner';
 
 
 export default function AuthContainer() {
@@ -96,7 +97,8 @@ export default function AuthContainer() {
                 <Button
                   style={{ backgroundColor: 'violet', color: 'white', width: '100%', fontSize: '18px' }}
                   onClick={() => signIn()}
-                >Sign in
+                >
+                  {loading === true ? <Spinner as="span" animation="grow" size="sm" role="status" aria-hidden="true"   />}
                 </Button>
               </div>
 
