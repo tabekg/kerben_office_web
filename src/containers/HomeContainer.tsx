@@ -107,7 +107,7 @@ export default function HomeContainer() {
                                                         style={{textDecoration: todo.completed ? 'line-through' : 'none',}}>
                                                         {todo.text}
                                                         </span>
-                        asd
+
                         <Color/>
                       </li>))}
                 </ol>
