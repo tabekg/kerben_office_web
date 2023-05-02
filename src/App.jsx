@@ -4,6 +4,7 @@ import AuthContainer from './containers/AuthContainer.jsx'
 import AppContainer from './containers/AppContainer.jsx'
 import {RootContext} from './utils/context.js'
 import storage from './utils/storage.js'
+import {BrowserRouter, Link} from 'react-router-dom'
 
 function App() {
   const [user, setUser] = useState()
@@ -47,7 +48,7 @@ function App() {
 
   return (
     <RootContext.Provider value={rootValue}>
-      {isAuthorized ? <AppContainer/> : <AuthContainer />}
+      {isAuthorized ? <AppContainer as={Link} to={'/app'}/> : <AuthContainer as={Link} to={'/'} />}
     </RootContext.Provider>
   )
 }

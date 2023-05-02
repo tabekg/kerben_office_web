@@ -1,4 +1,4 @@
-.log {
+    .log {
     width: 100%;
     padding: 10px 15px;
     margin: 15px;
@@ -9,6 +9,7 @@ body{
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
+    overflow-x:hidden;
 }
 .login{
     position: relative;
@@ -23,4 +24,54 @@ position: absolute;
 .password{
     top: 59%;
     left: 0;
+}
+.navbar-brand{
+    font-family: "Comic Sans MS" !important ;
+}
+.navbar{
+    background: linear-gradient(to right, #ffffff, #ff6e7f 80%);
+
+}
+.password-btn{
+    font-family: "Comic Sans MS" !important ;
+    font-size: 12px;
+    width: 109px;
+    height: 35px;
+    border-radius: 10em;
+    margin-right: 20px;
+    background: linear-gradient(to top right, #FF5F6D, #FFFFff 60%);
+    transition: 0.3s;
+
+}
+.password-btn:hover{
+    background: linear-gradient(to top right, #FF5F6D 20%, #FFFFff);
+    border:2px solid white;
+    color: white;
+
+}
+
+.exit-btn{
+    font-family: "Comic Sans MS" !important ;
+    font-size: 12px;
+    width: 60px;
+    height: 35px;
+    border-radius: 10em;
+    background: linear-gradient(to top right, #FF5F6D, #FFFFff 60%);
+    transition: 0.3s;
+
+}
+    .exit-btn:hover{
+        background: linear-gradient(to top right, #FF5F6D 20%, #FFFFff);
+        border:2px solid white;
+        color: white;
+
+    }
+.inp-{
+    width: 200px;
+    font-size: 12px;
+    border-top: none;
+    border-right: none;
+    border-left: none;
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
 }

@@ -7,7 +7,9 @@ export default function HomeContainer() {
   const [drivers, setDrivers] = useState([])
   const [selectedDriver, setSelectedDriver] = useState(0)
 
-  const timeoutId = useRef(-1)
+  const timeoutId = useRef<ReturnType<typeof setTimeout> | number>(-1);
+
+
 
   useEffect(() => {
     fetchDrivers()
@@ -42,7 +44,7 @@ export default function HomeContainer() {
         }}
       >
         <Col lg={3} md={4} sm={12}>
-          <div className={'driver-list'}>
+          <div className={'driver-list'} style={{overflowX:'hidden'}}>
             {drivers.map((g, i) => {
               const isOnline =
                 g.payload &&
