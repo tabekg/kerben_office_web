@@ -61,7 +61,7 @@ export default function AuthContainer() {
             <div className="cont2" style={{ height: 'auto', width: '460px', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '5px 15px' }}>
 
               <div className="login" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '5px' }}>
-                <img src={Logo} alt="" />
+                <img className='logo_img' src={Logo} alt="" />
                 <h1 style={{ color: 'white', textAlign: 'center' }}>WelCome to Kerben</h1>
                 <div>
                   <label
@@ -98,7 +98,7 @@ export default function AuthContainer() {
                   style={{ backgroundColor: 'violet', color: 'white', width: '100%', fontSize: '18px' }}
                   onClick={() => signIn()}
                 >
-                 
+                  {loading ? <Spinner as="span" animation="grow" size="sm" role="status" aria-hidden="true"/> : 'Sign In'}
                 </Button>
               </div>
 

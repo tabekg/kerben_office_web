@@ -17,10 +17,14 @@ label{
 position: absolute;
 }
 .email{
-    top: 36%;
+    top: 45%;
     left: 0;
 }
 .password{
-    top: 59%;
+    top: 66%;
     left: 0;
+}
+.logo_img{
+    width: 130px;
+    height: 130px;
 }
