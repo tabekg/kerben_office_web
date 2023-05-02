@@ -12,6 +12,7 @@ export default function AuthContainer() {
   const [login, setLogin] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
+  const [load, setLoad] = useState(true)
 
 
   const signIn = () => {
@@ -34,6 +35,7 @@ export default function AuthContainer() {
         }
       })
       .catch((e) => {
+        setLoad(false)
         console.log(e)
         if (e?.response) {
           if (e?.response?.data?.status === 'wrong_password') {
@@ -56,14 +58,12 @@ export default function AuthContainer() {
     <>
       <div className="main_div" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
         <div className='card' style={{ background: 'rgba(8, 14, 44, 0.5)' }}>
-          <div className="cont" style={{ display: 'flex', height: '60vh', width: '100%', }}>
-
+          <div className="cont" style={{ display: 'flex', height: '460px', width: '100%', }}>
             <div className="cont2" style={{ height: 'auto', width: '460px', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '5px 15px' }}>
-
               <div className="login" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '5px' }}>
                 <img className='logo_img' src={Logo} alt="" />
                 <h1 style={{ color: 'white', textAlign: 'center' }}>WelCome to Kerben</h1>
-                <div>
+                <div className='label_email'>
                   <label
                     className='email'
                     style={{ color: 'white' }}
@@ -71,42 +71,39 @@ export default function AuthContainer() {
                   >Email
                   </label>
                 </div>
-
-
                 <input
                   className="log"
                   placeholder="Your email"
                   type="text"
                   onChange={(e) => setLogin(e.target.value)}
-                  style={loading ? { border: "2px solid red" } : null}
+                  style={!load ? { border: "2px solid red" } : { border: "2px solid black" }}
                 />
                 <label
                   className='password'
                   style={{ color: 'white' }}
                   htmlFor=""
-                >Password</label>
+                >
+                  Password
+                </label>
                 <input
                   className="log"
                   placeholder="Your password"
                   onChange={(e) => setPassword(e.target.value)}
                   onKeyDown={(e) => KeyEnter(e.code)}
                   type="password"
-                  style={loading ? { border: "2px solid red" } : { border: "2px solid black" }}
+                  style={!load ? { border: "2px solid red" } : { border: "2px solid black" }}
                 />
-
                 <Button
+                  className='log_btn'
                   style={{ backgroundColor: 'violet', color: 'white', width: '100%', fontSize: '18px' }}
                   onClick={() => signIn()}
                 >
-                  {loading ? <Spinner as="span" animation="grow" size="sm" role="status" aria-hidden="true"/> : 'Sign In'}
+                  {loading ? <Spinner as="span" animation="grow" size="sm" role="status" aria-hidden="true" /> : 'Sign In'}
                 </Button>
               </div>
-
             </div>
-
           </div>
         </div>
-
       </div>
     </>
   )
