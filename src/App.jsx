@@ -29,7 +29,14 @@ function App() {
     setUser(u)
   }
 
-  const signOut = () => {
+  const signOut = (force = false) => {
+    if (
+      !force &&
+      !window.confirm('Вы действительно хотите выйти из аккаунта?')
+    ) {
+      return
+    }
+
     setToken(null)
     setUser(null)
   }

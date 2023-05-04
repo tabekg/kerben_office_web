@@ -29,9 +29,9 @@ async function get(url, params) {
   return (await request(url, 'get', params))?.data
 }
 
-async function storage(url, params) {
-  return (await request('/storage' + url, 'get', params, true))?.data
-}
+// async function storage(url, params) {
+//   return (await request('/storage' + url, 'get', params, true))?.data
+// }
 
 async function post(url, data = {}) {
   return (await request(url, 'post', data))?.data
@@ -40,8 +40,8 @@ async function post(url, data = {}) {
 export default {
   get,
   post,
-  storage,
-  delete: async (url, data) => {
-    return (await request(url, 'delete', data)).data
-  },
+  // storage,
+  // delete: async (url, data) => {
+  //   return (await request(url, 'delete', data)).data
+  // },
 }
