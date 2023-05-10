@@ -3,10 +3,13 @@ import MapComponent from '../components/MapComponent'
 import {useEffect, useRef, useState} from 'react'
 import requester from '../utils/requester'
 import moment from 'moment'
+import AddDriverModalComponent from '../components/AddDriverModalComponent.jsx'
 
 export default function HomeContainer() {
   const [drivers, setDrivers] = useState([])
   const [selectedDriver, setSelectedDriver] = useState(0)
+
+  const [addDriverModal, setAddDriverModal] = useState(false)
 
   const timeoutId = useRef(-1)
 
@@ -36,6 +39,11 @@ export default function HomeContainer() {
 
   return (
     <>
+      <AddDriverModalComponent
+        show={addDriverModal}
+        setShow={setAddDriverModal}
+      />
+
       <Row
         style={{
           flexGrow: 1,
@@ -79,6 +87,7 @@ export default function HomeContainer() {
             <div
               className={'driver-list-item justify-content-center'}
               style={{color: 'grey'}}
+              onClick={() => setAddDriverModal(true)}
             >
               Добавить новый водитель
             </div>
