@@ -68,10 +68,6 @@ export default function HomeContainer() {
                   className={'driver-list-item'}
                   onClick={() => setModalShow(true)}
                 >
-                  <MyVerticallyCenteredModal
-                    show={modalShow}
-                    onHide={() => setModalShow(false)}
-                  />
                   <div>
                     <div style={{fontSize: 24}}>{g.title}</div>
                     {g.payload ? (
@@ -102,7 +98,10 @@ export default function HomeContainer() {
             {/*</div>*/}
           </div>
         </Col>
-
+        <MyVerticallyCenteredModal
+          show={modalShow}
+          onHide={() => setModalShow(false)}
+        />
         <Col lg={10} md={8} sm={12}>
           <MapComponent
             // @ts-ignore
