@@ -7,19 +7,19 @@ import Logo from '../assets/logo.png'
 export default function AuthContainer() {
   const root = useContext(RootContext)
 
-  const [login, setLogin] = useState('')
+  const [phoneNumber, setPhoneNumber] = useState('+996')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
 
   const signIn = () => {
-    if (loading) {
+    if (loading || phoneNumber.length < 1 || password.length < 1) {
       return
     }
     setLoading(true)
     requester
       .post('/auth', {
-        type: 'super_admin',
-        login,
+        roles: ['SUPER_ADMIN'],
+        phone_number: phoneNumber.slice(1),
         password,
       })
       .then((res) => {
@@ -52,7 +52,7 @@ export default function AuthContainer() {
   return (
     <Row style={{height: '100vh'}}>
       <div className={'d-flex justify-content-center align-items-center'}>
-        <Col xl={3} xxl={3} lg={3} md={4} sm={10} xs={12}>
+        <Col xl={3} xxl={3} lg={4} md={4} sm={10} xs={12}>
           <Card
             style={{
               background: 'rgba(8, 14, 44, 0.8)',
@@ -67,19 +67,21 @@ export default function AuthContainer() {
             >
               <img src={Logo} alt='Logo Kerben' />
             </div>
-            <h1 className={'text-white text-center mb-4'}>
-              Добро пожаловать в Кербен
-            </h1>
+            <h2 className={'text-white text-center mb-4'}>
+              Добро пожаловать в панель управления Кербен
+            </h2>
 
             <Form.Group className='mb-3' controlId='login'>
-              <Form.Label className={'text-white'}>Ваш логин</Form.Label>
+              <Form.Label className={'text-white'}>
+                Ваш телефон номер
+              </Form.Label>
               <Form.Control
                 className={'w-100'}
                 type='text'
-                onChange={(e) => setLogin(e.target.value)}
-                value={login}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                value={phoneNumber}
                 disabled={loading}
-                placeholder='Ваш логин'
+                placeholder='Ваш телефон номер'
               />
             </Form.Group>
 
@@ -97,7 +99,9 @@ export default function AuthContainer() {
 
             <div className={'d-flex justify-content-center align-items-center'}>
               <Button
-                disabled={loading}
+                disabled={
+                  loading || phoneNumber.length < 1 || password.length < 1
+                }
                 onClick={() => signIn()}
                 className={'px-5'}
               >

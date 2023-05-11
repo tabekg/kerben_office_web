@@ -6,7 +6,7 @@ import moment from 'moment'
 import AddDriverModalComponent from '../components/AddDriverModalComponent.jsx'
 
 export default function HomeContainer() {
-  const [drivers, setDrivers] = useState([])
+  const [shipments, setShipments] = useState([])
   const [selectedDriver, setSelectedDriver] = useState(0)
 
   const [addDriverModal, setAddDriverModal] = useState(false)
@@ -14,7 +14,7 @@ export default function HomeContainer() {
   const timeoutId = useRef(-1)
 
   useEffect(() => {
-    fetchDrivers()
+    fetchShipments()
 
     return () => {
       if (timeoutId.current && timeoutId.current > -1) {
@@ -23,17 +23,17 @@ export default function HomeContainer() {
     }
   }, [])
 
-  const fetchDrivers = () => {
+  const fetchShipments = () => {
     requester
-      .get('/office/driver')
+      .get('/shipment')
       .then((res) => {
         if (res.status === 'success') {
-          setDrivers(res.payload)
+          setShipments(res.payload)
         }
-        timeoutId.current = setTimeout(() => fetchDrivers(), 3000)
+        timeoutId.current = setTimeout(() => fetchShipments(), 3000)
       })
       .catch(() => {
-        timeoutId.current = setTimeout(() => fetchDrivers(), 3000)
+        timeoutId.current = setTimeout(() => fetchShipments(), 3000)
       })
   }
 
@@ -53,21 +53,22 @@ export default function HomeContainer() {
       >
         <Col lg={2} md={4} sm={12}>
           <div className={'driver-list'}>
-            {drivers.map((g, i) => {
-              const isOnline =
-                g.payload &&
-                g.payload[0]?.timestamp > new Date().getTime() - 30000
+            {shipments.map((g, i) => {
+              // const isOnline =
+              //   g.payload &&
+              //   g.payload[0]?.timestamp > new Date().getTime() - 30000
+              const isOnline = false
               return (
                 <div
                   key={i}
                   className={'driver-list-item'}
-                  onClick={() => setSelectedDriver(g.id)}
+                  // onClick={() => setSelectedDriver(g.id)}
                 >
                   <div>
-                    <div style={{fontSize: 24}}>{g.full_name}</div>
+                    <div style={{fontSize: 24}}>{g.title}</div>
                     {g.payload ? (
                       <div>
-                        {moment(new Date(g.payload[0].timestamp)).fromNow()}
+                        {/*{moment(new Date(g.payload[0].timestamp)).fromNow()}*/}
                       </div>
                     ) : null}
                   </div>
@@ -84,22 +85,28 @@ export default function HomeContainer() {
                 </div>
               )
             })}
-            <div
-              className={'driver-list-item justify-content-center'}
-              style={{color: 'grey'}}
-              onClick={() => setAddDriverModal(true)}
-            >
-              Добавить новый водитель
-            </div>
+            {/*<div*/}
+            {/*  className={'driver-list-item justify-content-center'}*/}
+            {/*  style={{color: 'grey'}}*/}
+            {/*  onClick={() => setAddDriverModal(true)}*/}
+            {/*>*/}
+            {/*  Добавить новый водитель*/}
+            {/*</div>*/}
           </div>
         </Col>
         <Col lg={10} md={8} sm={12}>
           <MapComponent
             // @ts-ignore
-            selectedDriver={(drivers || []).find(
-              (g) => g.id === selectedDriver
-            )}
-            markers={drivers}
+            // selectedDriver={(shipments || []).find(
+            //   (g) => g.id === selectedDriver
+            // )}
+            markers={shipments
+              .filter((g) => g.location_lat && g.location_lng)
+              .map((g) => ({
+                lat: g.location_lat,
+                lng: g.location_lng,
+                label: g.title,
+              }))}
           />
         </Col>
       </Row>

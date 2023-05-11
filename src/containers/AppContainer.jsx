@@ -19,7 +19,7 @@ export default function AppContainer() {
       <div style={{display: 'flex', flexDirection: 'column', height: '100%'}}>
         <Navbar bg='dark' expand='lg' variant={'dark'}>
           <Container>
-            <Navbar.Brand href='/'>Кербен</Navbar.Brand>
+            <Navbar.Brand href='/'>Панель управления Кербен</Navbar.Brand>
             <Navbar.Toggle aria-controls='basic-navbar-nav' />
             <Navbar.Collapse id='basic-navbar-nav'>
               <Nav className='ms-auto'>
