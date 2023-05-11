@@ -3,11 +3,15 @@ import MapComponent from '../components/MapComponent'
 import {useEffect, useRef, useState} from 'react'
 import requester from '../utils/requester'
 import moment from 'moment'
+import React from 'react'
 import AddDriverModalComponent from '../components/AddDriverModalComponent.jsx'
+import MyVerticallyCenteredModal from './Modal-window'
 
 export default function HomeContainer() {
   const [shipments, setShipments] = useState([])
   const [selectedDriver, setSelectedDriver] = useState(0)
+
+  const [modalShow, setModalShow] = React.useState(false);
 
   const [addDriverModal, setAddDriverModal] = useState(false)
 
@@ -62,8 +66,12 @@ export default function HomeContainer() {
                 <div
                   key={i}
                   className={'driver-list-item'}
-                  // onClick={() => setSelectedDriver(g.id)}
+                  onClick={() => setModalShow(true)}
                 >
+                  <MyVerticallyCenteredModal
+                    show={modalShow}
+                    onHide={() => setModalShow(false)}
+                  />
                   <div>
                     <div style={{fontSize: 24}}>{g.title}</div>
                     {g.payload ? (
@@ -94,6 +102,7 @@ export default function HomeContainer() {
             {/*</div>*/}
           </div>
         </Col>
+
         <Col lg={10} md={8} sm={12}>
           <MapComponent
             // @ts-ignore
