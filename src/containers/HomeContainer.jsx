@@ -3,12 +3,20 @@ import MapComponent from '../components/MapComponent'
 import {useEffect, useMemo, useRef, useState} from 'react'
 import requester from '../utils/requester'
 import moment from 'moment'
+import React from 'react'
 import AddDriverModalComponent from '../components/AddDriverModalComponent.jsx'
-import {getRouteStatus, getRouteStatusText} from '../utils/index.js'
+import MyVerticallyCenteredModal from './Modal-window'
+import {
+  getLastRouteInfoByShipment,
+  getRouteStatus,
+  getRouteStatusText,
+} from '../utils/index.jsx'
 
 export default function HomeContainer() {
   const [shipments, setShipments] = useState([])
-  const [selectedDriver, setSelectedDriver] = useState(0)
+  const [selectedShipment, setSelectedShipment] = useState(0)
+
+  const [modalShow, setModalShow] = React.useState(false)
 
   const [addDriverModal, setAddDriverModal] = useState(false)
 
@@ -40,49 +48,7 @@ export default function HomeContainer() {
 
   const list = useMemo(() => {
     return shipments.map((g) => {
-      const datetime = g.location_updated_at
-        ? moment(new Date(g.location_updated_at))
-        : null
-      const isOnline =
-        datetime && datetime.toDate().getTime() > new Date().getTime() - 60000
-      const status = getRouteStatus(g.last_route)
-      return {
-        isOnline,
-        status,
-        label: getRouteStatusText(status),
-        datetime,
-        colorBg:
-          status === 1 || status === 3
-            ? g.last_route.received_at
-              ? 'rgba(46,125,50,0.1)'
-              : 'rgba(255,241,118,0.3)'
-            : isOnline
-            ? 'rgba(46,125,50,0.1)'
-            : 'rgba(255,241,118,0.3)',
-        icon:
-          status === 1 || status === 3 ? (
-            <span
-              className='material-symbols-outlined'
-              style={{
-                fontSize: 30,
-                color: g.last_route.received_at ? '#2E7D32' : '#F9A825',
-              }}
-            >
-              inventory_2
-            </span>
-          ) : (
-            <span
-              className='material-symbols-outlined'
-              style={{
-                fontSize: 30,
-                color: isOnline ? '#2E7D32' : '#F9A825',
-              }}
-            >
-              local_shipping
-            </span>
-          ),
-        ...g,
-      }
+      return getLastRouteInfoByShipment(g)
     })
   }, [shipments])
 
@@ -108,11 +74,11 @@ export default function HomeContainer() {
                 <div
                   key={i}
                   className={'driver-list-item'}
-                  // onClick={() => setSelectedDriver(g.id)}
+                  onClick={() => setSelectedShipment(g)}
                 >
                   <div
                     className={
-                      'p-2 me-3 d-flex rounded-circle justify-content-center align-items-center'
+                      'p-2 me-3 mt-2 d-flex rounded-circle justify-content-center align-items-center'
                     }
                     style={{
                       backgroundColor: g.colorBg,
@@ -125,10 +91,14 @@ export default function HomeContainer() {
                     <div className={'text-muted'}>{g.label}</div>
                     <div className={'my-2 text-muted'}>
                       <div>
+                        Гос. номер транспорта:{' '}
+                        <strong>{g.last_route.truck_number}</strong>
+                      </div>
+                      <div>
                         Отправитель:{' '}
                         <strong>
                           {g.last_route.sender.full_name} (+
-                          {g.last_route.driver.phone_number})
+                          {g.last_route.sender.phone_number})
                         </strong>
                       </div>
                       <div>
@@ -200,6 +170,11 @@ export default function HomeContainer() {
           />
         </Col>
       </Row>
+
+      <MyVerticallyCenteredModal
+        shipment={selectedShipment}
+        onClose={() => setSelectedShipment(null)}
+      />
     </>
   )
 }

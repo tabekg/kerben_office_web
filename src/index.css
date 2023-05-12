@@ -16,7 +16,7 @@ html, body, div#root {
     transition: 0.3s;
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: start;
 }
 
 .driver-list-item:hover {
