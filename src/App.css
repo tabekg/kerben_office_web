@@ -75,3 +75,15 @@ body{
     background-repeat: no-repeat;
     background-size: cover;
 }
+
+.modal-content{
+    width: 1000px;
+    height: 500px;
+    background-color: #16a085;
+}
+
+.oper-name{
+    height: 50px;
+    display: flex;
+    justify-content: space-between;
+}

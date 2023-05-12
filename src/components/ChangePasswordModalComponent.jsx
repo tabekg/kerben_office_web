@@ -3,7 +3,7 @@ import {useState} from 'react'
 import requester from '../utils/requester.js'
 
 // eslint-disable-next-line react/prop-types
-export default function ChangePasswordModalComponent({show, setShow}) {
+export default function ChangePasswodModalComponent({show, setShow}) {
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [repeatPassword, setRepeatPassword] = useState('')
