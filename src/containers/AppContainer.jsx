@@ -30,7 +30,6 @@ export default function AppContainer() {
           }
           setBlocks([...blocks, newBlock])
      }
-
      const handleDeleteBlock = (id) => {
           const updatedBlocks = blocks.filter((block) => block.id !== id)
           setBlocks(updatedBlocks)
