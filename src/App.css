@@ -87,3 +87,7 @@ body{
     display: flex;
     justify-content: space-between;
 }
+
+.oper-conteiner{
+    overflow-y: scroll;
+}
