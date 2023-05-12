@@ -3,6 +3,25 @@ body {
     background-color: #f2f2f2;
 }
 
+.marker-class {
+    background-color: #fff;
+    padding: 6px;
+    border-radius: 8px;
+    font-size: 15px !important;
+    min-width: 90px;
+    transform: translateY(-120%);
+}
+
+.marker-class.is-online {
+    border: 2px solid #1B5E20;
+    color: #1B5E20 !important;
+}
+
+.marker-class.is-offline {
+    border: 2px solid #B71C1C;
+    color: #B71C1C !important;
+}
+
 button {
     padding: 10px;
     font-size: 20px;
