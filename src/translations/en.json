@@ -1,0 +1,10 @@
+{
+  "welcomeMessage": "Welcome",
+  "phoneNumberLabel": "Phone Number",
+  "phoneNumberPlaceholder": "Enter your phone number",
+  "passwordLabel": "Password",
+  "passwordPlaceholder": "Enter your password",
+  "signIn": "Sign In",
+  "loading": "Loading",
+  "changeLanguage": "Change Language"
+}

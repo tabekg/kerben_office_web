@@ -1,0 +1,10 @@
+{
+  "welcomeMessage": "欢迎",
+  "phoneNumberLabel": "电话号码",
+  "phoneNumberPlaceholder": "请输入电话号码",
+  "passwordLabel": "密码",
+  "passwordPlaceholder": "请输入密码",
+  "signIn": "登录",
+  "loading": "加载中...",
+  "changeLanguage": "切换语言"
+}
