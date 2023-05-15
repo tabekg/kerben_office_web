@@ -8,3 +8,9 @@ export const OFFICE_URL = DEBUG_MODE
   : 'https://office.kerben.besoft.kg'
 
 export const APP_NAME = 'Кербен'
+
+export const LANGUAGES = [
+  {title: 'Русский', code: 'ru'},
+  {title: '中文', code: 'cn'},
+  {title: 'English', code: 'en'},
+]
