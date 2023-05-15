@@ -52,7 +52,7 @@ export default function AppContainer() {
             <Navbar.Toggle aria-controls='basic-navbar-nav' />
             <Navbar.Collapse id='basic-navbar-nav'>
               <Nav className='ms-auto'>
-                <Nav.Link onClick={handleButtonClick}>Оператор</Nav.Link>
+                {/*<Nav.Link onClick={handleButtonClick}>Оператор</Nav.Link>*/}
                 <NavDropdown
                   title={
                     LANGUAGES.find((g) => g.code === root.language)?.title ||
