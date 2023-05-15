@@ -1,11 +1,14 @@
-import {Button, Card, Col, Form, Row} from 'react-bootstrap'
+import {Button, ButtonGroup, Card, Col, Form, Row} from 'react-bootstrap'
 import {useContext, useState} from 'react'
 import {RootContext} from '../utils/context.js'
 import requester from '../utils/requester.js'
 import Logo from '../assets/logo.png'
+import {useTranslation} from 'react-i18next'
+import {LANGUAGES} from '../utils/config.js'
 
 export default function AuthContainer() {
   const root = useContext(RootContext)
+  const {t} = useTranslation()
 
   const [phoneNumber, setPhoneNumber] = useState('+996')
   const [password, setPassword] = useState('')
@@ -24,24 +27,24 @@ export default function AuthContainer() {
       })
       .then((res) => {
         if (res.status === 'success') {
-          window.alert(`Добро пожаловать, ${res.payload.user.full_name}!`)
+          window.alert(`${t('welcome_a')}${res.payload.user.full_name}!`)
           root.signIn(res.payload.user, res.payload.token)
         } else {
-          window.alert('Неизвестная ошибка!')
+          window.alert(t('unknown_error'))
         }
       })
       .catch((e) => {
         console.log(e)
         if (e?.response) {
           if (e?.response?.data?.status === 'wrong_password') {
-            window.alert(`Неверный пароль!`)
+            window.alert(t('incorrect_password'))
           } else if (e?.response?.data?.status === 'not_found') {
-            window.alert(`Пользователь не найден!`)
+            window.alert(t('user_not_found'))
           } else {
-            window.alert('Неизвестная ошибка!')
+            window.alert(t('unknown_error'))
           }
         } else {
-          window.alert('Ошибка соединения!')
+          window.alert(t('connection_error'))
         }
       })
       .finally(() => {
@@ -67,47 +70,61 @@ export default function AuthContainer() {
             >
               <img src={Logo} alt='Logo Kerben' />
             </div>
-            <h2 className={'text-white text-center mb-4'}>
-              Добро пожаловать в панель управления Кербен
+            <h2 className='text-white text-center mb-4'>
+              {t('welcome_to_kerben_control_panel')}
             </h2>
 
             <Form.Group className='mb-3' controlId='login'>
-              <Form.Label className={'text-white'}>
-                Ваш телефон номер
+              <Form.Label className='text-white'>
+                {t('your_phone_number')}
               </Form.Label>
               <Form.Control
-                className={'w-100'}
+                className='w-100'
                 type='text'
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 value={phoneNumber}
                 disabled={loading}
-                placeholder='Ваш телефон номер'
+                placeholder={t('your_phone_number')}
               />
             </Form.Group>
 
             <Form.Group className='mb-5' controlId='password'>
-              <Form.Label className={'text-white'}>Ваш пароль</Form.Label>
+              <Form.Label className='text-white'>
+                {t('your_password')}
+              </Form.Label>
               <Form.Control
-                className={'w-100'}
+                className='w-100'
                 type='password'
-                placeholder='Ваш пароль'
+                placeholder={t('your_password')}
                 onChange={(e) => setPassword(e.target.value)}
                 value={password}
                 disabled={loading}
               />
             </Form.Group>
 
-            <div className={'d-flex justify-content-center align-items-center'}>
+            <div className='d-flex justify-content-center align-items-center'>
               <Button
                 disabled={
                   loading || phoneNumber.length < 1 || password.length < 1
                 }
                 onClick={() => signIn()}
-                className={'px-5'}
+                className='px-5'
               >
-                {loading ? 'Подождите...' : 'Войти'}
+                {loading ? t('please_wait') : t('sign_in')}
               </Button>
             </div>
+
+            <ButtonGroup className={'mt-5'} size={'sm'}>
+              {LANGUAGES.map((g, i) => (
+                <Button
+                  variant={root.language === g.code ? 'info' : 'secondary'}
+                  key={i}
+                  onClick={() => root.setLanguage(g.code)}
+                >
+                  {g.title}
+                </Button>
+              ))}
+            </ButtonGroup>
           </Card>
         </Col>
       </div>
