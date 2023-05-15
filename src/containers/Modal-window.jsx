@@ -1,13 +1,15 @@
 import Button from 'react-bootstrap/Button'
 import Modal from 'react-bootstrap/Modal'
-import React, {useEffect, useState} from 'react'
+import {useEffect, useState} from 'react'
 import requester from '../utils/requester.js'
 import {getRouteInfo} from '../utils/index.jsx'
 import moment from 'moment'
+import {useTranslation} from 'react-i18next'
 
 function MyVerticallyCenteredModal({shipment, onClose}) {
   const [loading, setLoading] = useState(false)
   const [routes, setRoutes] = useState([])
+  const {t} = useTranslation()
 
   useEffect(() => {
     if (shipment) {
@@ -46,16 +48,17 @@ function MyVerticallyCenteredModal({shipment, onClose}) {
       </Modal.Header>
       <Modal.Body>
         {loading ? (
-          <p>Пожалуйста, подожите...</p>
+          <p>{t('please_wait')}</p>
         ) : (
           <>
             {routes.map((g, i) => {
-              const route = getRouteInfo(g)
+              const route = getRouteInfo(g, t)
               return (
                 <>
                   <div
                     key={i}
                     className={'driver-list-item'}
+                    style={{cursor: 'default'}}
                     // onClick={() => setSelectedShipment(g)}
                   >
                     <div
@@ -72,11 +75,11 @@ function MyVerticallyCenteredModal({shipment, onClose}) {
                       <div className={'text-muted'}>{route.label}</div>
                       <div className={'my-2 text-muted'}>
                         <div>
-                          Гос. номер транспорта:{' '}
+                          {t('state_transport_number_n')}
                           <strong>{route.truck_number}</strong>
                         </div>
                         <div>
-                          Отправитель:{' '}
+                          {t('sender_a_b')}
                           <strong>
                             {route.sender.full_name} (+
                             {route.sender.phone_number})
@@ -93,24 +96,26 @@ function MyVerticallyCenteredModal({shipment, onClose}) {
                           </strong>
                         </div>
                         <div>
-                          Водитель:{' '}
+                          {t('driver_a_b')}
                           <strong>
                             {route.driver.full_name} (+
                             {route.driver.phone_number})
                           </strong>
                         </div>
                         <div>
-                          Водител принял:{' '}
+                          {t('driver_accepted_a')}
                           <strong>
-                            {route.accepted_at
-                              ? moment(route.accepted_at).format(
-                                  'DD.MM.YYYY HH:mm:ss'
-                                )
-                              : ''}
+                            {route.accepted_at ? (
+                              moment(route.accepted_at).format(
+                                'DD.MM.YYYY HH:mm:ss'
+                              )
+                            ) : (
+                              <i>{t('no_data')}</i>
+                            )}
                           </strong>
                         </div>
                         <div>
-                          Получатель:{' '}
+                          {t('receiver_a_b')}
                           <strong>
                             {route.receiver ? (
                               <>
@@ -118,18 +123,20 @@ function MyVerticallyCenteredModal({shipment, onClose}) {
                                 {route.receiver.phone_number})
                               </>
                             ) : (
-                              <i>нет данных</i>
+                              <i>{t('no_data')}</i>
                             )}
                           </strong>
                         </div>
                         <div>
-                          Получил:{' '}
+                          {t('received_a')}
                           <strong>
-                            {route.received_at
-                              ? moment(route.received_at).format(
-                                  'DD.MM.YYYY HH:mm:ss'
-                                )
-                              : ''}
+                            {route.received_at ? (
+                              moment(route.received_at).format(
+                                'DD.MM.YYYY HH:mm:ss'
+                              )
+                            ) : (
+                              <i>{t('no_data')}</i>
+                            )}
                           </strong>
                         </div>
                       </div>
@@ -157,7 +164,7 @@ function MyVerticallyCenteredModal({shipment, onClose}) {
         )}
       </Modal.Body>
       <Modal.Footer>
-        <Button onClick={onClose}>Закрыть</Button>
+        <Button onClick={onClose}>{t('close')}</Button>
       </Modal.Footer>
     </Modal>
   )
