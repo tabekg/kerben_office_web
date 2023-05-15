@@ -121,3 +121,19 @@ body{
     left: 50%;
     transform: translateX(-50%);
 }
+
+.modal-content{
+    width: 1000px;
+    height: 500px;
+    background-color: #16a085;
+}
+
+.oper-name{
+    height: 50px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.oper-conteiner{
+    overflow-y: scroll;
+}
