@@ -4,7 +4,7 @@
 // 3 in stock
 // 4 archived
 
-import moment from 'moment/moment.js'
+import moment from 'moment'
 
 export function getRouteStatus(route) {
   if (!route.is_accepted) {
@@ -19,19 +19,19 @@ export function getRouteStatus(route) {
   return 0
 }
 
-export function getRouteStatusText(status) {
+export function getRouteStatusText(status, t) {
   return status === 1
-    ? 'ГРУЗ ЖДЕТ ВОДИТЕЛЯ'
+    ? t('shipment_waiting_for_driver')
     : status === 2
-    ? 'ГРУЗ В ПУТИ'
+    ? t('shipment_on_the_way')
     : status === 3
-    ? 'ГРУЗ НА СКЛАДЕ'
+    ? t('shipment_in_stock')
     : status === 3
-    ? 'АРХИВИРОВАНО'
-    : 'НЕИЗВЕСТНО'
+    ? t('archived')
+    : t('unknown')
 }
 
-export function getLastRouteInfoByShipment(g) {
+export function getLastRouteInfoByShipment(g, t) {
   const datetime = g.location_updated_at
     ? moment(new Date(g.location_updated_at))
     : null
@@ -41,7 +41,7 @@ export function getLastRouteInfoByShipment(g) {
   return {
     isOnline,
     status,
-    label: getRouteStatusText(status),
+    label: getRouteStatusText(status, t),
     datetime,
     colorBg:
       status === 1 || status === 3
@@ -77,11 +77,11 @@ export function getLastRouteInfoByShipment(g) {
   }
 }
 
-export function getRouteInfo(route) {
+export function getRouteInfo(route, t) {
   const status = getRouteStatus(route)
   return {
     status,
-    label: getRouteStatusText(status),
+    label: getRouteStatusText(status, t),
     colorBg:
       status === 1 || status === 3
         ? route.received_at
