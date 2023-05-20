@@ -83,11 +83,13 @@ export default function HomeContainer() {
                   <div className={'flex-grow-1'}>
                     <div style={{fontSize: 24}}>{g.title}</div>
                     <div className={'text-muted'}>{g.label}</div>
-                    <div className={'text-muted'}>
-                      {g.last_route.truck_number} |{' '}
-                      {g.last_route.driver.full_name} | +
-                      {g.last_route.driver.phone_number}
-                    </div>
+                    {g.last_route.driver ? (
+                      <div className={'text-muted'}>
+                        {g.last_route.truck_number} |{' '}
+                        {g.last_route.driver.full_name} | +
+                        {g.last_route.driver.phone_number}
+                      </div>
+                    ) : null}
                     <div
                       style={{width: '100%'}}
                       className={

@@ -75,10 +75,12 @@ function MyVerticallyCenteredModal({shipment, onClose}) {
                       <div className={'flex-grow-1'}>
                         <div className={'text-muted'}>{route.label}</div>
                         <div className={'my-2 text-muted'}>
-                          <div>
-                            {t('state_transport_number_n')}
-                            <strong>{route.truck_number}</strong>
-                          </div>
+                          {route.truck_number ? (
+                            <div>
+                              {t('state_transport_number_n')}
+                              <strong>{route.truck_number}</strong>
+                            </div>
+                          ) : null}
                           <div>
                             {t('sender_a_b')}
                             <strong>
@@ -96,13 +98,15 @@ function MyVerticallyCenteredModal({shipment, onClose}) {
                                 : ''}
                             </strong>
                           </div>
-                          <div>
-                            {t('driver_a_b')}
-                            <strong>
-                              {route.driver.full_name} (+
-                              {route.driver.phone_number})
-                            </strong>
-                          </div>
+                          {route.driver ? (
+                            <div>
+                              {t('driver_a_b')}
+                              <strong>
+                                {route.driver.full_name} (+
+                                {route.driver.phone_number})
+                              </strong>
+                            </div>
+                          ) : null}
                           <div>
                             {t('driver_accepted_a')}
                             <strong>
