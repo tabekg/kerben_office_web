@@ -4,7 +4,7 @@
 // 3 in stock
 // 4 archived
 
-import moment from 'moment/moment.js'
+import moment from 'moment/moment'
 
 export function getRouteStatus(route) {
   if (!route.is_accepted) {
