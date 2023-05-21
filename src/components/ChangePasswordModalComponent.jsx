@@ -1,6 +1,7 @@
 import {Button, Modal, Form} from 'react-bootstrap'
 import {useState} from 'react'
 import requester from '../utils/requester.js'
+import {useTranslation} from 'react-i18next'
 
 // eslint-disable-next-line react/prop-types
 export default function ChangePasswordModalComponent({show, setShow}) {
@@ -9,6 +10,7 @@ export default function ChangePasswordModalComponent({show, setShow}) {
   const [repeatPassword, setRepeatPassword] = useState('')
 
   const [loading, setLoading] = useState(false)
+  const {t} = useTranslation()
 
   const change = () => {
     if (
@@ -29,7 +31,7 @@ export default function ChangePasswordModalComponent({show, setShow}) {
       })
       .then((res) => {
         if (res.status === 'success') {
-          window.alert('Пароль успешно изменено!')
+          window.alert(t('password_successfully_changed'))
           resetForm()
           setShow(false)
         }
@@ -48,37 +50,37 @@ export default function ChangePasswordModalComponent({show, setShow}) {
   return (
     <Modal show={show} centered onHide={() => setShow(false)}>
       <Modal.Header closeButton>
-        <Modal.Title>Сменить пароль</Modal.Title>
+        <Modal.Title>{t('change_password')}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Form.Group
           className='mb-3'
           controlId='changePasswordModalCurrentPassword'
         >
-          <Form.Label>Текущий пароль</Form.Label>
+          <Form.Label>{t('current_password')}</Form.Label>
           <Form.Control
             value={currentPassword}
             onChange={(t) => setCurrentPassword(t.target.value)}
             type='password'
-            placeholder='Текущий пароль'
+            placeholder={t('current_password')}
           />
         </Form.Group>
         <Form.Group className='mb-3' controlId='changePasswordModalNewPassword'>
-          <Form.Label>Новый пароль</Form.Label>
+          <Form.Label>{t('new_password')}</Form.Label>
           <Form.Control
             value={newPassword}
             onChange={(t) => setNewPassword(t.target.value)}
             type='password'
-            placeholder='Новый пароль'
+            placeholder={t('new_password')}
           />
         </Form.Group>
         <Form.Group className='mb-3' controlId='changePasswordModalNewPassword'>
-          <Form.Label>Повторите новый пароль</Form.Label>
+          <Form.Label>{t('repeat_new_password')}</Form.Label>
           <Form.Control
             value={repeatPassword}
             onChange={(t) => setRepeatPassword(t.target.value)}
             type='password'
-            placeholder='Повторите новый пароль'
+            placeholder={t('repeat_new_password')}
           />
         </Form.Group>
       </Modal.Body>
@@ -88,7 +90,7 @@ export default function ChangePasswordModalComponent({show, setShow}) {
           variant='secondary'
           onClick={() => setShow(false)}
         >
-          Закрыть
+          {t('close')}
         </Button>
         <Button
           variant='primary'
@@ -101,7 +103,7 @@ export default function ChangePasswordModalComponent({show, setShow}) {
           }
           onClick={change}
         >
-          Сменить пароль
+          {t('change_password')}
         </Button>
       </Modal.Footer>
     </Modal>

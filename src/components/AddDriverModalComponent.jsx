@@ -1,6 +1,7 @@
 import {Button, Modal, Form} from 'react-bootstrap'
 import {useState} from 'react'
 import requester from '../utils/requester.js'
+import {useTranslation} from 'react-i18next'
 
 // eslint-disable-next-line react/prop-types
 export default function AddDriverModalComponent({show, setShow}) {
@@ -9,6 +10,7 @@ export default function AddDriverModalComponent({show, setShow}) {
   const [fullName, setFullName] = useState('')
 
   const [loading, setLoading] = useState(false)
+  const {t} = useTranslation()
 
   const add = () => {
     if (

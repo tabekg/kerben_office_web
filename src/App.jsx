@@ -5,9 +5,46 @@ import AppContainer from './containers/AppContainer.jsx'
 import {RootContext} from './utils/context.js'
 import storage from './utils/storage.js'
 
+import {useTranslation, initReactI18next} from 'react-i18next'
+import i18n from 'i18next'
+import translationEN from './translations/en.json'
+import translationCH from './translations/cn.json'
+import translationRU from './translations/ru.json'
+import moment from 'moment'
+
+i18n
+  .use(initReactI18next)
+  .init({
+    resources: {
+      en: {translation: translationEN},
+      cn: {translation: translationCH},
+      ru: {translation: translationRU},
+    },
+    lng:
+      storage.get('language', 'ru') === 'cn'
+        ? 'zh-cn'
+        : storage.get('language', 'ru'),
+    fallbackLng: 'ru',
+    interpolation: {
+      escapeValue: false,
+    },
+  })
+  .then()
+
 function App() {
+  const {t} = useTranslation()
   const [user, setUser] = useState()
   const [token, setToken] = useState()
+  const [language, setLanguage] = useState(storage.get('language', 'ru'))
+
+  useEffect(() => {
+    if (language !== i18n.language) {
+      i18n.changeLanguage(language).then()
+      moment.locale(language === 'cn' ? 'zh-cn' : language)
+    }
+    document.title = t('kerben_control_panel')
+    storage.set('language', language)
+  }, [language])
 
   const isAuthorized = useMemo(() => {
     return !!token && !!user
@@ -30,10 +67,7 @@ function App() {
   }
 
   const signOut = (force = false) => {
-    if (
-      !force &&
-      !window.confirm('Вы действительно хотите выйти из аккаунта?')
-    ) {
+    if (!force && !window.confirm(t('do_you_really_want_to_log_out'))) {
       return
     }
 
@@ -46,6 +80,8 @@ function App() {
     setUser,
     signIn,
     signOut,
+    language,
+    setLanguage,
   }
 
   if (typeof user === 'undefined' || typeof token === 'undefined') {

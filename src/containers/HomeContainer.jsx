@@ -2,25 +2,19 @@ import {Col, Row} from 'react-bootstrap'
 import MapComponent from '../components/MapComponent'
 import {useEffect, useMemo, useRef, useState} from 'react'
 import requester from '../utils/requester'
-import moment from 'moment'
-import React from 'react'
 import AddDriverModalComponent from '../components/AddDriverModalComponent.jsx'
 import MyVerticallyCenteredModal from './Modal-window'
-import {
-  getLastRouteInfoByShipment,
-  getRouteStatus,
-  getRouteStatusText,
-} from '../utils/index.jsx'
+import {getLastRouteInfoByShipment} from '../utils/index.jsx'
+import {useTranslation} from 'react-i18next'
 
 export default function HomeContainer() {
   const [shipments, setShipments] = useState([])
   const [selectedShipment, setSelectedShipment] = useState(0)
 
-  const [modalShow, setModalShow] = React.useState(false)
-
   const [addDriverModal, setAddDriverModal] = useState(false)
 
   const timeoutId = useRef(-1)
+  const {t} = useTranslation()
 
   useEffect(() => {
     fetchShipments()
@@ -48,9 +42,9 @@ export default function HomeContainer() {
 
   const list = useMemo(() => {
     return shipments.map((g) => {
-      return getLastRouteInfoByShipment(g)
+      return getLastRouteInfoByShipment(g, t)
     })
-  }, [shipments])
+  }, [shipments, t])
 
   return (
     <>
@@ -89,39 +83,13 @@ export default function HomeContainer() {
                   <div className={'flex-grow-1'}>
                     <div style={{fontSize: 24}}>{g.title}</div>
                     <div className={'text-muted'}>{g.label}</div>
-                    <div className={'my-2 text-muted'}>
-                      <div>
-                        Гос. номер транспорта:{' '}
-                        <strong>{g.last_route.truck_number}</strong>
+                    {g.last_route.driver ? (
+                      <div className={'text-muted'}>
+                        {g.last_route.truck_number} |{' '}
+                        {g.last_route.driver.full_name} | +
+                        {g.last_route.driver.phone_number}
                       </div>
-                      <div>
-                        Отправитель:{' '}
-                        <strong>
-                          {g.last_route.sender.full_name} (+
-                          {g.last_route.sender.phone_number})
-                        </strong>
-                      </div>
-                      <div>
-                        Водитель:{' '}
-                        <strong>
-                          {g.last_route.driver.full_name} (+
-                          {g.last_route.driver.phone_number})
-                        </strong>
-                      </div>
-                      <div>
-                        Получатель:{' '}
-                        <strong>
-                          {g.last_route.receiver ? (
-                            <>
-                              {g.last_route.receiver.full_name} (+
-                              {g.last_route.receiver.phone_number})
-                            </>
-                          ) : (
-                            <i>нет данных</i>
-                          )}
-                        </strong>
-                      </div>
-                    </div>
+                    ) : null}
                     <div
                       style={{width: '100%'}}
                       className={

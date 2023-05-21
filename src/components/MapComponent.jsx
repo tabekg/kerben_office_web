@@ -6,7 +6,7 @@ const containerStyle = {
   height: '100%',
 }
 
-const center = {lat: 40.5283, lng: 72.7985}
+const center = {lat: 40.52, lng: 72.79}
 
 function MapComponent({markers}) {
   const {isLoaded} = useJsApiLoader({
@@ -17,9 +17,13 @@ function MapComponent({markers}) {
   const [map, setMap] = useState(null)
 
   const onLoad = useCallback(function callback(map) {
-    // This is just an example of getting and using the map instance!!! don't just blindly copy!
-    const bounds = new window.google.maps.LatLngBounds(center)
+    const bounds = new window.google.maps.LatLngBounds(
+      markers.length > 0
+        ? {lat: markers[0].location_lat, lng: markers[0].location_lng}
+        : center
+    )
     map.fitBounds(bounds)
+    map.setZoom(5)
 
     setMap(map)
   }, [])
@@ -32,7 +36,6 @@ function MapComponent({markers}) {
     <GoogleMap
       mapContainerStyle={containerStyle}
       center={center}
-      zoom={12}
       onLoad={onLoad}
       onUnmount={onUnmount}
       onZoomChanged={console.log}
