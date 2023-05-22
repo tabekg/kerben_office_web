@@ -5,6 +5,7 @@ import requester from '../utils/requester.js'
 import {getRouteInfo} from '../utils/index.jsx'
 import moment from 'moment'
 import {useTranslation} from 'react-i18next'
+import {API_URL} from '../utils/config.js'
 
 function MyVerticallyCenteredModal({shipment, onClose}) {
   const [loading, setLoading] = useState(false)
@@ -161,13 +162,18 @@ function MyVerticallyCenteredModal({shipment, onClose}) {
                           <div className={'h5'}>{route.to_point.title}</div>
                         </div>
                       </div>
-                      <div>
-                        <img
-                          alt={shipment?.title}
-                          src={'https://i.stack.imgur.com/KkwZt.png'}
-                          width={120}
-                        />
-                      </div>
+                      {route.cmr_path ? (
+                        <a
+                          target={'_blank'}
+                          href={`${API_URL}/storage/cmr/${route.cmr_path}`}
+                        >
+                          <img
+                            alt={shipment?.title + ' ' + route.truck_number}
+                            src={`${API_URL}/storage/cmr/${route.cmr_path}`}
+                            width={120}
+                          />
+                        </a>
+                      ) : null}
                     </div>
                   </div>
                 </>
