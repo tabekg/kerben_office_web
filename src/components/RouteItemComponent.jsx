@@ -1,6 +1,6 @@
 import React from 'react'
 import {getRouteStatus, getRouteStatusText} from '../utils/index.jsx'
-import moment from 'moment/moment.js'
+import moment from 'moment/moment'
 
 export default function RouteItemComponent({route, selectShipment}) {
   const datetime = route.location_updated_at
