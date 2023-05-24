@@ -10,7 +10,6 @@
   "state_transport_number_n": "Гос. номер транспорта: ",
   "sender_a_b": "Отправитель: ",
   "driver_a_b": "Водитель: ",
-  "receiver_a_b": "Получатель: ",
   "no_data": "нет данных",
   "sign_out": "Выйти",
   "welcome_a": "Добро пожаловать, ",
@@ -24,11 +23,16 @@
   "sign_in": "Войти",
   "please_wait": "Подождите...",
   "driver_accepted_a": "Водител принял: ",
-  "received_a": "Получил: ",
   "close": "Закрыть",
   "shipment_waiting_for_driver": "ГРУЗ ЖДЕТ ВОДИТЕЛЯ",
   "shipment_on_the_way": "ГРУЗ В ПУТИ",
   "shipment_in_stock": "ГРУЗ НА СКЛАДЕ",
   "archived": "АРХИВИРОВАНО",
-  "unknown": "НЕИЗВЕСТНО"
+  "unknown": "НЕИЗВЕСТНО",
+  "operators": "Операторы",
+  "new_operator": "Новый оператор",
+  "full_name": "Полное имя",
+  "phone_number": "Телефон номер",
+  "location": "Местонахождение",
+  "add_button": "Добавить"
 }

@@ -10,7 +10,6 @@
   "state_transport_number_n": "交通工具国家编号：",
   "sender_a_b": "发件人：",
   "driver_a_b": "驾驶员：",
-  "receiver_a_b": "接收者：",
   "no_data": "无数据",
   "sign_out": "退出",
   "welcome_a": "欢迎，",
@@ -24,11 +23,16 @@
   "sign_in": "登陆",
   "please_wait": "请稍等...",
   "driver_accepted_a": "驾驶员已接受：",
-  "received_a": "已收到：",
   "close": "关闭",
   "shipment_waiting_for_driver": "货物等待驾驶员接受",
   "shipment_on_the_way": "货物在路上",
   "shipment_in_stock": "货物在库存中",
   "archived": "已归档",
-  "unknown": "未知"
+  "unknown": "未知",
+  "operators": "运营商",
+  "new_operator": "新运营商",
+  "full_name": "全名",
+  "phone_number": "电话号码",
+  "location": "地点",
+  "add_button": "添加"
 }

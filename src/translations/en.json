@@ -10,7 +10,6 @@
   "state_transport_number_n": "State transport number: ",
   "sender_a_b": "Sender: ",
   "driver_a_b": "Driver: ",
-  "receiver_a_b": "Receiver: ",
   "no_data": "No data",
   "sign_out": "Sign Out",
   "welcome_a": "Welcome, ",
@@ -24,11 +23,16 @@
   "sign_in": "Sign In",
   "please_wait": "Please wait...",
   "driver_accepted_a": "Driver accepted: ",
-  "received_a": "Received: ",
   "close": "Close",
   "shipment_waiting_for_driver": "SHIPMENT WAITING FOR DRIVER",
   "shipment_on_the_way": "SHIPMENT ON THE WAY",
   "shipment_in_stock": "SHIPMENT IN STOCK",
   "archived": "ARCHIVED",
-  "unknown": "UNKNOWN"
+  "unknown": "UNKNOWN",
+  "operators": "Operators",
+  "new_operator": "New operator",
+  "full_name": "Full name",
+  "phone_number": "Phone number",
+  "location": "Location",
+  "add_button": "Add"
 }
