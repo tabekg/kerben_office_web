@@ -41,9 +41,11 @@ export default function HomeContainer() {
   }
 
   const list = useMemo(() => {
-    return shipments.map((g) => {
-      return getLastRouteInfoByShipment(g, t)
-    })
+    return shipments
+      .filter((g) => !!g.last_route)
+      .map((g) => {
+        return getLastRouteInfoByShipment(g, t)
+      })
   }, [shipments, t])
 
   return (
