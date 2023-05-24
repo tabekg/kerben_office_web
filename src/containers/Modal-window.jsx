@@ -53,130 +53,22 @@ function MyVerticallyCenteredModal({shipment, onClose}) {
         ) : (
           <>
             {routes.map((g, i) => {
-              const route = getRouteInfo(g, t)
               return (
-                <>
-                  <div
-                    key={i}
-                    className={'driver-list-item'}
-                    style={{cursor: 'default'}}
-                    // onClick={() => setSelectedShipment(g)}
-                  >
-                    <div
-                      className={
-                        'p-2 me-3 mt-2 d-flex rounded-circle justify-content-center align-items-center'
-                      }
-                      style={{
-                        backgroundColor: route.colorBg,
-                      }}
-                    >
-                      {route.icon}
-                    </div>
-                    <div className={'flex-grow-1 d-flex'}>
-                      <div className={'flex-grow-1'}>
-                        <div className={'text-muted'}>{route.label}</div>
-                        <div className={'my-2 text-muted'}>
-                          {route.truck_number ? (
-                            <div>
-                              {t('state_transport_number_n')}
-                              <strong>{route.truck_number}</strong>
-                            </div>
-                          ) : null}
-                          <div>
-                            {t('sender_a_b')}
-                            <strong>
-                              {route.sender.full_name} (+
-                              {route.sender.phone_number})
-                            </strong>
-                          </div>
-                          <div>
-                            Отправлен в:{' '}
-                            <strong>
-                              {route.created_at
-                                ? moment
-                                    .utc(route.created_at)
-                                    .format('DD.MM.YYYY HH:mm:ss')
-                                : ''}
-                            </strong>
-                          </div>
-                          {route.driver ? (
-                            <div>
-                              {t('driver_a_b')}
-                              <strong>
-                                {route.driver.full_name} (+
-                                {route.driver.phone_number})
-                              </strong>
-                            </div>
-                          ) : null}
-                          <div>
-                            {t('driver_accepted_a')}
-                            <strong>
-                              {route.accepted_at ? (
-                                moment(route.accepted_at).format(
-                                  'DD.MM.YYYY HH:mm:ss'
-                                )
-                              ) : (
-                                <i>{t('no_data')}</i>
-                              )}
-                            </strong>
-                          </div>
-                          <div>
-                            {t('receiver_a_b')}
-                            <strong>
-                              {route.receiver ? (
-                                <>
-                                  {route.receiver.full_name} (+
-                                  {route.receiver.phone_number})
-                                </>
-                              ) : (
-                                <i>{t('no_data')}</i>
-                              )}
-                            </strong>
-                          </div>
-                          <div>
-                            {t('received_a')}
-                            <strong>
-                              {route.received_at ? (
-                                moment(route.received_at).format(
-                                  'DD.MM.YYYY HH:mm:ss'
-                                )
-                              ) : (
-                                <i>{t('no_data')}</i>
-                              )}
-                            </strong>
-                          </div>
-                        </div>
-                        <div
-                          style={{width: '100%'}}
-                          className={
-                            'd-flex mt-2 justify-content-around align-items-center'
-                          }
-                        >
-                          <div className={'h5'}>{route.from_point.title}</div>
-                          <span
-                            className='material-symbols-outlined'
-                            style={{color: 'grey'}}
-                          >
-                            arrow_forward
-                          </span>
-                          <div className={'h5'}>{route.to_point.title}</div>
-                        </div>
-                      </div>
-                      {route.cmr_path ? (
-                        <a
-                          target={'_blank'}
-                          href={`${API_URL}/storage/cmr/${route.cmr_path}`}
-                        >
-                          <img
-                            alt={shipment?.title + ' ' + route.truck_number}
-                            src={`${API_URL}/storage/cmr/${route.cmr_path}`}
-                            width={120}
-                          />
-                        </a>
-                      ) : null}
-                    </div>
-                  </div>
-                </>
+                <RouteItem
+                  onChangeStatus={(id, status) => {
+                    setRoutes((p) =>
+                      p.map((g) => {
+                        if (g.id === id) {
+                          return {...g, cmr_status: status}
+                        }
+                        return g
+                      })
+                    )
+                  }}
+                  shipment={shipment}
+                  key={i}
+                  route={getRouteInfo(g, t)}
+                />
               )
             })}
           </>
@@ -186,6 +78,164 @@ function MyVerticallyCenteredModal({shipment, onClose}) {
         <Button onClick={onClose}>{t('close')}</Button>
       </Modal.Footer>
     </Modal>
+  )
+}
+
+// eslint-disable-next-line react/prop-types
+function RouteItem({route, shipment, key, onChangeStatus}) {
+  const {t} = useTranslation()
+
+  const [loading, setLoading] = useState(false)
+
+  const accept = () => {
+    if (loading || route.cmr_status === 'ACCEPTED' || !route.cmr_status) {
+      return
+    }
+    setLoading(true)
+    requester
+      .post('/office/shipment/cmr/accept', {route_id: route.id})
+      .then((res) => {
+        if (res.status === 'success') {
+          onChangeStatus(route.id, 'ACCEPTED')
+        }
+      })
+      .finally(() => {
+        setLoading(false)
+      })
+  }
+  const reject = () => {
+    if (loading || route.cmr_status === 'REJECTED' || !route.cmr_status) {
+      return
+    }
+    setLoading(true)
+    requester
+      .post('/office/shipment/cmr/reject', {route_id: route.id})
+      .then((res) => {
+        if (res.status === 'success') {
+          onChangeStatus(route.id, 'REJECTED')
+        }
+      })
+      .finally(() => {
+        setLoading(false)
+      })
+  }
+
+  return (
+    <>
+      <div
+        key={key}
+        className={'driver-list-item'}
+        style={{cursor: 'default'}}
+        // onClick={() => setSelectedShipment(g)}
+      >
+        <div
+          className={
+            'p-2 me-3 mt-2 d-flex rounded-circle justify-content-center align-items-center'
+          }
+          style={{
+            backgroundColor: route.colorBg,
+          }}
+        >
+          {route.icon}
+        </div>
+        <div className={'flex-grow-1 d-flex'}>
+          <div className={'flex-grow-1'}>
+            <div className={'text-muted'}>{route.label}</div>
+            <div className={'my-2 text-muted'}>
+              {route.truck_number ? (
+                <div>
+                  {t('state_transport_number_n')}
+                  <strong>{route.truck_number}</strong>
+                </div>
+              ) : null}
+              <div>
+                {t('sender_a_b')}
+                <strong>
+                  {route.sender.full_name} (+
+                  {route.sender.phone_number})
+                </strong>
+              </div>
+              <div>
+                Отправлен в:{' '}
+                <strong>
+                  {route.created_at
+                    ? moment.utc(route.created_at).format('DD.MM.YYYY HH:mm:ss')
+                    : ''}
+                </strong>
+              </div>
+              {route.driver ? (
+                <div>
+                  {t('driver_a_b')}
+                  <strong>
+                    {route.driver.full_name} (+
+                    {route.driver.phone_number})
+                  </strong>
+                </div>
+              ) : null}
+              <div>
+                {t('driver_accepted_a')}
+                <strong>
+                  {route.accepted_at ? (
+                    moment(route.accepted_at).format('DD.MM.YYYY HH:mm:ss')
+                  ) : (
+                    <i>{t('no_data')}</i>
+                  )}
+                </strong>
+              </div>
+            </div>
+            <div
+              style={{width: '100%'}}
+              className={
+                'd-flex mt-2 justify-content-around align-items-center'
+              }
+            >
+              <div className={'h5'}>{route.from_point.title}</div>
+              <span
+                className='material-symbols-outlined'
+                style={{color: 'grey'}}
+              >
+                arrow_forward
+              </span>
+              <div className={'h5'}>{route.to_point.title}</div>
+            </div>
+          </div>
+          {route.cmr_path ? (
+            <div className={'d-flex flex-column gap-2'}>
+              <a
+                target={'_blank'}
+                href={`${API_URL}/storage/cmr/${route.cmr_path}`}
+              >
+                <img
+                  alt={shipment?.title + ' ' + route.truck_number}
+                  src={`${API_URL}/storage/cmr/${route.cmr_path}`}
+                  width={120}
+                />
+              </a>
+              {route.cmr_status !== 'ACCEPTED' ? (
+                <>
+                  <Button
+                    size={'sm'}
+                    onClick={() => accept()}
+                    disabled={loading}
+                    variant={'success'}
+                  >
+                    {t('cmr_accept_button')}
+                  </Button>
+                  <Button
+                    size={'sm'}
+                    onClick={() => reject()}
+                    disabled={loading || route.cmr_status === 'REJECTED'}
+                    variant={'danger'}
+                  >
+                    {t('cmr_reject_button')}
+                  </Button>
+                </>
+              ) : null}
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </>
   )
 }
 

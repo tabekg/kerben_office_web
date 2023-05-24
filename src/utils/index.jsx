@@ -10,10 +10,10 @@ export function getRouteStatus(route) {
   if (!route.is_accepted) {
     return 1
   }
-  if (route.is_accepted && !route.received_at) {
+  if (route.is_accepted && !route.cmr_status) {
     return 2
   }
-  if (route.received_at) {
+  if (route.cmr_status) {
     return 3
   }
   return 0

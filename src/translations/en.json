@@ -34,5 +34,7 @@
   "full_name": "Full name",
   "phone_number": "Phone number",
   "location": "Location",
-  "add_button": "Add"
+  "add_button": "Add",
+  "cmr_accept_button": "Accept",
+  "cmr_reject_button": "Reject"
 }

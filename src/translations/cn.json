@@ -34,5 +34,7 @@
   "full_name": "全名",
   "phone_number": "电话号码",
   "location": "地点",
-  "add_button": "添加"
+  "add_button": "添加",
+  "cmr_accept_button": "接受",
+  "cmr_reject_button": "拒绝"
 }

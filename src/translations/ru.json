@@ -34,5 +34,7 @@
   "full_name": "Полное имя",
   "phone_number": "Телефон номер",
   "location": "Местонахождение",
-  "add_button": "Добавить"
+  "add_button": "Добавить",
+  "cmr_accept_button": "Принять",
+  "cmr_reject_button": "Отклонить"
 }
