@@ -3,46 +3,26 @@ import {Container, Nav, Navbar, NavDropdown} from 'react-bootstrap'
 import {useContext, useState} from 'react'
 import {RootContext} from '../utils/context.js'
 import ChangePasswordModalComponent from '../components/ChangePasswordModalComponent.jsx'
-import {Button, Modal} from 'react-bootstrap'
-import {MdDeleteForever} from 'react-icons/md'
-import {GrEdit} from 'react-icons/gr'
 import {LANGUAGES} from '../utils/config.js'
 import {useTranslation} from 'react-i18next'
+import OperatorsModalComponent from '../components/OperatorsModalComponent.jsx'
 
 export default function AppContainer() {
   const root = useContext(RootContext)
   const {t} = useTranslation()
 
   const [changePasswordModal, setChangePasswordModal] = useState(false)
-
-  const [showModal, setShowModal] = useState(false)
-
-  const handleButtonClick = () => {
-    setShowModal(true)
-  }
-
-  const handleCloseModal = () => {
-    setShowModal(false)
-  }
-
-  const [blocks, setBlocks] = useState([])
-
-  const addBlock = () => {
-    const newBlock = {
-      id: Date.now(), // Уникальный идентификатор блока
-    }
-    setBlocks([...blocks, newBlock])
-  }
-  const handleDeleteBlock = (id) => {
-    const updatedBlocks = blocks.filter((block) => block.id !== id)
-    setBlocks(updatedBlocks)
-  }
+  const [operatorsModal, setOperatorsModal] = useState(false)
 
   return (
     <>
       <ChangePasswordModalComponent
         show={changePasswordModal}
         setShow={setChangePasswordModal}
+      />
+      <OperatorsModalComponent
+        show={operatorsModal}
+        setShow={setOperatorsModal}
       />
 
       <div style={{display: 'flex', flexDirection: 'column', height: '100%'}}>
@@ -73,6 +53,9 @@ export default function AppContainer() {
                 <Nav.Link href='#' onClick={() => setChangePasswordModal(true)}>
                   {t('change_password')}
                 </Nav.Link>
+                <Nav.Link href='#' onClick={() => setOperatorsModal(true)}>
+                  {t('operators')}
+                </Nav.Link>
                 <Nav.Link href='#' onClick={() => root.signOut()}>
                   {t('sign_out')}
                 </Nav.Link>
@@ -82,45 +65,6 @@ export default function AppContainer() {
         </Navbar>
         <HomeContainer />
       </div>
-
-      <Modal show={showModal} onHide={handleCloseModal} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>Операторы</Modal.Title>
-        </Modal.Header>
-        <div className='oper-conteiner'>
-          {blocks.map((block, index) => (
-            <Modal.Body key={index} className='oper-name'>
-              <p style={{fontSize: '20px'}}>Оператордун аты жону</p>
-              <div>
-                <GrEdit
-                  style={{
-                    fontSize: '25px',
-                    cursor: 'pointer',
-                    marginLeft: '20px',
-                  }}
-                />
-                <MdDeleteForever
-                  onClick={() => handleDeleteBlock(block.id)}
-                  style={{
-                    fontSize: '30px',
-                    cursor: 'pointer',
-                    color: 'red',
-                    marginLeft: '20px',
-                  }}
-                />
-              </div>
-            </Modal.Body>
-          ))}
-        </div>
-        <Modal.Footer>
-          <Button variant='secondary' onClick={handleCloseModal}>
-            Закрыть
-          </Button>
-          <Button variant='primary' onClick={addBlock}>
-            Оператор кошуу
-          </Button>
-        </Modal.Footer>
-      </Modal>
     </>
   )
 }
