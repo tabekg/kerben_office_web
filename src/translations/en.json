@@ -40,5 +40,6 @@
   "archive": "Archive",
   "unzip": "Unzip",
   "activeShipments": "Active",
-  "archivedShipments": "Archived"
+  "archivedShipments": "Archived",
+  "search": "Search"
 }
