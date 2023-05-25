@@ -6,8 +6,9 @@ import {getRouteInfo} from '../utils/index.jsx'
 import moment from 'moment'
 import {useTranslation} from 'react-i18next'
 import {API_URL} from '../utils/config.js'
+import {Spinner} from 'react-bootstrap'
 
-function MyVerticallyCenteredModal({shipment, onClose}) {
+function MyVerticallyCenteredModal({shipment, onChangeShipment, onClose}) {
   const [loading, setLoading] = useState(false)
   const [routes, setRoutes] = useState([])
   const {t} = useTranslation()
@@ -34,10 +35,29 @@ function MyVerticallyCenteredModal({shipment, onClose}) {
     setRoutes([])
   }
 
+  const archive = () => {
+    if (loading) {
+      return
+    }
+    setLoading(true)
+    requester
+      .post(`/office/shipment/${shipment?.is_archived ? 'unzip' : 'archive'}`, {
+        shipment_id: shipment?.id,
+      })
+      .then((res) => {
+        if (res.status === 'success') {
+          onChangeShipment({...shipment, is_archived: !shipment.is_archived})
+        }
+      })
+      .finally(() => {
+        setLoading(false)
+      })
+  }
+
   return (
     <Modal
       show={!!shipment}
-      onHide={onClose}
+      onHide={!loading ? onClose : null}
       size='lg'
       aria-labelledby='contained-modal-title-vcenter'
       centered
@@ -47,35 +67,60 @@ function MyVerticallyCenteredModal({shipment, onClose}) {
           {shipment?.title}
         </Modal.Title>
       </Modal.Header>
-      <Modal.Body>
+      <Modal.Body className={'position-relative'}>
         {loading ? (
-          <p>{t('please_wait')}</p>
-        ) : (
-          <>
-            {routes.map((g, i) => {
-              return (
-                <RouteItem
-                  onChangeStatus={(id, status) => {
-                    setRoutes((p) =>
-                      p.map((g) => {
-                        if (g.id === id) {
-                          return {...g, cmr_status: status}
-                        }
-                        return g
-                      })
-                    )
-                  }}
-                  shipment={shipment}
-                  key={i}
-                  route={getRouteInfo(g, t)}
-                />
-              )
-            })}
-          </>
-        )}
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              backgroundColor: 'rgba(255, 255, 255, 0.8)',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <Spinner animation='border' role='status' variant={'primary'}>
+              <span className='visually-hidden'>Loading...</span>
+            </Spinner>
+          </div>
+        ) : null}
+
+        <>
+          {routes.map((g, i) => {
+            return (
+              <RouteItem
+                onChangeStatus={(id, status) => {
+                  setRoutes((p) =>
+                    p.map((g) => {
+                      if (g.id === id) {
+                        return {...g, cmr_status: status}
+                      }
+                      return g
+                    })
+                  )
+                }}
+                shipment={shipment}
+                key={i}
+                route={getRouteInfo(g, t)}
+              />
+            )
+          })}
+        </>
       </Modal.Body>
-      <Modal.Footer>
-        <Button onClick={onClose}>{t('close')}</Button>
+      <Modal.Footer className={'d-flex justify-content-between'}>
+        <Button onClick={archive} disabled={loading} variant={'outline-danger'}>
+          {shipment?.is_archived ? t('unzip') : t('archive')}
+        </Button>
+        <Button
+          onClick={onClose}
+          disabled={loading}
+          variant={'outline-secondary'}
+        >
+          {t('close')}
+        </Button>
       </Modal.Footer>
     </Modal>
   )

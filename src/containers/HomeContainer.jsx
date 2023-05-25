@@ -1,15 +1,17 @@
 import {Col, Row} from 'react-bootstrap'
 import MapComponent from '../components/MapComponent'
-import {useEffect, useMemo, useRef, useState} from 'react'
+import {useContext, useEffect, useMemo, useRef, useState} from 'react'
 import requester from '../utils/requester'
 import AddDriverModalComponent from '../components/AddDriverModalComponent.jsx'
 import MyVerticallyCenteredModal from './Modal-window'
 import {getLastRouteInfoByShipment} from '../utils/index.jsx'
 import {useTranslation} from 'react-i18next'
+import {RootContext} from '../utils/context.js'
 
 export default function HomeContainer() {
   const [shipments, setShipments] = useState([])
   const [selectedShipment, setSelectedShipment] = useState(0)
+  const root = useContext(RootContext)
 
   const [addDriverModal, setAddDriverModal] = useState(false)
 
@@ -24,19 +26,27 @@ export default function HomeContainer() {
         clearTimeout(timeoutId.current)
       }
     }
-  }, [])
+  }, [root.shipmentsType])
 
   const fetchShipments = () => {
     requester
-      .get('/shipment')
+      .get('/shipment', {
+        is_archived: root.shipmentsType === 'archive' ? '1' : '0',
+      })
       .then((res) => {
         if (res.status === 'success') {
           setShipments(res.payload)
         }
-        timeoutId.current = setTimeout(() => fetchShipments(), 3000)
+        timeoutId.current =
+          root.shipmentsType === 'active'
+            ? setTimeout(() => fetchShipments(), 3000)
+            : null
       })
       .catch(() => {
-        timeoutId.current = setTimeout(() => fetchShipments(), 3000)
+        timeoutId.current =
+          root.shipmentsType === 'active'
+            ? setTimeout(() => fetchShipments(), 3000)
+            : null
       })
   }
 
