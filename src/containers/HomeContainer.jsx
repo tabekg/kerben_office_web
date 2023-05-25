@@ -142,6 +142,7 @@ export default function HomeContainer() {
       </Row>
 
       <MyVerticallyCenteredModal
+        onChangeShipment={(s) => setSelectedShipment(s)}
         shipment={selectedShipment}
         onClose={() => setSelectedShipment(null)}
       />

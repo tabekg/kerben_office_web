@@ -36,6 +36,7 @@ function App() {
   const [user, setUser] = useState()
   const [token, setToken] = useState()
   const [language, setLanguage] = useState(storage.get('language', 'ru'))
+  const [shipmentsType, setShipmentsType] = useState('active')
 
   useEffect(() => {
     if (language !== i18n.language) {
@@ -82,6 +83,8 @@ function App() {
     signOut,
     language,
     setLanguage,
+    shipmentsType,
+    setShipmentsType,
   }
 
   if (typeof user === 'undefined' || typeof token === 'undefined') {
