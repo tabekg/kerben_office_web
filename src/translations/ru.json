@@ -36,5 +36,9 @@
   "location": "Местонахождение",
   "add_button": "Добавить",
   "cmr_accept_button": "Принять",
-  "cmr_reject_button": "Отклонить"
+  "cmr_reject_button": "Отклонить",
+  "archive": "Архивировать",
+  "unzip": "Разархивировать",
+  "activeShipments": "Активные",
+  "archivedShipments": "Архивированные"
 }

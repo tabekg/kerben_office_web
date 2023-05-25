@@ -36,5 +36,9 @@
   "location": "Location",
   "add_button": "Add",
   "cmr_accept_button": "Accept",
-  "cmr_reject_button": "Reject"
+  "cmr_reject_button": "Reject",
+  "archive": "Archive",
+  "unzip": "Unzip",
+  "activeShipments": "Active",
+  "archivedShipments": "Archived"
 }

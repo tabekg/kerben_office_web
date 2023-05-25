@@ -36,5 +36,9 @@
   "location": "地点",
   "add_button": "添加",
   "cmr_accept_button": "接受",
-  "cmr_reject_button": "拒绝"
+  "cmr_reject_button": "拒绝",
+  "archive": "档案",
+  "unzip": "解压缩",
+  "activeShipments": "积极的",
+  "archivedShipments": "存档"
 }

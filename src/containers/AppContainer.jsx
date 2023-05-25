@@ -35,6 +35,27 @@ export default function AppContainer() {
                 {/*<Nav.Link onClick={handleButtonClick}>Оператор</Nav.Link>*/}
                 <NavDropdown
                   title={
+                    root.shipmentsType === 'active'
+                      ? t('activeShipments')
+                      : t('archivedShipments')
+                  }
+                  id='change-archive-type-dropdown'
+                >
+                  <NavDropdown.Item
+                    href='#'
+                    onClick={() => root.setShipmentsType('active')}
+                  >
+                    {t('activeShipments')}
+                  </NavDropdown.Item>
+                  <NavDropdown.Item
+                    href='#'
+                    onClick={() => root.setShipmentsType('archive')}
+                  >
+                    {t('archivedShipments')}
+                  </NavDropdown.Item>
+                </NavDropdown>
+                <NavDropdown
+                  title={
                     LANGUAGES.find((g) => g.code === root.language)?.title ||
                     'Сменить язык'
                   }
