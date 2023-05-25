@@ -2,6 +2,7 @@ import {Button, Modal, Form, Spinner} from 'react-bootstrap'
 import {useEffect, useState} from 'react'
 import requester from '../utils/requester.js'
 import {useTranslation} from 'react-i18next'
+import Table from 'react-bootstrap/Table'
 
 // eslint-disable-next-line react/prop-types
 export default function OperatorsModalComponent({show, setShow}) {
@@ -15,6 +16,7 @@ export default function OperatorsModalComponent({show, setShow}) {
   const [step, setStep] = useState(0)
   const [points, setPoints] = useState([])
   const [users, setUsers] = useState([])
+  let id = 1
 
   useEffect(() => {
     requester.get('/point').then((res) => {
@@ -110,20 +112,49 @@ export default function OperatorsModalComponent({show, setShow}) {
 
         {step === 0 ? (
           <div className={'d-flex flex-column gap-2'}>
-            {users.map((g) => (
-              <>
-                <div style={{display: 'flex', gap: 15}}>
-                  <span>{g.full_name}</span> | <span>+{g.phone_number}</span> |{' '}
-                  <span>{g.point.title}</span>
-                  {g.is_disabled ? (
-                    <>
-                      {' '}
-                      | <span className={'text-danger'}>деактивировано</span>
-                    </>
-                  ) : null}
+            <div style={{display: 'flex', gap: 15}}>
+              <Table striped bordered hover>
+                <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Полное имя</th>
+                  <th>Номер телефона</th>
+                  <th>Местонахождение</th>
+                  <th>Действия</th>
+                </tr>
+                </thead>
+                {users.map(g => (
+                  <>
+                    <tbody>
+                    <tr>
+                      <td>{id++}</td>
+                      <td>{g.full_name}</td>
+                      <td>+{g.phone_number}</td>
+                      <td>{g.point.title}</td>
+                      <td style={{display:'flex'}}>
+                        <Button variant="outline-primary" size={'sm'} style={{marginRight:'5px'}}>Редактировать</Button>
+                        <Button variant="outline-danger" size={'sm'}>Деактивировать</Button>
+                      </td>
+                    </tr>
+
+
+                    </tbody>
+
+
+
+                    {g.is_disabled ? (
+                      <>
+                        {' '}
+                        | <span className={'text-danger'}>деактивировано</span>
+                      </>
+                    ) : null}
+                  </>
+                ))}
+                <div className={'btns'}>
+
                 </div>
-              </>
-            ))}
+              </Table>
+            </div>
           </div>
         ) : step === 1 ? (
           <>

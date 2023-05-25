@@ -127,3 +127,19 @@ body{
     height: 500px;
     background-color: #16a085;
 }
+thead{
+    width: 70% !important;
+}
+.btns{
+    width: 320px;
+    position: absolute;
+    transform: translateX(-50%);
+    top: 77%;
+    left: 50%;
+    display: flex;
+    justify-content: space-between;
+}
+.table-bordered>:not(caption)>* {
+     border-width: 1px !important;
+}
+
