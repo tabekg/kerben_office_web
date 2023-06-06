@@ -93,7 +93,22 @@ export default function HomeContainer() {
                     {g.icon}
                   </div>
                   <div className={'flex-grow-1'}>
-                    <div style={{fontSize: 24}}>{g.title}</div>
+                    <div
+                      style={{fontSize: 24}}
+                      className={'d-flex align-items-center gap-2'}
+                    >
+                      {g.last_route.cmr_status === 'PENDING' ? (
+                        <div
+                          style={{fontSize: 15}}
+                          className={
+                            'bg-success d-inline text-white p-1 rounded'
+                          }
+                        >
+                          CMR
+                        </div>
+                      ) : null}
+                      {g.title}
+                    </div>
                     <div className={'text-muted'}>{g.label}</div>
                     {g.last_route.driver ? (
                       <div className={'text-muted'}>
