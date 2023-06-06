@@ -58,6 +58,7 @@ export default function HomeContainer() {
       .filter(
         (g) =>
           // g.title.toLowerCase().includes(searchInput.toLowerCase()) ||
+          g.title.toLowerCase().includes(searchInput.toLowerCase()) ||
           g.last_route.sender.phone_number
             .toLowerCase()
             .includes(searchInput.toLowerCase()) ||
@@ -89,69 +90,73 @@ export default function HomeContainer() {
         }}
       >
         <Col lg={3} md={4} sm={12} style={{height: '100%'}}>
+          <InputGroup>
+            <Form.Control
+              className='mb-3 mt-3 ms-2'
+              placeholder={t('search')}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+            />
+          </InputGroup>
           <div className={'driver-list'}>
-            <InputGroup>
-              <Form.Control
-                className='mb-3'
-                placeholder={t('search')}
-                aria-label='Username'
-                aria-describedby='basic-addon1'
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-              />
-            </InputGroup>
             {list.map((g, i) => {
               return (
-                <div
-                  key={i}
-                  className={'driver-list-item'}
-                  onClick={() => setSelectedShipment(g)}
-                >
+                <>
                   <div
-                    className={
-                      'p-2 me-3 mt-2 d-flex rounded-circle justify-content-center align-items-center'
-                    }
-                    style={{
-                      backgroundColor: g.colorBg,
-                    }}
+                    key={i}
+                    className={'driver-list-item'}
+                    onClick={() => setSelectedShipment(g)}
                   >
-                    {g.icon}
-                  </div>
-                  <div className={'flex-grow-1'}>
-                    <div style={{fontSize: 24}}>{g.title}</div>
-                    <div className={'text-muted'}>{g.label}</div>
-                    {g.last_route.driver ? (
-                      <div className={'text-muted'}>
-                        {g.last_route.truck_number} |{' '}
-                        {g.last_route.driver.full_name} | +
-                        {g.last_route.driver.phone_number}
-                      </div>
-                    ) : null}
                     <div
-                      style={{width: '100%'}}
                       className={
-                        'd-flex mt-2 justify-content-around align-items-center'
+                        'p-2 me-3 mt-2 d-flex rounded-circle justify-content-center align-items-center'
                       }
+                      style={{
+                        backgroundColor: g.colorBg,
+                      }}
                     >
-                      <div className={'h5'}>
-                        {g.last_route.from_point.title}
-                      </div>
-                      <span
-                        className='material-symbols-outlined'
-                        style={{color: 'grey'}}
-                      >
-                        arrow_forward
-                      </span>
-                      <div className={'h5'}>{g.last_route.to_point.title}</div>
+                      {g.icon}
                     </div>
-                    {/*<pre>{JSON.stringify(g.last_route, null, 2)}</pre>*/}
-                    {/*{g.payload ? (*/}
-                    {g.location_updated_at ? (
-                      <div className={'text-muted'}>{g.datetime.fromNow()}</div>
-                    ) : null}
-                    {/*) : null}*/}
+                    <div className={'flex-grow-1'}>
+                      <div style={{fontSize: 24}}>{g.title}</div>
+                      <div className={'text-muted'}>{g.label}</div>
+                      {g.last_route.driver ? (
+                        <div className={'text-muted'}>
+                          {g.last_route.truck_number} |{' '}
+                          {g.last_route.driver.full_name} | +
+                          {g.last_route.driver.phone_number}
+                        </div>
+                      ) : null}
+                      <div
+                        style={{width: '100%'}}
+                        className={
+                          'd-flex mt-2 justify-content-around align-items-center'
+                        }
+                      >
+                        <div className={'h5'}>
+                          {g.last_route.from_point.title}
+                        </div>
+                        <span
+                          className='material-symbols-outlined'
+                          style={{color: 'grey'}}
+                        >
+                          arrow_forward
+                        </span>
+                        <div className={'h5'}>
+                          {g.last_route.to_point.title}
+                        </div>
+                      </div>
+                      {/*<pre>{JSON.stringify(g.last_route, null, 2)}</pre>*/}
+                      {/*{g.payload ? (*/}
+                      {g.location_updated_at ? (
+                        <div className={'text-muted'}>
+                          {g.datetime.fromNow()}
+                        </div>
+                      ) : null}
+                      {/*) : null}*/}
+                    </div>
                   </div>
-                </div>
+                </>
               )
             })}
             {/*<div*/}
