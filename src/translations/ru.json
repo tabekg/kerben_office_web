@@ -40,5 +40,6 @@
   "archive": "Архивировать",
   "unzip": "Разархивировать",
   "activeShipments": "Активные",
-  "archivedShipments": "Архивированные"
+  "archivedShipments": "Архивированные",
+  "search": "Поиск"
 }
