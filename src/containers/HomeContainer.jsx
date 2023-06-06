@@ -107,6 +107,33 @@ export default function HomeContainer() {
                     className={'driver-list-item'}
                     onClick={() => setSelectedShipment(g)}
                   >
+                    {g.icon}
+                  </div>
+                  <div className={'flex-grow-1'}>
+                    <div
+                      style={{fontSize: 24}}
+                      className={'d-flex align-items-center gap-2'}
+                    >
+                      {g.last_route.cmr_status === 'PENDING' ? (
+                        <div
+                          style={{fontSize: 15}}
+                          className={
+                            'bg-success d-inline text-white p-1 rounded'
+                          }
+                        >
+                          CMR
+                        </div>
+                      ) : null}
+                      {g.title}
+                    </div>
+                    <div className={'text-muted'}>{g.label}</div>
+                    {g.last_route.driver ? (
+                      <div className={'text-muted'}>
+                        {g.last_route.truck_number} |{' '}
+                        {g.last_route.driver.full_name} | +
+                        {g.last_route.driver.phone_number}
+                      </div>
+                    ) : null}
                     <div
                       className={
                         'p-2 me-3 mt-2 d-flex rounded-circle justify-content-center align-items-center'
