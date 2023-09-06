@@ -1,10 +1,17 @@
-import {Col, Row, InputGroup, Form} from 'react-bootstrap'
+import {Col, Row, InputGroup, Form, Button} from 'react-bootstrap'
 import MapComponent from '../components/MapComponent'
-import {useContext, useEffect, useMemo, useRef, useState} from 'react'
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import requester from '../utils/requester'
 import AddDriverModalComponent from '../components/AddDriverModalComponent.jsx'
 import MyVerticallyCenteredModal from './Modal-window'
-import {getLastRouteInfoByShipment} from '../utils/index.jsx'
+import {getLastRouteInfoByShipment, getShipmentType} from '../utils/index.jsx'
 import {useTranslation} from 'react-i18next'
 import {RootContext} from '../utils/context.js'
 
@@ -19,38 +26,31 @@ export default function HomeContainer() {
   const {t} = useTranslation()
 
   const [searchInput, setSearchInput] = useState('')
+  const [shipmentType, setShipmentType] = useState('')
 
   useEffect(() => {
-    fetchShipments()
+    const s = setInterval(() => {
+      fetchShipments()
+    }, 3000)
 
     return () => {
-      if (timeoutId.current && timeoutId.current > -1) {
-        clearTimeout(timeoutId.current)
-      }
+      clearTimeout(s)
     }
-  }, [root.shipmentsType])
+  }, [root.shipmentsType, shipmentType])
 
-  const fetchShipments = () => {
+  const fetchShipments = useCallback(() => {
     requester
       .get('/shipment', {
         is_archived: root.shipmentsType === 'archive' ? '1' : '0',
+        type: shipmentType,
       })
       .then((res) => {
         if (res.status === 'success') {
           setShipments(res.payload)
         }
-        timeoutId.current =
-          root.shipmentsType === 'active'
-            ? setTimeout(() => fetchShipments(), 3000)
-            : null
       })
-      .catch(() => {
-        timeoutId.current =
-          root.shipmentsType === 'active'
-            ? setTimeout(() => fetchShipments(), 3000)
-            : null
-      })
-  }
+      .catch(() => {})
+  }, [root.shipmentsType, shipmentType])
 
   const list = useMemo(() => {
     return shipments
@@ -99,6 +99,37 @@ export default function HomeContainer() {
             />
           </InputGroup>
           <div className={'driver-list'}>
+            <Row className='px-3'>
+              <Col sm={4} className='p-0 px-1'>
+                <Button
+                  variant={shipmentType == '' ? 'primary' : 'light'}
+                  className='w-100'
+                  onClick={() => setShipmentType('')}
+                >
+                  Все
+                </Button>
+              </Col>
+              <Col sm={4} className='p-0 px-1'>
+                <Button
+                  variant={
+                    shipmentType == 'tashkent_trade' ? 'primary' : 'light'
+                  }
+                  className='w-100'
+                  onClick={() => setShipmentType('tashkent_trade')}
+                >
+                  Тashkent Trade
+                </Button>
+              </Col>
+              <Col sm={4} className='p-0 px-1'>
+                <Button
+                  variant={shipmentType == 'transit' ? 'primary' : 'light'}
+                  className='w-100'
+                  onClick={() => setShipmentType('transit')}
+                >
+                  Транзит
+                </Button>
+              </Col>
+            </Row>
             {list.map((g, i) => {
               return (
                 <>
@@ -163,9 +194,11 @@ export default function HomeContainer() {
                       </div>
                       {/*<pre>{JSON.stringify(g.last_route, null, 2)}</pre>*/}
                       {/*{g.payload ? (*/}
-                      {g.location_updated_at ? (
+                      {g.location_updated_at || g.type ? (
                         <div className={'text-muted'}>
-                          {g.datetime.fromNow()}
+                          {g.location_updated_at ? g.datetime.fromNow() : ''}
+                          {g.location_updated_at && g.type ? ' | ' : ''}
+                          {g.type ? `${getShipmentType(g.type)}` : ''}
                         </div>
                       ) : null}
                       {/*) : null}*/}
