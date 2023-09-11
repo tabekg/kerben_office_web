@@ -35,6 +35,7 @@
   "phone_number": "Phone number",
   "location": "Location",
   "add_button": "Add",
+  "save_button": "Save",
   "cmr_accept_button": "Accept",
   "cmr_reject_button": "Reject",
   "archive": "Archive",

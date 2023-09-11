@@ -99,7 +99,7 @@ export default function HomeContainer() {
             />
           </InputGroup>
           <div className={'driver-list'}>
-            <Row className='px-3'>
+            <Row className='px-3 mb-2'>
               <Col sm={4} className='p-0 px-1'>
                 <Button
                   variant={shipmentType == '' ? 'primary' : 'light'}

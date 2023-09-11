@@ -1,5 +1,5 @@
-import {Button, Modal, Form, Spinner} from 'react-bootstrap'
-import {useEffect, useState} from 'react'
+import {Button, Modal, Form, Spinner, Table} from 'react-bootstrap'
+import {useEffect, useState, useCallback} from 'react'
 import requester from '../utils/requester.js'
 import {useTranslation} from 'react-i18next'
 
@@ -8,6 +8,7 @@ export default function OperatorsModalComponent({show, setShow}) {
   const [fullName, setFullName] = useState('')
   const [phoneNumber, setPhoneNumber] = useState('+996')
   const [pointId, setPointId] = useState(null)
+  const [editingUser, setEditingUser] = useState(null)
 
   const [loading, setLoading] = useState(false)
   const {t} = useTranslation()
@@ -25,6 +26,7 @@ export default function OperatorsModalComponent({show, setShow}) {
   useEffect(() => {
     if (!show) {
       resetForm()
+      setStep(0)
     } else {
       fetchUsers()
     }
@@ -47,6 +49,14 @@ export default function OperatorsModalComponent({show, setShow}) {
       })
   }
 
+  const resetForm = useCallback(() => {
+    setFullName('')
+    setPhoneNumber('+996')
+    setPointId(null)
+    setStep(0)
+    setEditingUser(null)
+  }, [setEditingUser, setStep, setPointId, setPhoneNumber, setFullName])
+
   const addSubmit = () => {
     if (fullName.length < 1 || phoneNumber.length < 10 || !pointId || loading) {
       return
@@ -63,6 +73,7 @@ export default function OperatorsModalComponent({show, setShow}) {
         if (res.status === 'success') {
           setUsers((p) => [res.payload, ...p])
           resetForm()
+          setStep(0)
         }
       })
       .finally(() => {
@@ -70,19 +81,128 @@ export default function OperatorsModalComponent({show, setShow}) {
       })
   }
 
-  const resetForm = () => {
-    setFullName('')
-    setPhoneNumber('+996')
-    setPointId(null)
+  const editSubmit = useCallback(() => {
+    if (
+      fullName.length < 1 ||
+      !editingUser ||
+      phoneNumber.length < 10 ||
+      !pointId ||
+      loading
+    ) {
+      return
+    }
+
+    setLoading(true)
+    requester
+      .post('/office/user/operator', {
+        id: editingUser.id,
+        full_name: fullName,
+        phone_number: phoneNumber.slice(1),
+        point_id: pointId,
+      })
+      .then((res) => {
+        if (res.status === 'success') {
+          setUsers((p) =>
+            p.map((k) => (k.id === editingUser.id ? res.payload : k))
+          )
+          resetForm()
+          setStep(0)
+        }
+      })
+      .finally(() => {
+        setLoading(false)
+      })
+  }, [
+    setLoading,
+    fullName,
+    editingUser,
+    phoneNumber,
+    pointId,
+    loading,
+    resetForm,
+    setStep,
+  ])
+
+  const deactivate = useCallback(
+    (user) => {
+      if (loading || !user) {
+        return
+      }
+      if (!window.confirm('Вы уверены деактивировать этого оператора?')) {
+        return
+      }
+      setLoading(true)
+      requester
+        .post('/office/user/operator/deactivate', {
+          user_id: user.id,
+        })
+        .then((res) => {
+          if (res.status === 'success') {
+            setUsers((p) => p.map((o) => (o.id === user.id ? res.payload : o)))
+          }
+        })
+        .finally(() => {
+          setLoading(false)
+        })
+    },
+    [loading, users]
+  )
+
+  const close = useCallback(() => {
+    resetForm()
     setStep(0)
-  }
+  }, [setStep, resetForm])
+
+  const activate = useCallback(
+    (user) => {
+      if (loading || !user) {
+        return
+      }
+      if (!window.confirm('Вы уверены активировать этого оператора?')) {
+        return
+      }
+      setLoading(true)
+      requester
+        .post('/office/user/operator/activate', {
+          user_id: user.id,
+        })
+        .then((res) => {
+          if (res.status === 'success') {
+            setUsers((p) => p.map((o) => (o.id === user.id ? res.payload : o)))
+          }
+        })
+        .finally(() => {
+          setLoading(false)
+        })
+    },
+    [loading, users]
+  )
+
+  const editUser = useCallback(
+    (user) => {
+      setEditingUser(user)
+
+      setFullName(user.full_name)
+      setPhoneNumber('+' + user.phone_number)
+      setPointId(user.point.id)
+
+      setStep(1)
+    },
+    [setEditingUser, setStep]
+  )
+
+  const newOperator = useCallback(() => {
+    setEditingUser(null)
+    resetForm()
+    setStep(1)
+  }, [setStep, setEditingUser])
 
   return (
     <Modal
       show={show}
       centered
       onHide={() => !loading && setShow(false)}
-      size={'lg'}
+      size={'xl'}
     >
       <Modal.Header closeButton>
         <Modal.Title>{t('operators')}</Modal.Title>
@@ -109,22 +229,63 @@ export default function OperatorsModalComponent({show, setShow}) {
         ) : null}
 
         {step === 0 ? (
-          <div className={'d-flex flex-column gap-2'}>
-            {users.map((g) => (
-              <>
-                <div style={{display: 'flex', gap: 15}}>
-                  <span>{g.full_name}</span> | <span>+{g.phone_number}</span> |{' '}
-                  <span>{g.point.title}</span>
-                  {g.is_disabled ? (
-                    <>
-                      {' '}
-                      | <span className={'text-danger'}>деактивировано</span>
-                    </>
-                  ) : null}
-                </div>
-              </>
-            ))}
-          </div>
+          <>
+            <Table striped bordered hover>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Полное имя</th>
+                  <th>Телефон номер</th>
+                  <th>Точка</th>
+                  <th>Статус</th>
+                  <th>Действия</th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.map((g) => (
+                  <tr>
+                    <td>{g.id}</td>
+                    <td>{g.full_name}</td>
+                    <td>+{g.phone_number}</td>
+                    <td>{g.point.title}</td>
+                    <td>
+                      {g.is_disabled ? (
+                        <span className={'text-danger'}>деактивировано</span>
+                      ) : (
+                        <span className={'text-success'}>активно</span>
+                      )}
+                    </td>
+                    <td className='gap-1 d-flex'>
+                      <Button
+                        size='small'
+                        onClick={() => editUser(g)}
+                        variant='info'
+                      >
+                        Редактировать
+                      </Button>
+                      {g.is_disabled ? (
+                        <Button
+                          size='small'
+                          onClick={() => activate(g)}
+                          variant='success'
+                        >
+                          Активировать
+                        </Button>
+                      ) : (
+                        <Button
+                          size='small'
+                          onClick={() => deactivate(g)}
+                          variant='danger'
+                        >
+                          Деактивировать
+                        </Button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </>
         ) : step === 1 ? (
           <>
             <Form.Group className='mb-3' controlId='newOperatorFullName'>
@@ -167,7 +328,7 @@ export default function OperatorsModalComponent({show, setShow}) {
         <Button
           disabled={loading}
           variant='outline-secondary'
-          onClick={() => (step === 0 ? setShow(false) : resetForm())}
+          onClick={() => (step === 0 ? setShow(false) : close())}
         >
           {t('close')}
         </Button>
@@ -175,7 +336,7 @@ export default function OperatorsModalComponent({show, setShow}) {
           <Button
             variant='outline-primary'
             disabled={loading}
-            onClick={() => setStep(1)}
+            onClick={() => newOperator()}
           >
             {t('new_operator')}
           </Button>
@@ -188,9 +349,9 @@ export default function OperatorsModalComponent({show, setShow}) {
               fullName.length < 1 ||
               phoneNumber.length < 10
             }
-            onClick={() => addSubmit()}
+            onClick={() => (editingUser ? editSubmit() : addSubmit())}
           >
-            {t('add_button')}
+            {editingUser ? t('save_button') : t('add_button')}
           </Button>
         ) : null}
       </Modal.Footer>
