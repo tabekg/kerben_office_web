@@ -1,6 +1,6 @@
 import Button from 'react-bootstrap/Button'
 import Modal from 'react-bootstrap/Modal'
-import {useEffect, useState} from 'react'
+import {useCallback, useEffect, useState} from 'react'
 import requester from '../utils/requester.js'
 import {getRouteInfo} from '../utils/index.jsx'
 import moment from 'moment'
@@ -102,6 +102,16 @@ function MyVerticallyCenteredModal({shipment, onChangeShipment, onClose}) {
                     })
                   )
                 }}
+                onChangeCmrPath={(id, path) => {
+                  setRoutes((p) =>
+                    p.map((g) => {
+                      if (g.id === id) {
+                        return {...g, cmr_path: path}
+                      }
+                      return g
+                    })
+                  )
+                }}
                 shipment={shipment}
                 key={i}
                 route={getRouteInfo(g, t)}
@@ -127,10 +137,12 @@ function MyVerticallyCenteredModal({shipment, onChangeShipment, onClose}) {
 }
 
 // eslint-disable-next-line react/prop-types
-function RouteItem({route, shipment, key, onChangeStatus}) {
+function RouteItem({route, shipment, key, onChangeStatus, onChangeCmrPath}) {
   const {t} = useTranslation()
 
   const [loading, setLoading] = useState(false)
+  const [completeIsOpen, setCompleteIsOpen] = useState(false)
+  const [cmrFile, setCmrFile] = useState(null)
 
   const accept = () => {
     if (loading || route.cmr_status === 'ACCEPTED' || !route.cmr_status) {
@@ -164,6 +176,46 @@ function RouteItem({route, shipment, key, onChangeStatus}) {
         setLoading(false)
       })
   }
+
+  const complete = useCallback(() => {
+    if (loading || route.cmr_status === 'ACCEPTED') {
+      return
+    }
+    if (!completeIsOpen) {
+      setCompleteIsOpen(true)
+      return
+    }
+    setLoading(true)
+
+    const formData = new FormData()
+    formData.append('id', shipment.id)
+    if (cmrFile) {
+      formData.append('image', cmrFile)
+    }
+
+    requester
+      .post('/office/shipment/cmr', formData)
+      .then((res) => {
+        if (res.status === 'success') {
+          onChangeStatus(route.id, 'ACCEPTED')
+          onChangeCmrPath(route.id, res.payload.cmr_path)
+        }
+      })
+      .finally(() => {
+        setLoading(false)
+        setCompleteIsOpen(false)
+      })
+  }, [
+    setLoading,
+    loading,
+    route,
+    shipment,
+    cmrFile,
+    onChangeCmrPath,
+    onChangeStatus,
+    completeIsOpen,
+    setCompleteIsOpen,
+  ])
 
   return (
     <>
@@ -277,6 +329,40 @@ function RouteItem({route, shipment, key, onChangeStatus}) {
                 </>
               ) : null}
             </div>
+          ) : route.is_accepted ? (
+            <>
+              {completeIsOpen ? (
+                <>
+                  <Button
+                    as='label'
+                    size={'sm'}
+                    style={{alignSelf: 'flex-start', marginRight: 12}}
+                    disabled={loading}
+                    variant={'warning'}
+                  >
+                    <input
+                      type={'file'}
+                      accept='image/*'
+                      disabled={loading}
+                      onChange={(f) =>
+                        f.target.files.length && setCmrFile(f.target.files[0])
+                      }
+                      style={{display: 'none'}}
+                    />
+                    {cmrFile ? cmrFile.name : 'Выберите CMR файл'}
+                  </Button>
+                </>
+              ) : null}
+              <Button
+                size={'sm'}
+                style={{alignSelf: 'flex-start'}}
+                onClick={() => complete()}
+                disabled={(completeIsOpen ? !cmrFile : false) || loading}
+                variant={'danger'}
+              >
+                Завершить
+              </Button>
+            </>
           ) : null}
         </div>
       </div>
