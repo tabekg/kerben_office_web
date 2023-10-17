@@ -14,6 +14,7 @@ import MyVerticallyCenteredModal from './Modal-window'
 import {getLastRouteInfoByShipment, getShipmentType} from '../utils/index.jsx'
 import {useTranslation} from 'react-i18next'
 import {RootContext} from '../utils/context.js'
+import moment from 'moment'
 
 export default function HomeContainer() {
   const [shipments, setShipments] = useState([])
@@ -74,6 +75,26 @@ export default function HomeContainer() {
       })
   }, [shipments, searchInput, t])
 
+  const newList = useMemo(() => {
+    const l = {}
+
+    list.forEach((g) => {
+      const d = new Date(g.date).getTime()
+      if (typeof l[d] !== 'undefined') {
+        l[d].push(g)
+      } else {
+        l[d] = [g]
+      }
+    })
+
+    return Object.keys(l)
+      .sort((a, b) => a > b)
+      .reduce((obj, key) => {
+        obj[key] = l[key]
+        return obj
+      }, {})
+  }, [list])
+
   return (
     <>
       <AddDriverModalComponent
@@ -130,81 +151,102 @@ export default function HomeContainer() {
                 </Button>
               </Col>
             </Row>
-            {list.map((g, i) => {
+            {Object.keys(newList).map((a, i) => {
               return (
-                <>
+                <div
+                  style={{
+                    borderBottom: '1px solid rgba(0, 0, 0, 0.1)',
+                  }}
+                >
                   <div
-                    key={i}
-                    className={'driver-list-item'}
-                    onClick={() => setSelectedShipment(g)}
+                    style={{
+                      padding: 12,
+                      fontWeight: 500,
+                      backgroundColor: 'rgba(0, 0, 0, 0.1)',
+                    }}
                   >
-                    <div
-                      className={
-                        'p-2 me-3 mt-2 d-flex rounded-circle justify-content-center align-items-center'
-                      }
-                      style={{
-                        backgroundColor: g.colorBg,
-                      }}
-                    >
-                      {g.icon}
-                    </div>
-                    <div className={'flex-grow-1'}>
-                      <div
-                        style={{fontSize: 24}}
-                        className={'d-flex align-items-center gap-2'}
-                      >
-                        {g.last_route.cmr_status === 'PENDING' ? (
-                          <div
-                            style={{fontSize: 15}}
-                            className={
-                              'bg-success d-inline text-white p-1 rounded'
-                            }
-                          >
-                            CMR
-                          </div>
-                        ) : null}
-                        {g.title}
-                      </div>
-                      <div className={'text-muted'}>{g.label}</div>
-                      {g.last_route.driver ? (
-                        <div className={'text-muted'}>
-                          {g.last_route.truck_number} |{' '}
-                          {g.last_route.driver.full_name} | +
-                          {g.last_route.driver.phone_number}
-                        </div>
-                      ) : null}
-                      <div
-                        style={{width: '100%'}}
-                        className={
-                          'd-flex mt-2 justify-content-around align-items-center'
-                        }
-                      >
-                        <div className={'h5'}>
-                          {g.last_route.from_point.title}
-                        </div>
-                        <span
-                          className='material-symbols-outlined'
-                          style={{color: 'grey'}}
-                        >
-                          arrow_forward
-                        </span>
-                        <div className={'h5'}>
-                          {g.last_route.to_point.title}
-                        </div>
-                      </div>
-                      {/*<pre>{JSON.stringify(g.last_route, null, 2)}</pre>*/}
-                      {/*{g.payload ? (*/}
-                      {g.location_updated_at || g.type ? (
-                        <div className={'text-muted'}>
-                          {g.location_updated_at ? g.datetime.fromNow() : ''}
-                          {g.location_updated_at && g.type ? ' | ' : ''}
-                          {g.type ? `${getShipmentType(g.type)}` : ''}
-                        </div>
-                      ) : null}
-                      {/*) : null}*/}
-                    </div>
+                    {moment(+a).format('DD.MM.YYYY')}
                   </div>
-                </>
+                  {newList[a].map((g) => {
+                    return (
+                      <>
+                        <div
+                          key={i}
+                          className={'driver-list-item'}
+                          onClick={() => setSelectedShipment(g)}
+                        >
+                          <div
+                            className={
+                              'p-2 me-3 mt-2 d-flex rounded-circle justify-content-center align-items-center'
+                            }
+                            style={{
+                              backgroundColor: g.colorBg,
+                            }}
+                          >
+                            {g.icon}
+                          </div>
+                          <div className={'flex-grow-1'}>
+                            <div
+                              style={{fontSize: 24}}
+                              className={'d-flex align-items-center gap-2'}
+                            >
+                              {g.last_route.cmr_status === 'PENDING' ? (
+                                <div
+                                  style={{fontSize: 15}}
+                                  className={
+                                    'bg-success d-inline text-white p-1 rounded'
+                                  }
+                                >
+                                  CMR
+                                </div>
+                              ) : null}
+                              {g.title}
+                            </div>
+                            <div className={'text-muted'}>{g.label}</div>
+                            {g.last_route.driver ? (
+                              <div className={'text-muted'}>
+                                {g.last_route.truck_number} |{' '}
+                                {g.last_route.driver.full_name} | +
+                                {g.last_route.driver.phone_number}
+                              </div>
+                            ) : null}
+                            <div
+                              style={{width: '100%'}}
+                              className={
+                                'd-flex mt-2 justify-content-around align-items-center'
+                              }
+                            >
+                              <div className={'h5'}>
+                                {g.last_route.from_point.title}
+                              </div>
+                              <span
+                                className='material-symbols-outlined'
+                                style={{color: 'grey'}}
+                              >
+                                arrow_forward
+                              </span>
+                              <div className={'h5'}>
+                                {g.last_route.to_point.title}
+                              </div>
+                            </div>
+                            {/*<pre>{JSON.stringify(g.last_route, null, 2)}</pre>*/}
+                            {/*{g.payload ? (*/}
+                            {g.location_updated_at || g.type ? (
+                              <div className={'text-muted'}>
+                                {g.location_updated_at
+                                  ? g.datetime.format('DD.MM.YYYY HH:ss')
+                                  : ''}
+                                {g.location_updated_at && g.type ? ' | ' : ''}
+                                {g.type ? `${getShipmentType(g.type)}` : ''}
+                              </div>
+                            ) : null}
+                            {/*) : null}*/}
+                          </div>
+                        </div>
+                      </>
+                    )
+                  })}
+                </div>
               )
             })}
             {/*<div*/}
