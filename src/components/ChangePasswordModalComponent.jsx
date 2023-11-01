@@ -1,10 +1,18 @@
 import {Button, Modal, Form} from 'react-bootstrap'
-import {useState} from 'react'
+import {useContext, useState} from 'react'
 import requester from '../utils/requester.js'
 import {useTranslation} from 'react-i18next'
+import {RootContext} from '../utils/context.js'
 
 // eslint-disable-next-line react/prop-types
-export default function ChangePasswordModalComponent({show, setShow}) {
+export default function ChangePasswordModalComponent() {
+  const root = useContext(RootContext)
+
+  const [show, setShow] = [
+    root.changePasswordModal,
+    root.setChangePasswordModal,
+  ]
+
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [repeatPassword, setRepeatPassword] = useState('')

@@ -29,6 +29,8 @@ export default function HomeContainer() {
   const [searchInput, setSearchInput] = useState('')
   const [shipmentType, setShipmentType] = useState('')
 
+  const [activeIndex, setActiveIndex] = useState(-1)
+
   useEffect(() => {
     const s = setInterval(() => {
       fetchShipments()
@@ -95,6 +97,8 @@ export default function HomeContainer() {
       }, {})
   }, [list])
 
+  const arrayList = useMemo(() => Object.keys(newList), [newList])
+
   return (
     <>
       <AddDriverModalComponent
@@ -151,101 +155,125 @@ export default function HomeContainer() {
                 </Button>
               </Col>
             </Row>
-            {Object.keys(newList).map((a, i) => {
+            {arrayList.map((a, i) => {
               return (
                 <div
                   style={{
-                    borderBottom: '1px solid rgba(0, 0, 0, 0.1)',
+                    borderBottom:
+                      i + 1 === arrayList.length
+                        ? undefined
+                        : '1px solid rgba(0, 0, 0, .3)',
                   }}
                 >
                   <div
+                    onClick={() => setActiveIndex((p) => (p === i ? -1 : i))}
                     style={{
+                      cursor: 'pointer',
                       padding: 12,
                       fontWeight: 500,
-                      backgroundColor: 'rgba(0, 0, 0, 0.1)',
+                      backgroundColor: 'rgba(0, 0, 0, 0.05)',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
                     }}
                   >
-                    {moment(+a).format('DD.MM.YYYY')}
+                    <span>{moment(+a).format('DD.MM.YYYY')}</span>
+                    <span
+                      className='material-symbols-outlined'
+                      style={{
+                        color: 'grey',
+                        transition: '0.5s all',
+                        transform: `rotate(${activeIndex === i ? -90 : 90}deg)`,
+                      }}
+                    >
+                      arrow_forward
+                    </span>
                   </div>
-                  {newList[a].map((g) => {
-                    return (
-                      <>
-                        <div
-                          key={i}
-                          className={'driver-list-item'}
-                          onClick={() => setSelectedShipment(g)}
-                        >
-                          <div
-                            className={
-                              'p-2 me-3 mt-2 d-flex rounded-circle justify-content-center align-items-center'
-                            }
-                            style={{
-                              backgroundColor: g.colorBg,
-                            }}
-                          >
-                            {g.icon}
-                          </div>
-                          <div className={'flex-grow-1'}>
+                  {activeIndex === i ? (
+                    <>
+                      {newList[a].map((g) => {
+                        return (
+                          <>
                             <div
-                              style={{fontSize: 24}}
-                              className={'d-flex align-items-center gap-2'}
+                              key={i}
+                              className={'driver-list-item'}
+                              onClick={() => setSelectedShipment(g)}
                             >
-                              {g.last_route.cmr_status === 'PENDING' ? (
+                              <div
+                                className={
+                                  'p-2 me-3 mt-2 d-flex rounded-circle justify-content-center align-items-center'
+                                }
+                                style={{
+                                  backgroundColor: g.colorBg,
+                                }}
+                              >
+                                {g.icon}
+                              </div>
+                              <div className={'flex-grow-1'}>
                                 <div
-                                  style={{fontSize: 15}}
+                                  style={{fontSize: 24}}
+                                  className={'d-flex align-items-center gap-2'}
+                                >
+                                  {g.last_route.cmr_status === 'PENDING' ? (
+                                    <div
+                                      style={{fontSize: 15}}
+                                      className={
+                                        'bg-success d-inline text-white p-1 rounded'
+                                      }
+                                    >
+                                      CMR
+                                    </div>
+                                  ) : null}
+                                  {g.title}
+                                </div>
+                                <div className={'text-muted'}>{g.label}</div>
+                                {g.last_route.driver ? (
+                                  <div className={'text-muted'}>
+                                    {g.last_route.truck_number} |{' '}
+                                    {g.last_route.driver.full_name} | +
+                                    {g.last_route.driver.phone_number}
+                                  </div>
+                                ) : null}
+                                <div
+                                  style={{width: '100%'}}
                                   className={
-                                    'bg-success d-inline text-white p-1 rounded'
+                                    'd-flex mt-2 justify-content-around align-items-center'
                                   }
                                 >
-                                  CMR
+                                  <div className={'h5'}>
+                                    {g.last_route.from_point.title}
+                                  </div>
+                                  <span
+                                    className='material-symbols-outlined'
+                                    style={{color: 'grey'}}
+                                  >
+                                    arrow_forward
+                                  </span>
+                                  <div className={'h5'}>
+                                    {g.last_route.to_point.title}
+                                  </div>
                                 </div>
-                              ) : null}
-                              {g.title}
-                            </div>
-                            <div className={'text-muted'}>{g.label}</div>
-                            {g.last_route.driver ? (
-                              <div className={'text-muted'}>
-                                {g.last_route.truck_number} |{' '}
-                                {g.last_route.driver.full_name} | +
-                                {g.last_route.driver.phone_number}
-                              </div>
-                            ) : null}
-                            <div
-                              style={{width: '100%'}}
-                              className={
-                                'd-flex mt-2 justify-content-around align-items-center'
-                              }
-                            >
-                              <div className={'h5'}>
-                                {g.last_route.from_point.title}
-                              </div>
-                              <span
-                                className='material-symbols-outlined'
-                                style={{color: 'grey'}}
-                              >
-                                arrow_forward
-                              </span>
-                              <div className={'h5'}>
-                                {g.last_route.to_point.title}
+                                {/*<pre>{JSON.stringify(g.last_route, null, 2)}</pre>*/}
+                                {/*{g.payload ? (*/}
+                                {g.location_updated_at || g.type ? (
+                                  <div className={'text-muted'}>
+                                    {g.location_updated_at
+                                      ? g.datetime.format('DD.MM.YYYY HH:ss')
+                                      : ''}
+                                    {g.location_updated_at && g.type
+                                      ? ' | '
+                                      : ''}
+                                    {g.type ? `${getShipmentType(g.type)}` : ''}
+                                  </div>
+                                ) : null}
+                                {/*) : null}*/}
                               </div>
                             </div>
-                            {/*<pre>{JSON.stringify(g.last_route, null, 2)}</pre>*/}
-                            {/*{g.payload ? (*/}
-                            {g.location_updated_at || g.type ? (
-                              <div className={'text-muted'}>
-                                {g.location_updated_at
-                                  ? g.datetime.format('DD.MM.YYYY HH:ss')
-                                  : ''}
-                                {g.location_updated_at && g.type ? ' | ' : ''}
-                                {g.type ? `${getShipmentType(g.type)}` : ''}
-                              </div>
-                            ) : null}
-                            {/*) : null}*/}
-                          </div>
-                        </div>
-                      </>
-                    )
-                  })}
+                          </>
+                        )
+                      })}
+                    </>
+                  ) : null}
                 </div>
               )
             })}

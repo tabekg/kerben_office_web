@@ -1,10 +1,14 @@
 import {Button, Modal, Form, Spinner, Table} from 'react-bootstrap'
-import {useEffect, useState, useCallback} from 'react'
+import {useEffect, useState, useCallback, useContext} from 'react'
 import requester from '../utils/requester.js'
 import {useTranslation} from 'react-i18next'
+import {RootContext} from '../utils/context.js'
 
 // eslint-disable-next-line react/prop-types
-export default function OperatorsModalComponent({show, setShow}) {
+export default function OperatorsModalComponent() {
+  const root = useContext(RootContext)
+  const [show, setShow] = [root.operatorsModal, root.setOperatorsModal]
+
   const [fullName, setFullName] = useState('')
   const [phoneNumber, setPhoneNumber] = useState('+996')
   const [pointId, setPointId] = useState(null)

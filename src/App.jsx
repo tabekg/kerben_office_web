@@ -38,6 +38,9 @@ function App() {
   const [language, setLanguage] = useState(storage.get('language', 'ru'))
   const [shipmentsType, setShipmentsType] = useState('active')
 
+  const [changePasswordModal, setChangePasswordModal] = useState(false)
+  const [operatorsModal, setOperatorsModal] = useState(false)
+
   useEffect(() => {
     if (language !== i18n.language) {
       i18n.changeLanguage(language).then()
@@ -85,6 +88,11 @@ function App() {
     setLanguage,
     shipmentsType,
     setShipmentsType,
+
+    changePasswordModal,
+    operatorsModal,
+    setChangePasswordModal,
+    setOperatorsModal,
   }
 
   if (typeof user === 'undefined' || typeof token === 'undefined') {
