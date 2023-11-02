@@ -18,23 +18,32 @@ function MapComponent({markers}) {
 
   const onLoad = useCallback(
     function callback(m) {
-      const bounds = new window.google.maps.LatLngBounds(
-        markers.length > 0
-          ? {lat: markers[0].location_lat, lng: markers[0].location_lng}
-          : center
-      )
-      m.fitBounds(bounds)
-
       setMap(m)
     },
     [map, setMap]
   )
 
   useEffect(() => {
-    if (map) {
-      setTimeout(() => map.setZoom(10), 100)
+    let timeoutId = -1
+
+    if (map && isLoaded) {
+      timeoutId = setTimeout(() => {
+        const bounds = new window.google.maps.LatLngBounds(
+          markers.length > 0
+            ? {lat: markers[0].location_lat, lng: markers[0].location_lng}
+            : center
+        )
+        map.fitBounds(bounds)
+        map.setZoom(10)
+      }, 1000)
     }
-  }, [map])
+
+    return () => {
+      if (timeoutId > -1) {
+        clearTimeout(timeoutId)
+      }
+    }
+  }, [map, isLoaded])
 
   const onUnmount = useCallback(function callback(map) {
     setMap(null)
@@ -46,7 +55,6 @@ function MapComponent({markers}) {
       center={center}
       onLoad={onLoad}
       onUnmount={onUnmount}
-      onZoomChanged={console.log}
     >
       {markers.map((g) => (
         <Marker

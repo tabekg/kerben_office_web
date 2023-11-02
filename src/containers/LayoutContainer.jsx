@@ -1,13 +1,14 @@
 import {Container, Nav, Navbar, NavDropdown} from 'react-bootstrap'
 import {LANGUAGES} from '../utils/config.js'
-import {Outlet} from 'react-router-dom'
+import {Outlet, useNavigate} from 'react-router-dom'
 import {useTranslation} from 'react-i18next'
-import {useContext, useState} from 'react'
+import {useContext} from 'react'
 import {RootContext} from '../utils/context.js'
 
 const LayoutContainer = () => {
   const root = useContext(RootContext)
   const {t} = useTranslation()
+  const navigate = useNavigate()
 
   return (
     <div style={{display: 'flex', flexDirection: 'column', height: '100%'}}>
@@ -17,28 +18,9 @@ const LayoutContainer = () => {
           <Navbar.Toggle aria-controls='basic-navbar-nav' />
           <Navbar.Collapse id='basic-navbar-nav'>
             <Nav className='ms-auto'>
-              {/*<Nav.Link onClick={handleButtonClick}>Оператор</Nav.Link>*/}
-              <NavDropdown
-                title={
-                  root.shipmentsType === 'active'
-                    ? t('activeShipments')
-                    : t('archivedShipments')
-                }
-                id='change-archive-type-dropdown'
-              >
-                <NavDropdown.Item
-                  href='#'
-                  onClick={() => root.setShipmentsType('active')}
-                >
-                  {t('activeShipments')}
-                </NavDropdown.Item>
-                <NavDropdown.Item
-                  href='#'
-                  onClick={() => root.setShipmentsType('archive')}
-                >
-                  {t('archivedShipments')}
-                </NavDropdown.Item>
-              </NavDropdown>
+              <Nav.Link href='#' onClick={() => navigate('/archive')}>
+                {t('archivedShipments')}
+              </Nav.Link>
               <NavDropdown
                 title={
                   LANGUAGES.find((g) => g.code === root.language)?.title ||

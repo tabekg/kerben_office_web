@@ -1,9 +1,9 @@
-﻿import {useState} from 'react'
-import ChangePasswordModalComponent from '../components/ChangePasswordModalComponent.jsx'
+﻿import ChangePasswordModalComponent from '../components/ChangePasswordModalComponent.jsx'
 import OperatorsModalComponent from '../components/OperatorsModalComponent.jsx'
 import LayoutContainer from './LayoutContainer.jsx'
 import HomeContainer from './HomeContainer.jsx'
 import {createBrowserRouter, RouterProvider} from 'react-router-dom'
+import ArchiveContainer from './ArchiveContainer.jsx'
 
 const router = createBrowserRouter([
   {
@@ -13,6 +13,10 @@ const router = createBrowserRouter([
       {
         path: '',
         element: <HomeContainer />,
+      },
+      {
+        path: '/archive',
+        element: <ArchiveContainer />,
       },
     ],
   },

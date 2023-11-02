@@ -115,7 +115,7 @@ export function getRouteInfo(route, t) {
 }
 
 export const SHIPMENT_TYPES = {
-  tashkent_trade: 'Ташкент Trade',
+  tashkent_trade: 'АВТОВОЗ',
   transit: 'Транзит',
 }
 

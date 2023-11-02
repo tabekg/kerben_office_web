@@ -36,7 +36,6 @@ function App() {
   const [user, setUser] = useState()
   const [token, setToken] = useState()
   const [language, setLanguage] = useState(storage.get('language', 'ru'))
-  const [shipmentsType, setShipmentsType] = useState('active')
 
   const [changePasswordModal, setChangePasswordModal] = useState(false)
   const [operatorsModal, setOperatorsModal] = useState(false)
@@ -86,8 +85,6 @@ function App() {
     signOut,
     language,
     setLanguage,
-    shipmentsType,
-    setShipmentsType,
 
     changePasswordModal,
     operatorsModal,
