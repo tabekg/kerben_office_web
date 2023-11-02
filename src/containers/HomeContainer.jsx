@@ -1,4 +1,12 @@
-import {Col, Row, InputGroup, Form, Button} from 'react-bootstrap'
+import {
+  Col,
+  Row,
+  InputGroup,
+  Form,
+  Button,
+  Collapse,
+  Spinner,
+} from 'react-bootstrap'
 import MapComponent from '../components/MapComponent'
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react'
 import requester from '../utils/requester'
@@ -33,7 +41,7 @@ function ListDateComponent({list, arrayList, i, item, onSelect}) {
           alignItems: 'center',
         }}
       >
-        <span>
+        <span style={{userSelect: 'none'}}>
           {moment(+item).format('DD.MM.YYYY')} ({list.length})
         </span>
         <span
@@ -47,13 +55,13 @@ function ListDateComponent({list, arrayList, i, item, onSelect}) {
           arrow_forward
         </span>
       </div>
-      {isOpen ? (
-        <>
+      <Collapse in={isOpen}>
+        <div>
           {list.map((g) => (
             <ShipmentItemComponent onSelect={onSelect} g={g} />
           ))}
-        </>
-      ) : null}
+        </div>
+      </Collapse>
     </div>
   )
 }
@@ -61,6 +69,7 @@ function ListDateComponent({list, arrayList, i, item, onSelect}) {
 export default function HomeContainer() {
   const [shipments, setShipments] = useState([])
   const [selectedShipment, setSelectedShipment] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   const [addDriverModal, setAddDriverModal] = useState(false)
 
@@ -71,6 +80,8 @@ export default function HomeContainer() {
   const timeoutId = useRef(-1)
 
   useEffect(() => {
+    setLoading(true)
+    fetchShipments()
     timeoutId.current = setInterval(() => fetchShipments(), 6000)
 
     return () => {
@@ -78,7 +89,7 @@ export default function HomeContainer() {
         clearTimeout(timeoutId.current)
       }
     }
-  }, [shipmentType, timeoutId.current])
+  }, [shipmentType])
 
   const fetchShipments = useCallback(() => {
     requester
@@ -92,7 +103,8 @@ export default function HomeContainer() {
         }
       })
       .catch(() => {})
-  }, [shipmentType])
+      .finally(() => setLoading(false))
+  }, [shipmentType, loading])
 
   const list = useMemo(() => {
     return shipments
@@ -208,15 +220,33 @@ export default function HomeContainer() {
           </div>
           <div className={'driver-list'}>
             <div>
-              {arrayList.map((a, i) => (
-                <ListDateComponent
-                  onSelect={setSelectedShipment}
-                  arrayList={arrayList}
-                  item={a}
-                  i={i}
-                  list={newList[a]}
-                />
-              ))}
+              {loading ? (
+                <div
+                  style={{
+                    height: 300,
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Spinner animation='border' role='status' variant='secondary'>
+                    <span className='visually-hidden'>Loading...</span>
+                  </Spinner>
+                </div>
+              ) : (
+                <>
+                  {arrayList.map((a, i) => (
+                    <ListDateComponent
+                      onSelect={setSelectedShipment}
+                      arrayList={arrayList}
+                      item={a}
+                      i={i}
+                      list={newList[a]}
+                    />
+                  ))}
+                </>
+              )}
             </div>
             {/*<div*/}
             {/*  className={'driver-list-item justify-content-center'}*/}

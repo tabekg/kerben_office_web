@@ -1,6 +1,6 @@
 import {useTranslation} from 'react-i18next'
 import {useState, useEffect, useCallback, useMemo} from 'react'
-import {InputGroup, Form, Row, Col} from 'react-bootstrap'
+import {InputGroup, Form, Row, Col, Spinner} from 'react-bootstrap'
 import requester from '../utils/requester'
 import {getLastRouteInfoByShipment} from '../utils/index.jsx'
 import moment from 'moment'
@@ -14,12 +14,17 @@ export default function ArchiveContainer() {
   const [items, setItems] = useState([])
 
   const [searchInput, setSearchInput] = useState('')
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     fetchShipments()
   }, [])
 
   const fetchShipments = useCallback(() => {
+    if (loading) {
+      return
+    }
+    setLoading(true)
     requester
       .get('/shipment', {
         is_archived: '1',
@@ -31,7 +36,8 @@ export default function ArchiveContainer() {
         }
       })
       .catch(() => {})
-  }, [])
+      .finally(() => setLoading(false))
+  }, [loading])
 
   const list = useMemo(() => {
     return items
@@ -102,31 +108,55 @@ export default function ArchiveContainer() {
           </InputGroup>
         </div>
 
-        {arrayList.map((g) => (
-          <>
-            <div className='mb-2'>
-              <div style={{display: 'flex', gap: 12, alignItems: 'center'}}>
-                <span className='h5 text-muted'>
-                  {moment(+g).format('DD.MM.YYYY')} ({newList[g].length})
-                </span>
-                <div
-                  style={{flexGrow: 1, border: '1px solid rgba(0, 0, 0, .1)'}}
-                />
-              </div>
+        <>
+          {loading ? (
+            <div
+              style={{
+                height: 300,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Spinner animation='border' role='status' variant='secondary'>
+                <span className='visually-hidden'>Loading...</span>
+              </Spinner>
             </div>
+          ) : (
+            <>
+              {arrayList.map((g) => (
+                <>
+                  <div className='mb-2'>
+                    <div
+                      style={{display: 'flex', gap: 12, alignItems: 'center'}}
+                    >
+                      <span className='h5 text-muted'>
+                        {moment(+g).format('DD.MM.YYYY')} ({newList[g].length})
+                      </span>
+                      <div
+                        style={{
+                          flexGrow: 1,
+                          border: '1px solid rgba(0, 0, 0, .1)',
+                        }}
+                      />
+                    </div>
+                  </div>
 
-            <Row className='my-3'>
-              {newList[g].map((o) => (
-                <Col lg={3} md={4} sm={12}>
-                  <ShipmentItemComponent
-                    onSelect={() => setSelectedShipment(o)}
-                    g={o}
-                  />
-                </Col>
+                  <Row className='my-3'>
+                    {newList[g].map((o) => (
+                      <Col lg={3} md={4} sm={12}>
+                        <ShipmentItemComponent
+                          onSelect={() => setSelectedShipment(o)}
+                          g={o}
+                        />
+                      </Col>
+                    ))}
+                  </Row>
+                </>
               ))}
-            </Row>
-          </>
-        ))}
+            </>
+          )}
+        </>
       </div>
     </>
   )
