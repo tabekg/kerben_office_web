@@ -1,9 +1,9 @@
 import {Container, Nav, Navbar, NavDropdown} from 'react-bootstrap'
-import {LANGUAGES} from '../utils/config.js'
+import {LANGUAGES} from '../utils/config'
 import {Outlet, useNavigate} from 'react-router-dom'
 import {useTranslation} from 'react-i18next'
 import {useContext} from 'react'
-import {RootContext} from '../utils/context.js'
+import {RootContext} from '../utils/context'
 
 const LayoutContainer = () => {
   const root = useContext(RootContext)

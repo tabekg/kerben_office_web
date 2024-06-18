@@ -1,10 +1,16 @@
 import {Button, Modal, Form} from 'react-bootstrap'
-import {useState} from 'react'
+import {Dispatch, SetStateAction, useState} from 'react'
 import requester from '../utils/requester.js'
 import {useTranslation} from 'react-i18next'
 
 // eslint-disable-next-line react/prop-types
-export default function AddDriverModalComponent({show, setShow}) {
+export default function AddDriverModalComponent({
+  show,
+  setShow,
+}: {
+  show: boolean
+  setShow: Dispatch<SetStateAction<boolean>>
+}) {
   const [login, setLogin] = useState('')
   const [password, setPassword] = useState('')
   const [fullName, setFullName] = useState('')

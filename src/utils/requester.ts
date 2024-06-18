@@ -4,7 +4,12 @@ import _storage from './storage'
 
 // const sleep = async ms => new Promise((resolve) => setTimeout(resolve, ms))
 
-async function request(url, method, params = {}, no_api = false) {
+async function request(
+  url: string,
+  method: string,
+  params = {},
+  no_api = false
+) {
   try {
     const data = method === 'get' ? {params} : {data: params}
     const token = _storage.get('token')
@@ -25,7 +30,7 @@ async function request(url, method, params = {}, no_api = false) {
   }
 }
 
-async function get(url, params) {
+async function get(url: string, params: {[keyof: string]: any}) {
   return (await request(url, 'get', params))?.data
 }
 
@@ -33,7 +38,7 @@ async function get(url, params) {
 //   return (await request('/storage' + url, 'get', params, true))?.data
 // }
 
-async function post(url, data = {}) {
+async function post(url: string, data = {}) {
   return (await request(url, 'post', data))?.data
 }
 

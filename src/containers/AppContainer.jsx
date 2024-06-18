@@ -1,9 +1,9 @@
-﻿import ChangePasswordModalComponent from '../components/ChangePasswordModalComponent.jsx'
-import OperatorsModalComponent from '../components/OperatorsModalComponent.jsx'
-import LayoutContainer from './LayoutContainer.jsx'
-import HomeContainer from './HomeContainer.jsx'
+﻿import ChangePasswordModalComponent from '../components/ChangePasswordModalComponent'
+import OperatorsModalComponent from '../components/OperatorsModalComponent'
+import LayoutContainer from './LayoutContainer'
+import HomeContainer from './HomeContainer'
 import {createBrowserRouter, RouterProvider} from 'react-router-dom'
-import ArchiveContainer from './ArchiveContainer.jsx'
+import ArchiveContainer from './ArchiveContainer'
 
 const router = createBrowserRouter([
   {

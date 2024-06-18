@@ -1,20 +1,20 @@
 const STORAGE_PREFIX = '@Besoft:kerben-'
 
-const remove = (name) => {
+const remove = (name: string) => {
   localStorage.removeItem(STORAGE_PREFIX + name)
 }
 
 export default {
-  set: (name, value) => {
+  set: (name: string, value: any) => {
     if (value === null || value === undefined) {
       remove(name)
     } else {
       localStorage.setItem(`${STORAGE_PREFIX}${name}`, JSON.stringify(value))
     }
   },
-  get: (name, default_value = null) => {
+  get: (name: string, default_value = null) => {
     return (
-      JSON.parse(localStorage.getItem(`${STORAGE_PREFIX}${name}`)) ||
+      JSON.parse(localStorage.getItem(`${STORAGE_PREFIX}${name}`) || 'null') ||
       default_value
     )
   },

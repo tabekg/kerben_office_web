@@ -1,10 +1,10 @@
 import {Button, ButtonGroup, Card, Col, Form, Row} from 'react-bootstrap'
 import {useContext, useState} from 'react'
-import {RootContext} from '../utils/context.js'
-import requester from '../utils/requester.js'
+import {RootContext} from '../utils/context'
+import requester from '../utils/requester'
 import Logo from '../assets/logo.png'
 import {useTranslation} from 'react-i18next'
-import {LANGUAGES} from '../utils/config.js'
+import {LANGUAGES} from '../utils/config'
 
 export default function AuthContainer() {
   const root = useContext(RootContext)

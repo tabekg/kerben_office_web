@@ -1,14 +1,23 @@
 import Button from 'react-bootstrap/Button'
 import Modal from 'react-bootstrap/Modal'
 import {useCallback, useEffect, useState} from 'react'
-import requester from '../utils/requester.js'
-import {getRouteInfo} from '../utils/index.jsx'
+import requester from '../utils/requester'
+import {getRouteInfo} from '../utils/index'
 import moment from 'moment'
 import {useTranslation} from 'react-i18next'
-import {API_URL} from '../utils/config.js'
+import {API_URL} from '../utils/config'
 import {Spinner} from 'react-bootstrap'
+import {IShipment} from '../types/shipment'
 
-function MyVerticallyCenteredModal({shipment, onChangeShipment, onClose}) {
+function MyVerticallyCenteredModal({
+  shipment,
+  onChangeShipment,
+  onClose,
+}: {
+  shipment: IShipment | null
+  onChangeShipment: (shipment: IShipment) => void
+  onClose: () => void
+}) {
   const [loading, setLoading] = useState(false)
   const [routes, setRoutes] = useState([])
   const {t} = useTranslation()
@@ -35,8 +44,8 @@ function MyVerticallyCenteredModal({shipment, onChangeShipment, onClose}) {
     setRoutes([])
   }
 
-  const archive = () => {
-    if (loading) {
+  const archive = useCallback(() => {
+    if (loading || !shipment) {
       return
     }
     setLoading(true)
@@ -52,12 +61,12 @@ function MyVerticallyCenteredModal({shipment, onChangeShipment, onClose}) {
       .finally(() => {
         setLoading(false)
       })
-  }
+  }, [loading, shipment])
 
   return (
     <Modal
       show={!!shipment}
-      onHide={!loading ? onClose : null}
+      onHide={!loading ? onClose : undefined}
       size='lg'
       aria-labelledby='contained-modal-title-vcenter'
       centered
@@ -142,7 +151,7 @@ function RouteItem({route, shipment, key, onChangeStatus, onChangeCmrPath}) {
 
   const [loading, setLoading] = useState(false)
   const [completeIsOpen, setCompleteIsOpen] = useState(false)
-  const [cmrFile, setCmrFile] = useState(null)
+  const [cmrFile, setCmrFile] = useState<File | null>(null)
 
   const accept = () => {
     if (loading || route.cmr_status === 'ACCEPTED' || !route.cmr_status) {
@@ -345,7 +354,7 @@ function RouteItem({route, shipment, key, onChangeStatus, onChangeCmrPath}) {
                       accept='image/*'
                       disabled={loading}
                       onChange={(f) =>
-                        f.target.files.length && setCmrFile(f.target.files[0])
+                        f.target.files?.length && setCmrFile(f.target.files[0])
                       }
                       style={{display: 'none'}}
                     />

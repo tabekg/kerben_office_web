@@ -1,8 +1,8 @@
 import {Button, Modal, Form, Spinner, Table} from 'react-bootstrap'
 import {useEffect, useState, useCallback, useContext} from 'react'
-import requester from '../utils/requester.js'
+import requester from '../utils/requester'
 import {useTranslation} from 'react-i18next'
-import {RootContext} from '../utils/context.js'
+import {RootContext} from '../utils/context'
 
 // eslint-disable-next-line react/prop-types
 export default function OperatorsModalComponent() {

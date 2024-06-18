@@ -8,16 +8,42 @@ import {
   Spinner,
 } from 'react-bootstrap'
 import MapComponent from '../components/MapComponent'
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react'
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import requester from '../utils/requester'
-import AddDriverModalComponent from '../components/AddDriverModalComponent.jsx'
+import AddDriverModalComponent from '../components/AddDriverModalComponent'
 import MyVerticallyCenteredModal from './Modal-window'
-import {getLastRouteInfoByShipment} from '../utils/index.jsx'
+import {getLastRouteInfoByShipment} from '../utils/index'
 import {useTranslation} from 'react-i18next'
 import moment from 'moment'
 import ShipmentItemComponent from '../components/ShipmentItemComponent'
+import {
+  EShipmentHistoryStatus,
+  EShipmentStatus,
+  IShipment,
+  IShipmentInfo,
+} from '../types/shipment'
 
-function ListDateComponent({list, arrayList, i, item, onSelect}) {
+function ListDateComponent({
+  list,
+  arrayList,
+  i,
+  item,
+  onSelect,
+}: {
+  list: (IShipment & IShipmentInfo)[]
+  arrayList: string[]
+  i: number
+  item: string
+  onSelect: Dispatch<SetStateAction<null | IShipment>>
+}) {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
@@ -57,7 +83,7 @@ function ListDateComponent({list, arrayList, i, item, onSelect}) {
       </div>
       <Collapse in={isOpen}>
         <div>
-          {list.map((g) => (
+          {list.map((g: IShipment & IShipmentInfo) => (
             <ShipmentItemComponent onSelect={onSelect} g={g} />
           ))}
         </div>
@@ -67,8 +93,10 @@ function ListDateComponent({list, arrayList, i, item, onSelect}) {
 }
 
 export default function HomeContainer() {
-  const [shipments, setShipments] = useState([])
-  const [selectedShipment, setSelectedShipment] = useState(null)
+  const [shipments, setShipments] = useState<IShipment[]>([])
+  const [selectedShipment, setSelectedShipment] = useState<null | IShipment>(
+    null
+  )
   const [loading, setLoading] = useState(true)
 
   const [addDriverModal, setAddDriverModal] = useState(false)
@@ -106,21 +134,21 @@ export default function HomeContainer() {
       .finally(() => setLoading(false))
   }, [shipmentType, loading])
 
-  const list = useMemo(() => {
+  const list = useMemo<(IShipment & IShipmentInfo)[]>(() => {
     return shipments
-      .filter((g) => !!g.last_route)
+      .filter((g) => !!g.last_history)
       .filter(
         (g) =>
           // g.title.toLowerCase().includes(searchInput.toLowerCase()) ||
           g.title.toLowerCase().includes(searchInput.toLowerCase()) ||
-          g.last_route.sender.phone_number
-            .toLowerCase()
+          g.last_history?.driver_phone_number
+            ?.toLowerCase()
             .includes(searchInput.toLowerCase()) ||
-          g.last_route.truck_number
-            .toLowerCase()
+          g.last_history?.truck_number
+            ?.toLowerCase()
             .includes(searchInput.toLowerCase()) ||
-          g.last_route.sender.full_name
-            .toLowerCase()
+          g.last_history?.driver_full_name
+            ?.toLowerCase()
             .includes(searchInput.toLowerCase())
       )
       .map((g) => {
@@ -129,26 +157,23 @@ export default function HomeContainer() {
   }, [shipments, searchInput, t])
 
   const newList = useMemo(() => {
-    const l = {}
+    const l: {[keyof: number]: (IShipment & IShipmentInfo)[]} = {}
 
     list.forEach((g) => {
-      const d = new Date(g.date).getTime()
-      if (typeof l[d] !== 'undefined') {
+      const d = new Date(g.date!).getTime()
+      if (d in l) {
         l[d].push(g)
       } else {
         l[d] = [g]
       }
     })
 
-    return Object.keys(l)
-      .sort((a, b) => a > b)
-      .reduce((obj, key) => {
-        obj[key] = l[key]
-        return obj
-      }, {})
+    return l
   }, [list])
 
-  const arrayList = useMemo(() => Object.keys(newList), [newList])
+  const datesList = useMemo(() => {
+    return Object.keys(newList).sort((a, b) => (a > b ? -1 : 1))
+  }, [newList])
 
   return (
     <>
@@ -236,35 +261,31 @@ export default function HomeContainer() {
                 </div>
               ) : (
                 <>
-                  {arrayList.map((a, i) => (
+                  {datesList.map((a, i) => (
                     <ListDateComponent
                       onSelect={setSelectedShipment}
-                      arrayList={arrayList}
+                      arrayList={datesList}
                       item={a}
                       i={i}
-                      list={newList[a]}
+                      list={newList[+a]}
                     />
                   ))}
                 </>
               )}
             </div>
-            {/*<div*/}
-            {/*  className={'driver-list-item justify-content-center'}*/}
-            {/*  style={{color: 'grey'}}*/}
-            {/*  onClick={() => setAddDriverModal(true)}*/}
-            {/*>*/}
-            {/*  Добавить новый водитель*/}
-            {/*</div>*/}
           </div>
         </Col>
         <Col lg={9} md={8} sm={12} style={{height: '100%'}} className={'p-0'}>
           <MapComponent
-            // @ts-ignore
-            // selectedDriver={(shipments || []).find(
-            //   (g) => g.id === selectedDriver
-            // )}
-            markers={list.filter(
-              (g) => g.status === 2 && g.location_lat && g.location_lng
+            items={list.filter(
+              (g) =>
+                [
+                  EShipmentHistoryStatus.on_way,
+                  EShipmentHistoryStatus.changed_driver,
+                  EShipmentHistoryStatus.overload,
+                ].includes(g.last_history!.status) &&
+                g.location_lat &&
+                g.location_lng
             )}
           />
         </Col>
