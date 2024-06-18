@@ -12,7 +12,7 @@ export default {
       localStorage.setItem(`${STORAGE_PREFIX}${name}`, JSON.stringify(value))
     }
   },
-  get: (name: string, default_value = null) => {
+  get: (name: string, default_value: any = null) => {
     return (
       JSON.parse(localStorage.getItem(`${STORAGE_PREFIX}${name}`) || 'null') ||
       default_value

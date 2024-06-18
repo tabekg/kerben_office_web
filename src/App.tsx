@@ -1,9 +1,9 @@
 import './App.css'
 import {useEffect, useMemo, useState} from 'react'
-import AuthContainer from './containers/AuthContainer.jsx'
-import AppContainer from './containers/AppContainer.jsx'
-import {RootContext} from './utils/context.js'
-import storage from './utils/storage.js'
+import AuthContainer from './containers/AuthContainer'
+import AppContainer from './containers/AppContainer'
+import {RootContext} from './utils/context'
+import storage from './utils/storage'
 
 import {useTranslation, initReactI18next} from 'react-i18next'
 import i18n from 'i18next'
@@ -33,8 +33,8 @@ i18n
 
 function App() {
   const {t} = useTranslation()
-  const [user, setUser] = useState()
-  const [token, setToken] = useState()
+  const [user, setUser] = useState<undefined | any>()
+  const [token, setToken] = useState<undefined | null | string>()
   const [language, setLanguage] = useState(storage.get('language', 'ru'))
 
   const [changePasswordModal, setChangePasswordModal] = useState(false)
@@ -64,12 +64,13 @@ function App() {
     storage.set('user', user)
   }, [user, token])
 
-  const signIn = (u, t) => {
+  const signIn = (u: any, t: string) => {
     setToken(t)
     setUser(u)
   }
 
   const signOut = (force = false) => {
+    // @ts-ignore
     if (!force && !window.confirm(t('do_you_really_want_to_log_out'))) {
       return
     }
