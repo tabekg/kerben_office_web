@@ -277,6 +277,7 @@ export default function HomeContainer() {
         </Col>
         <Col lg={9} md={8} sm={12} style={{height: '100%'}} className={'p-0'}>
           <MapComponent
+            onPress={(g) => setSelectedShipment(g)}
             items={list.filter(
               (g) =>
                 [

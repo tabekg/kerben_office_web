@@ -9,7 +9,13 @@ const containerStyle = {
 
 const center = {lat: 40.52, lng: 72.79}
 
-function MapComponent({items}: {items: IShipment[]}) {
+function MapComponent({
+  items,
+  onPress,
+}: {
+  onPress: (item: IShipment) => void
+  items: IShipment[]
+}) {
   const {isLoaded} = useJsApiLoader({
     id: 'google-map-script',
     googleMapsApiKey: 'AIzaSyC_wByvMEPAAivPvpY2jXFdD8GyEAlEqJU',
@@ -59,18 +65,21 @@ function MapComponent({items}: {items: IShipment[]}) {
     >
       {items.map((g) => (
         <Marker
+          onClick={() => onPress(g)}
           key={g.id}
           position={{lat: g.location_lat!, lng: g.location_lng!}}
           icon={{
             path: 'M0-48c-9.8 0-17.7 7.8-17.7 17.4 0 15.5 17.7 30.6 17.7 30.6s17.7-15.4 17.7-30.6c0-9.6-7.9-17.4-17.7-17.4z',
-            fillColor: false ? '#1B5E20' : '#B71C1C',
+            fillColor: g.is_online ? '#1B5E20' : '#B71C1C',
             fillOpacity: 1,
             strokeColor: '',
             strokeWeight: 0,
           }}
           label={{
-            className: `marker-class ${false ? 'is-online' : 'is-offline'}`,
-            text: g.title,
+            className: `marker-class ${
+              g.is_online ? 'is-online' : 'is-offline'
+            }`,
+            text: g.last_history?.truck_number?.trim().split('/')[0] ?? g.title,
           }}
         />
       ))}

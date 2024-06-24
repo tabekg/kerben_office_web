@@ -41,16 +41,16 @@ export function getShipmentStatusLabel(
 }
 
 export function getRouteStatusText(
-  status,
+  status: EShipmentHistoryStatus,
   t: TFunction<'translation', undefined, 'translation'>
 ) {
-  return status === 1
+  return status === EShipmentHistoryStatus.created
     ? t('shipment_waiting_for_driver')
-    : status === 2
+    : status === EShipmentHistoryStatus.on_way
     ? t('shipment_on_the_way')
-    : status === 3
+    : status === EShipmentHistoryStatus.overload
     ? t('shipment_in_stock')
-    : status === 3
+    : status === EShipmentHistoryStatus.completed
     ? t('archived')
     : t('unknown')
 }
@@ -106,39 +106,35 @@ export function getLastRouteInfoByShipment(
   }
 }
 
-export function getRouteInfo(route, t) {
-  const status = getRouteStatus(route)
+export function getRouteInfo(route: IShipmentHistory, t) {
   return {
-    status,
-    label: getRouteStatusText(status, t),
-    colorBg:
-      status === 1 || status === 3
-        ? route.received_at
-          ? 'rgba(46,125,50,0.1)'
-          : 'rgba(255,241,118,0.3)'
-        : 'rgba(33,33,33,0.1)',
-    icon:
-      status === 1 || status === 3 ? (
-        <span
-          className='material-symbols-outlined'
-          style={{
-            fontSize: 30,
-            color: route.received_at ? '#2E7D32' : '#F9A825',
-          }}
-        >
-          inventory_2
-        </span>
-      ) : (
-        <span
-          className='material-symbols-outlined'
-          style={{
-            fontSize: 30,
-            color: '#212121',
-          }}
-        >
-          local_shipping
-        </span>
-      ),
+    label: getRouteStatusText(route.status, t),
+    colorBg: true
+      ? route.received_at
+        ? 'rgba(46,125,50,0.1)'
+        : 'rgba(255,241,118,0.3)'
+      : 'rgba(33,33,33,0.1)',
+    icon: true ? (
+      <span
+        className='material-symbols-outlined'
+        style={{
+          fontSize: 30,
+          color: route.received_at ? '#2E7D32' : '#F9A825',
+        }}
+      >
+        inventory_2
+      </span>
+    ) : (
+      <span
+        className='material-symbols-outlined'
+        style={{
+          fontSize: 30,
+          color: '#212121',
+        }}
+      >
+        local_shipping
+      </span>
+    ),
     ...route,
   }
 }

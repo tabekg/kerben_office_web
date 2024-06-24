@@ -7,7 +7,7 @@ import moment from 'moment'
 import {useTranslation} from 'react-i18next'
 import {API_URL} from '../utils/config'
 import {Spinner} from 'react-bootstrap'
-import {IShipment} from '../types/shipment'
+import {IShipment, IShipmentHistory} from '../types/shipment'
 
 function MyVerticallyCenteredModal({
   shipment,
@@ -19,7 +19,7 @@ function MyVerticallyCenteredModal({
   onClose: () => void
 }) {
   const [loading, setLoading] = useState(false)
-  const [routes, setRoutes] = useState([])
+  const [histories, setHistories] = useState<IShipmentHistory[]>([])
   const {t} = useTranslation()
 
   useEffect(() => {
@@ -29,7 +29,7 @@ function MyVerticallyCenteredModal({
         .get('/shipment', {id: shipment.id})
         .then((res) => {
           if (res.status === 'success') {
-            setRoutes(res.payload.routes)
+            setHistories(res.payload.histories)
           }
         })
         .catch((e) => console.log(e))
@@ -41,7 +41,7 @@ function MyVerticallyCenteredModal({
 
   const reset = () => {
     setLoading(false)
-    setRoutes([])
+    setHistories([])
   }
 
   const archive = useCallback(() => {
@@ -98,11 +98,21 @@ function MyVerticallyCenteredModal({
         ) : null}
 
         <>
-          {routes.map((g, i) => {
+          <div
+            style={{width: '100%'}}
+            className={'d-flex my-2 justify-content-around align-items-center'}
+          >
+            <div className={'h5'}>{shipment?.from_point?.title['ru']}</div>
+            <span className='material-symbols-outlined' style={{color: 'grey'}}>
+              arrow_forward
+            </span>
+            <div className={'h5'}>{shipment?.to_point?.title['ru']}</div>
+          </div>
+          {histories.map((g, i) => {
             return (
               <RouteItem
                 onChangeStatus={(id, status) => {
-                  setRoutes((p) =>
+                  setHistories((p) =>
                     p.map((g) => {
                       if (g.id === id) {
                         return {...g, cmr_status: status}
@@ -112,7 +122,7 @@ function MyVerticallyCenteredModal({
                   )
                 }}
                 onChangeCmrPath={(id, path) => {
-                  setRoutes((p) =>
+                  setHistories((p) =>
                     p.map((g) => {
                       if (g.id === id) {
                         return {...g, cmr_path: path}
@@ -257,8 +267,8 @@ function RouteItem({route, shipment, key, onChangeStatus, onChangeCmrPath}) {
               <div>
                 {t('sender_a_b')}
                 <strong>
-                  {route.sender.full_name} (+
-                  {route.sender.phone_number})
+                  {'route.sender.full_name'} (+
+                  {'route.sender.phone_number'})
                 </strong>
               </div>
               <div>
@@ -269,12 +279,11 @@ function RouteItem({route, shipment, key, onChangeStatus, onChangeCmrPath}) {
                     : ''}
                 </strong>
               </div>
-              {route.driver ? (
+              {route.driver_full_name && route.driver_phone_number ? (
                 <div>
                   {t('driver_a_b')}
                   <strong>
-                    {route.driver.full_name} (+
-                    {route.driver.phone_number})
+                    {route.driver_full_name} ({route.driver_phone_number})
                   </strong>
                 </div>
               ) : null}
@@ -288,21 +297,6 @@ function RouteItem({route, shipment, key, onChangeStatus, onChangeCmrPath}) {
                   )}
                 </strong>
               </div>
-            </div>
-            <div
-              style={{width: '100%'}}
-              className={
-                'd-flex mt-2 justify-content-around align-items-center'
-              }
-            >
-              <div className={'h5'}>{route.from_point.title}</div>
-              <span
-                className='material-symbols-outlined'
-                style={{color: 'grey'}}
-              >
-                arrow_forward
-              </span>
-              <div className={'h5'}>{route.to_point.title}</div>
             </div>
           </div>
           {route.cmr_path ? (

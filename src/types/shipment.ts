@@ -41,6 +41,8 @@ export interface IShipment {
 
   last_history?: IShipmentHistory
   histories?: IShipmentHistory[]
+
+  is_online: boolean
 }
 
 export interface IShipmentHistory {
