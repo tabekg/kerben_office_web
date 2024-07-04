@@ -8,7 +8,7 @@ import ShipmentItemComponent from '../components/ShipmentItemComponent'
 import MyVerticallyCenteredModal from './Modal-window'
 import {IShipment, IShipmentInfo} from '../types/shipment'
 
-export default function ArchiveContainer() {
+export default function CompletedShipmentsContainer() {
   const {t} = useTranslation()
   const [selectedShipment, setSelectedShipment] = useState(null)
 
@@ -28,8 +28,7 @@ export default function ArchiveContainer() {
     setLoading(true)
     requester
       .get('/shipment', {
-        is_archived: '1',
-        type: '',
+        status: 'completed',
       })
       .then((res) => {
         if (res.status === 'success') {
@@ -97,9 +96,7 @@ export default function ArchiveContainer() {
         className='p-3'
       >
         <div className='d-flex justify-content-between gap-5 mb-3 align-items-center'>
-          <h1 className='h3 text-muted'>
-            Архивированные грузы ({items.length})
-          </h1>
+          <h1 className='h3 text-muted'>Завершенные грузы ({items.length})</h1>
           <InputGroup style={{minWidth: 100, maxWidth: 300}}>
             <Form.Control
               placeholder={t('search')}

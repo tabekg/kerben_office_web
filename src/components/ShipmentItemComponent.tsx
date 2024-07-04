@@ -30,7 +30,7 @@ export default function ShipmentItemComponent({
             style={{fontSize: 24}}
             className={'d-flex align-items-center gap-2'}
           >
-            {g.last_history?.cmr_status === 'PENDING' ? (
+            {g.cmr_path ? (
               <div
                 style={{fontSize: 15}}
                 className={'bg-success d-inline text-white p-1 rounded'}

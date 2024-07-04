@@ -7,6 +7,7 @@
 import moment from 'moment'
 import {
   EShipmentHistoryStatus,
+  EShipmentStatus,
   IShipment,
   IShipmentHistory,
   IShipmentInfo,
@@ -17,27 +18,61 @@ export function getRouteStatus(route: IShipmentHistory | undefined) {
   return 0
 }
 
+export function getIconNameByShipment(g: IShipment) {
+  if (g.status == EShipmentStatus.on_way) {
+    return (
+      <span
+        className='material-symbols-outlined'
+        style={{
+          fontSize: 30,
+          color: true ? '#2E7D32' : '#F9A825',
+        }}
+      >
+        local_shipping
+      </span>
+    )
+  }
+
+  return (
+    <span
+      className='material-symbols-outlined'
+      style={{
+        fontSize: 30,
+        color:
+          g.last_history?.status == EShipmentHistoryStatus.on_way
+            ? '#2E7D32'
+            : '#F9A825',
+      }}
+    >
+      inventory_2
+    </span>
+  )
+}
+
 export function getShipmentStatusLabel(
-  item: IShipment,
+  item: IShipmentHistory | null,
   t: TFunction<'translation', undefined, 'translation'>
 ): string {
-  if (item.last_history?.status === EShipmentHistoryStatus.completed) {
+  if (!item) {
+    return 'Неизвестный'
+  }
+  if (item?.status === EShipmentHistoryStatus.completed) {
     return 'Завершен'
   }
-  if (item.last_history?.status === EShipmentHistoryStatus.created) {
+  if (item?.status === EShipmentHistoryStatus.created) {
     return 'Груз создан'
   }
-  if (item.last_history?.status == EShipmentHistoryStatus.on_way) {
+  if (item?.status == EShipmentHistoryStatus.on_way) {
     return 'Груз в пути'
   }
-  if (item.last_history?.status == EShipmentHistoryStatus.overload) {
+  if (item?.status == EShipmentHistoryStatus.overload) {
     return 'Перегружается'
   }
-  if (item.last_history?.status == EShipmentHistoryStatus.changed_driver) {
+  if (item?.status == EShipmentHistoryStatus.changed_driver) {
     return 'Водитель сменился'
   }
   console.log(EShipmentHistoryStatus.changed_driver)
-  return item.last_history?.status || 'Неизвестный'
+  return item?.status || 'Неизвестный'
 }
 
 export function getRouteStatusText(
@@ -64,10 +99,13 @@ export function getLastRouteInfoByShipment(
     datetime && datetime.toDate().getTime() > new Date().getTime() - 60000
   )
   const status = getRouteStatus(g.last_history)
+
+  const icon = getIconNameByShipment(g)
+
   return {
     isOnline,
     status,
-    label: getShipmentStatusLabel(g, t),
+    label: getShipmentStatusLabel(g.last_history ?? null, t),
     datetime,
     colorBg:
       status === 1 || status === 3
@@ -77,40 +115,16 @@ export function getLastRouteInfoByShipment(
         : isOnline
         ? 'rgba(46,125,50,0.1)'
         : 'rgba(255,241,118,0.3)',
-    icon:
-      status === 1 || status === 3 ? (
-        <span
-          className='material-symbols-outlined'
-          style={{
-            fontSize: 30,
-            color:
-              g.last_history?.status == EShipmentHistoryStatus.on_way
-                ? '#2E7D32'
-                : '#F9A825',
-          }}
-        >
-          inventory_2
-        </span>
-      ) : (
-        <span
-          className='material-symbols-outlined'
-          style={{
-            fontSize: 30,
-            color: isOnline ? '#2E7D32' : '#F9A825',
-          }}
-        >
-          local_shipping
-        </span>
-      ),
+    icon,
     ...g,
   }
 }
 
 export function getRouteInfo(route: IShipmentHistory, t) {
   return {
-    label: getRouteStatusText(route.status, t),
+    label: getShipmentStatusLabel(route, t),
     colorBg: true
-      ? route.received_at
+      ? true
         ? 'rgba(46,125,50,0.1)'
         : 'rgba(255,241,118,0.3)'
       : 'rgba(33,33,33,0.1)',
@@ -119,7 +133,7 @@ export function getRouteInfo(route: IShipmentHistory, t) {
         className='material-symbols-outlined'
         style={{
           fontSize: 30,
-          color: route.received_at ? '#2E7D32' : '#F9A825',
+          color: true ? '#2E7D32' : '#F9A825',
         }}
       >
         inventory_2

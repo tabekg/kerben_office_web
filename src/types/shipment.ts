@@ -29,7 +29,7 @@ export interface IShipment {
   location_lng?: number
   location_updated_at?: Date
 
-  date?: Date
+  date: Date
   status: EShipmentStatus
   uuid: string
 
@@ -68,4 +68,5 @@ export interface IShipmentInfo {
   color: string
   isOnline: boolean
   label: string
+  icon: string
 }

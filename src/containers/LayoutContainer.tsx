@@ -18,6 +18,12 @@ const LayoutContainer = () => {
           <Navbar.Toggle aria-controls='basic-navbar-nav' />
           <Navbar.Collapse id='basic-navbar-nav'>
             <Nav className='ms-auto'>
+              <Nav.Link
+                href='#'
+                onClick={() => navigate('/shipments/completed')}
+              >
+                Завершенные
+              </Nav.Link>
               <Nav.Link href='#' onClick={() => navigate('/archive')}>
                 {t('archivedShipments')}
               </Nav.Link>

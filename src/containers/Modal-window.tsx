@@ -20,6 +20,7 @@ function MyVerticallyCenteredModal({
 }) {
   const [loading, setLoading] = useState(false)
   const [histories, setHistories] = useState<IShipmentHistory[]>([])
+  const [item, setItem] = useState<null | IShipment>(null)
   const {t} = useTranslation()
 
   useEffect(() => {
@@ -30,6 +31,7 @@ function MyVerticallyCenteredModal({
         .then((res) => {
           if (res.status === 'success') {
             setHistories(res.payload.histories)
+            setItem(res.payload)
           }
         })
         .catch((e) => console.log(e))
@@ -98,6 +100,18 @@ function MyVerticallyCenteredModal({
         ) : null}
 
         <>
+          {item?.cmr_path ? (
+            <a
+              style={{marginBottom: 44, display: 'inline-block'}}
+              target='blank'
+              href={API_URL + '/storage/cmr/' + item?.cmr_path}
+            >
+              <img
+                src={API_URL + '/storage/cmr/' + item?.cmr_path}
+                width={300}
+              />
+            </a>
+          ) : null}
           <div
             style={{width: '100%'}}
             className={'d-flex my-2 justify-content-around align-items-center'}
@@ -140,7 +154,11 @@ function MyVerticallyCenteredModal({
         </>
       </Modal.Body>
       <Modal.Footer className={'d-flex justify-content-between'}>
-        <Button onClick={archive} disabled={loading} variant={'outline-danger'}>
+        <Button
+          onClick={archive}
+          disabled={loading || true}
+          variant={'outline-danger'}
+        >
           {shipment?.is_archived ? t('unzip') : t('archive')}
         </Button>
         <Button
