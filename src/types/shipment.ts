@@ -1,3 +1,4 @@
+import moment from 'moment'
 import {IPoint} from './point'
 import {IDriver} from './user'
 
@@ -68,5 +69,5 @@ export interface IShipmentInfo {
   color: string
   isOnline: boolean
   label: string
-  icon: string
+  datetime: moment.Moment | null
 }

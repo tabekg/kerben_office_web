@@ -107,7 +107,7 @@ export function getLastRouteInfoByShipment(
     status,
     label: getShipmentStatusLabel(g.last_history ?? null, t),
     datetime,
-    colorBg:
+    color:
       status === 1 || status === 3
         ? g.last_history?.status == EShipmentHistoryStatus.on_way
           ? 'rgba(46,125,50,0.1)'
@@ -120,7 +120,10 @@ export function getLastRouteInfoByShipment(
   }
 }
 
-export function getRouteInfo(route: IShipmentHistory, t) {
+export function getRouteInfo(
+  route: IShipmentHistory,
+  t: TFunction<'translation', undefined, 'translation'>
+) {
   return {
     label: getShipmentStatusLabel(route, t),
     colorBg: true

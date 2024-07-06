@@ -121,8 +121,7 @@ export default function HomeContainer() {
 
   const fetchShipments = useCallback(() => {
     requester
-      .get('/shipment', {
-        is_archived: '0',
+      .get('/office/shipment/active', {
         type: shipmentType,
       })
       .then((res) => {
