@@ -116,7 +116,7 @@ export default function InvoicesContainer() {
   }, [])
 
   const totalLeft = useMemo(() => {
-    return items.reduce((a, b) => a + b.left, 0)
+    return items.filter((g) => g.left > 0).reduce((a, b) => a + b.left, 0)
   }, [items])
 
   const renderList = useMemo(() => {
