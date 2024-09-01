@@ -9,6 +9,7 @@ import {
   ListGroup,
   Button,
 } from 'react-bootstrap'
+import requester from '../utils/requester'
 
 interface ITransaction {
   date: string
@@ -136,6 +137,36 @@ export default function InvoicesContainer() {
     [setItems]
   )
 
+  const sendWARemainings = useCallback(() => {
+    if (!window.confirm('Вы уверены?')) {
+      return
+    }
+
+    const list = items.filter((g) => g.left > 0)
+    const remaining = list.reduce((a, b) => a + b.left, 0)
+
+    const content =
+      'Kerben Остаток\n\n' +
+      list.map((g) => g.number + ': ' + g.left + ' сом').join('\n') +
+      '\n\nВсего остаток: ' +
+      remaining +
+      ' сом'
+
+    ;['996777171171', '996507454411', '996777599577'].map((g) => {
+      requester
+        .post('/office/wa-send-message', {
+          content,
+          phone_number: '+' + g,
+        })
+        .then((res) => {
+          console.log(res)
+        })
+        .catch((e) => {
+          console.log(e)
+        })
+    })
+  }, [items])
+
   return (
     <>
       <div
@@ -143,7 +174,12 @@ export default function InvoicesContainer() {
         className='p-3'
       >
         <div className='d-flex justify-content-between gap-5 mb-3 align-items-center'>
-          <h1 className='h3 text-muted'>Квитанции ({renderList.length})</h1>
+          <div className='d-flex gap-3'>
+            <h1 className='h3 text-muted'>Квитанции ({renderList.length})</h1>
+            <Button onClick={() => sendWARemainings()} variant='secondary'>
+              Отправить остаток
+            </Button>
+          </div>
           <div className='d-flex justify-content-end align-items-center gap-3'>
             <Form.Check
               checked={showHiddenItems}
