@@ -116,7 +116,7 @@ export default function InvoicesContainer() {
   }, [])
 
   const totalLeft = useMemo(() => {
-    return items.filter((g) => g.left > 0).reduce((a, b) => a + b.left, 0)
+    return items.filter((g) => !g.isHidden).reduce((a, b) => a + b.left, 0)
   }, [items])
 
   const renderList = useMemo(() => {
@@ -142,7 +142,7 @@ export default function InvoicesContainer() {
       return
     }
 
-    const list = items.filter((g) => g.left > 0)
+    const list = items.filter((g) => !g.isHidden)
     const remaining = list.reduce((a, b) => a + b.left, 0)
 
     const content =
@@ -152,19 +152,21 @@ export default function InvoicesContainer() {
       remaining +
       ' сом'
 
-    ;['996777171171', '996507454411', '996777599577'].map((g) => {
-      requester
-        .post('/office/wa-send-message', {
-          content,
-          phone_number: '+' + g,
-        })
-        .then((res) => {
-          console.log(res)
-        })
-        .catch((e) => {
-          console.log(e)
-        })
-    })
+    ;['996777171171', '996507454411', '996777599577', '996990759577'].map(
+      (g) => {
+        requester
+          .post('/office/wa-send-message', {
+            content,
+            phone_number: g,
+          })
+          .then((res) => {
+            console.log(res)
+          })
+          .catch((e) => {
+            console.log(e)
+          })
+      }
+    )
   }, [items])
 
   return (
