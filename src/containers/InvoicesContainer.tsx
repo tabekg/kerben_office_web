@@ -152,7 +152,7 @@ export default function InvoicesContainer() {
       remaining +
       ' сом'
 
-    ;['996777171171', '996507454411', '996777599577', '996990759577'].map(
+    ;['996777171171', '996507454411', '996777599577', '996999466000'].map(
       (g) => {
         requester
           .post('/office/wa-send-message', {
