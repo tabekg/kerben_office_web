@@ -1,6 +1,6 @@
 import {useEffect, useState} from 'react'
 import styled from 'styled-components'
-import GridComponentsCard from '../components/GridComponentsCard'
+import ContainerCardComponent from '../components/ContainerCardComponent'
 import requester from '../utils/requester'
 
 export default function ContainersContainer() {
@@ -33,7 +33,7 @@ export default function ContainersContainer() {
 
         <GeneralgridContainer>
           {containers.map((container) => (
-            <GridComponentsCard key={container.id} data={container} />
+            <ContainerCardComponent key={container.id} data={container} />
           ))}
         </GeneralgridContainer>
       </div>
