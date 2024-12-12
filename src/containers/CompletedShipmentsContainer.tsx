@@ -74,7 +74,7 @@ export default function CompletedShipmentsContainer() {
     })
 
     return Object.keys(l)
-      .sort((a, b) => a > b)
+      .sort((a, b) => a > b ? -1 : 1)
       .reduce((obj, key) => {
         obj[key] = l[key]
         return obj

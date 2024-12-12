@@ -30,7 +30,7 @@ async function request(
   }
 }
 
-async function get(url: string, params: {[keyof: string]: any}) {
+async function get(url: string, params: {[keyof: string]: any} = {}) {
   return (await request(url, 'get', params))?.data
 }
 

@@ -51,7 +51,7 @@ function ListDateComponent({
       style={{
         borderBottom:
           i + 1 === arrayList.length
-            ? undefined
+            ? undefined 
             : '1px solid rgba(0, 0, 0, .3)',
       }}
     >

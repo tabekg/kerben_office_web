@@ -6,6 +6,7 @@ import {useContext} from 'react'
 import {RootContext} from '../utils/context'
 
 const LayoutContainer = () => {
+
   const root = useContext(RootContext)
   const {t} = useTranslation()
   const navigate = useNavigate()
@@ -20,6 +21,9 @@ const LayoutContainer = () => {
             <Nav className='ms-auto'>
               <Nav.Link href='#' onClick={() => navigate('/invoices')}>
                 Квитанции
+              </Nav.Link>
+              <Nav.Link href='#' onClick={() => navigate('/containers')}>
+                Контейнер
               </Nav.Link>
               <Nav.Link
                 href='#'

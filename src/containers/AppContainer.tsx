@@ -6,6 +6,7 @@ import {createBrowserRouter, RouterProvider} from 'react-router-dom'
 import ArchiveContainer from './ArchiveContainer'
 import CompletedShipmentsContainer from './CompletedShipmentsContainer'
 import InvoicesContainer from './InvoicesContainer'
+import ContainersContainer from './ContainersContainer'
 
 const router = createBrowserRouter([
   {
@@ -15,6 +16,10 @@ const router = createBrowserRouter([
       {
         path: '',
         element: <HomeContainer />,
+      },
+      {
+        path: '/containers',
+        element: <ContainersContainer />
       },
       {
         path: '/archive',
