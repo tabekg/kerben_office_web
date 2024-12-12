@@ -4,8 +4,6 @@ import {CgArrowLongRight} from 'react-icons/cg'
 export default function ContainerCardComponent({data}: {data: any}) {
   const colorStyle = {color: data.is_empty ? 'green' : 'red'}
 
-  const cargoCity = data.point !== null
-
   return (
     <div>
       <div>
@@ -17,7 +15,7 @@ export default function ContainerCardComponent({data}: {data: any}) {
             </Div>
             <h5>Номер транспорта: {data.vehicle_state_number || '-'}</h5>
             <LineBlock></LineBlock>
-            {cargoCity ? (
+            {data.point !== null ? (
               <Div>
                 <h5>{data.point?.title?.ru || '-'}</h5>
               </Div>

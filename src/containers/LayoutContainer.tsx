@@ -6,7 +6,6 @@ import {useContext} from 'react'
 import {RootContext} from '../utils/context'
 
 const LayoutContainer = () => {
-
   const root = useContext(RootContext)
   const {t} = useTranslation()
   const navigate = useNavigate()
@@ -23,7 +22,7 @@ const LayoutContainer = () => {
                 Квитанции
               </Nav.Link>
               <Nav.Link href='#' onClick={() => navigate('/containers')}>
-                Контейнер
+                Контейнеры
               </Nav.Link>
               <Nav.Link
                 href='#'
