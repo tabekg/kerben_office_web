@@ -1,24 +1,22 @@
-import React, { useEffect, useState } from 'react'
+import {useEffect, useState} from 'react'
 import styled from 'styled-components'
-import GridComponentsCard from '../components/GridComponentsCard';
-import requester from '../utils/requester';
+import GridComponentsCard from '../components/GridComponentsCard'
+import requester from '../utils/requester'
 
-
-export default function ContainersContainer () {
-
-
-
-  const [containers, setContainers] = useState([]);
+export default function ContainersContainer() {
+  const [containers, setContainers] = useState<any[]>([])
 
   useEffect(() => {
-    requester.get('/container').then(res => {
-        setContainers(res.payload);
+    requester
+      .get('/container')
+      .then((res) => {
+        setContainers(res.payload)
         console.log(res)
       })
-      .catch(err => {
-        console.error('Ошибка', err);
-      });
-  }, []);
+      .catch((err) => {
+        console.error('Ошибка', err)
+      })
+  }, [])
 
   return (
     <ContainerDev>
@@ -34,15 +32,14 @@ export default function ContainersContainer () {
         </BlockContainer>
 
         <GeneralgridContainer>
-          {containers.map(container => (
+          {containers.map((container) => (
             <GridComponentsCard key={container.id} data={container} />
           ))}
         </GeneralgridContainer>
       </div>
     </ContainerDev>
-  );
+  )
 }
-
 
 const ContainerDev = styled.div`
   background-color: white;
@@ -56,7 +53,6 @@ const BlockContainer = styled.div`
   width: 600px;
   margin: 30px;
   color: #6c757d;
-
 `
 const Line = styled.div`
   width: 3px;
@@ -74,8 +70,7 @@ const GeneralgridContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-
-`;
+`
 
 const GridIten = styled.div`
   background-color: #f0f0f0;
@@ -89,7 +84,7 @@ const GridIten = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-around;
-`;
+`
 
 const RoundBlock = styled.button`
   width: 40px;
@@ -99,7 +94,6 @@ const RoundBlock = styled.button`
   border: 1px solid gray;
 `
 const Div = styled.div`
- display: flex;
- justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
 `
-
