@@ -49,6 +49,26 @@ export default function InvoicesContainer() {
   const [searchInput, setSearchInput] = useState('')
 
   useEffect(() => {
+    if (items && items.length > 0) {
+      requester
+        .post('/office/invoices', {data: items})
+        .then((res) => {
+          console.log(res)
+        })
+        .catch((e) => window.alert('Ошибка: ' + e))
+    } else {
+      // requester
+      //   .get('/office/invoices')
+      //   .then((res) => {
+      //     if (res.status === 'success') {
+      //       setItems()
+      //     }
+      //   })
+      //   .catch((e) => window.alert('Ошибка: ' + e))
+    }
+  }, [items])
+
+  useEffect(() => {
     if (items.length < 1) {
       return
     }
