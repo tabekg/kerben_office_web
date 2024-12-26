@@ -18,6 +18,9 @@ const LayoutContainer = () => {
           <Navbar.Toggle aria-controls='basic-navbar-nav' />
           <Navbar.Collapse id='basic-navbar-nav'>
             <Nav className='ms-auto'>
+              <Nav.Link href='#' onClick={() => navigate('/containers')}>
+                Контейнеры
+              </Nav.Link>
               <Nav.Link href='#' onClick={() => navigate('/invoices')}>
                 Квитанции
               </Nav.Link>
