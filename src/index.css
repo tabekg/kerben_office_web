@@ -1,32 +1,24 @@
 html,
 body,
 div#root {
-    height: 100%;
+  height: 100%;
 }
 
 .driver-list {
-    flex: 1 1 auto;
-    overflow-y: auto;
-    min-height: 0px;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  min-height: 0px;
 }
 
 .driver-list-item {
-    padding: 14px;
-    cursor: pointer;
-    transition: 0.3s;
-    display: flex;
-    justify-content: space-between;
-    align-items: start;
+  padding: 14px;
+  cursor: pointer;
+  transition: 0.3s;
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
 }
 
 .driver-list-item:hover {
-    background-color: rgba(0, 0, 0, 0.05);
-}
-
-.confirmm {
-    top: -30px;
-    right: -105px;
-    background-color: tomato;
-    color: white;
-    padding: 6px 10px;
+  background-color: rgba(0, 0, 0, 0.05);
 }
