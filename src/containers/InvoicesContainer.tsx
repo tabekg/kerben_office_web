@@ -1,5 +1,5 @@
-import {useTranslation} from 'react-i18next'
-import {useCallback, useEffect, useMemo, useState} from 'react'
+import { useTranslation } from 'react-i18next'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   InputGroup,
   Form,
@@ -9,6 +9,7 @@ import {
   ListGroup,
   Button,
 } from 'react-bootstrap'
+import { MdDeleteOutline } from "react-icons/md"
 import requester from '../utils/requester'
 
 interface ITransaction {
@@ -28,9 +29,11 @@ interface IInvoice {
 }
 
 export default function InvoicesContainer() {
-  const {t} = useTranslation()
+  const { t } = useTranslation()
 
   const [showHiddenItems, setShowHiddenItems] = useState(false)
+  const [isConfirm, setIsConfirm] = useState<boolean>(false)
+  const [index, setIndex] = useState<number | null>(null)
 
   const [items, setItems] = useState<IInvoice[]>(
     JSON.parse(localStorage.getItem('__invoices') || '[]')
@@ -43,15 +46,17 @@ export default function InvoicesContainer() {
         return a_ > b_ ? 1 : a_ < b_ ? -1 : 0
         // return a.localeCompare(b);         // <-- alternative
       })
-      .map((g: IInvoice) => ({...g, isHidden: !!g.isHidden}))
+      .map((g: IInvoice) => ({ ...g, isHidden: !!g.isHidden }))
   )
 
   const [searchInput, setSearchInput] = useState('')
 
   useEffect(() => {
     if (items && items.length > 0) {
+      console.log(items.length , '0000');
+      
       requester
-        .post('/office/invoices', {data: items})
+        .post('/office/invoices', { data: items })
         .then((res) => {
           console.log(res)
         })
@@ -79,7 +84,7 @@ export default function InvoicesContainer() {
     if (
       items_sync.length < 1 ||
       JSON.stringify(items) !==
-        JSON.stringify(items_sync[items_sync.length - 1])
+      JSON.stringify(items_sync[items_sync.length - 1])
     ) {
       localStorage.setItem(
         '__invoices_sync',
@@ -126,7 +131,7 @@ export default function InvoicesContainer() {
         if (g.number != invoiceNumber) {
           return g
         }
-        g.transactions = [...g.transactions, {date, sum}]
+        g.transactions = [...g.transactions, { date, sum }]
         return {
           ...g,
           left: g.left - sum,
@@ -148,7 +153,7 @@ export default function InvoicesContainer() {
       setItems((p) => {
         return p.map((g, i) => {
           if (g.number === invoiceId) {
-            return {...g, isHidden: !g.isHidden}
+            return { ...g, isHidden: !g.isHidden }
           }
           return g
         })
@@ -172,27 +177,44 @@ export default function InvoicesContainer() {
       remaining +
       ' сом'
 
-    ;['996777171171', '996507454411', '996777599577', '996999466000'].map(
-      (g) => {
-        requester
-          .post('/office/wa-send-message', {
-            content,
-            phone_number: g,
-          })
-          .then((res) => {
-            console.log(res)
-          })
-          .catch((e) => {
-            console.log(e)
-          })
-      }
-    )
+      ;['996777171171', '996507454411', '996777599577', '996999466000'].map(
+        (g) => {
+          requester
+            .post('/office/wa-send-message', {
+              content,
+              phone_number: g,
+            })
+            .then((res) => {
+              console.log(res)
+            })
+            .catch((e) => {
+              console.log(e)
+            })
+        }
+      )
   }, [items])
+
+  useEffect(() => {
+    if (isConfirm) {
+      const ask = confirm("Вы уверены")
+      if (ask) {
+        const filteredItems = items.filter((el, i) => {
+          return i !== index
+        })
+        setIndex(null)
+        localStorage.setItem('__invoices', JSON.stringify(filteredItems))
+        setItems(filteredItems)
+        setIsConfirm(false)
+      } else {
+        setIsConfirm(false)
+      }
+    }
+  }, [isConfirm])
 
   return (
     <>
       <div
-        style={{backgroundColor: 'white', flexGrow: 1, gap: 0}}
+        style={{ backgroundColor: 'white', flexGrow: 1, gap: 0 }}
         className='p-3'
       >
         <div className='d-flex justify-content-between gap-5 mb-3 align-items-center'>
@@ -210,17 +232,17 @@ export default function InvoicesContainer() {
               id={`showIsHIddenItems`}
               label={`Скрытые`}
             />
-            <div style={{whiteSpace: 'nowrap'}}>
+            <div style={{ whiteSpace: 'nowrap' }}>
               Всего остаток: <strong>{totalLeft} сом</strong>
             </div>
-            <InputGroup style={{minWidth: 100, maxWidth: 300}}>
+            <InputGroup style={{ minWidth: 100, maxWidth: 300 }}>
               <Form.Control
                 placeholder={t('search')}
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
               />
             </InputGroup>
-            <Button style={{whiteSpace: 'nowrap'}} onClick={createInvoice}>
+            <Button style={{ whiteSpace: 'nowrap' }} onClick={createInvoice}>
               Новая квитанция
             </Button>
           </div>
@@ -229,7 +251,7 @@ export default function InvoicesContainer() {
         <Row>
           {renderList.map((g, i) => (
             <Col sm={6} md={3} xl={2} className='align-self-stretch mb-4'>
-              <Card style={{height: '100%'}}>
+              <Card style={{ height: '100%' }}>
                 <Card.Body>
                   <Card.Title>
                     <Button
@@ -252,6 +274,16 @@ export default function InvoicesContainer() {
                       </ListGroup.Item>
                     ))}
                   </ListGroup>
+                  <Button
+                    className='position-relative'
+                    variant='danger'
+                    onClick={() => {
+                      setIsConfirm(true)
+                      setIndex(i)
+                    }}
+                  >
+                    <MdDeleteOutline />
+                  </Button>
                   <div className='d-flex justify-content-end align-items-center mt-3'>
                     <Button
                       variant='secondary'

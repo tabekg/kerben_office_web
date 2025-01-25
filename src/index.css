@@ -1,4 +1,6 @@
-html, body, div#root {
+html,
+body,
+div#root {
     height: 100%;
 }
 
@@ -19,4 +21,12 @@ html, body, div#root {
 
 .driver-list-item:hover {
     background-color: rgba(0, 0, 0, 0.05);
+}
+
+.confirmm {
+    top: -30px;
+    right: -105px;
+    background-color: tomato;
+    color: white;
+    padding: 6px 10px;
 }
