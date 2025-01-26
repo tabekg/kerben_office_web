@@ -287,7 +287,7 @@ export default function InvoicesContainer() {
                       variant='secondary'
                       onClick={() => toggleHidden(g.number)}
                     >
-                      С/П 
+                      С/П
                     </Button>
                     {g.date} #{g.number}
                     <div>
@@ -296,10 +296,11 @@ export default function InvoicesContainer() {
                   </Card.Title>
                   <ListGroup variant='flush'>
                     {g.transactions.map((o) => (
-                      <ListGroup.Item>
+                      <ListGroup.Item className='d-flex justify-content-between align-items-center'>
                         {o.date}: {o.sum} сом
                         <Button
                           variant='danger'
+                          size='sm'
                           onClick={() =>
                             deleteTransaction(g.id || 0, o.id || 0)
                           }
@@ -309,19 +310,6 @@ export default function InvoicesContainer() {
                       </ListGroup.Item>
                     ))}
                   </ListGroup>
-<<<<<<< HEAD
-                  <Button
-                    className='position-relative'
-                    variant=''
-                    onClick={() => {
-                      setIsConfirm(true)
-                      setIndex(i)
-                    }}
-                  >
-                    <MdDeleteOutline />
-                  </Button>
-=======
->>>>>>> 1a37a262c00f8b4a7d8f81c569214735471984ec
                   <div className='d-flex justify-content-end align-items-center mt-3'>
                     <Button
                       variant='secondary'
