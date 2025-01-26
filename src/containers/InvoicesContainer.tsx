@@ -260,7 +260,7 @@ export default function InvoicesContainer() {
                       variant='secondary'
                       onClick={() => toggleHidden(g.number)}
                     >
-                      С/П
+                      С/П 
                     </Button>
                     {g.date} #{g.number}
                     <div>
@@ -276,7 +276,7 @@ export default function InvoicesContainer() {
                   </ListGroup>
                   <Button
                     className='position-relative'
-                    variant='danger'
+                    variant=''
                     onClick={() => {
                       setIsConfirm(true)
                       setIndex(i)
