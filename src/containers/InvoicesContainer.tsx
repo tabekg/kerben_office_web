@@ -9,14 +9,17 @@ import {
   ListGroup,
   Button,
 } from 'react-bootstrap'
+import {MdDeleteOutline} from 'react-icons/md'
 import requester from '../utils/requester'
 
 interface ITransaction {
+  id?: number
   date: string
   sum: number
 }
 
 interface IInvoice {
+  id?: number
   date?: string
   number: string
   sum: number
@@ -43,7 +46,21 @@ export default function InvoicesContainer() {
         return a_ > b_ ? 1 : a_ < b_ ? -1 : 0
         // return a.localeCompare(b);         // <-- alternative
       })
-      .map((g: IInvoice) => ({...g, isHidden: !!g.isHidden}))
+      .map((g: IInvoice) => ({
+        ...g,
+        transactions: g.transactions || [],
+        isHidden: !!g.isHidden,
+      }))
+      .map((g: IInvoice, i: number) => {
+        return {
+          ...g,
+          transactions: g.transactions.map((t, it) => ({
+            ...t,
+            id: t.id || it + 1,
+          })),
+          id: g.id || i + 1,
+        }
+      })
   )
 
   const [searchInput, setSearchInput] = useState('')
@@ -104,6 +121,7 @@ export default function InvoicesContainer() {
       return [
         ...p,
         {
+          id: (p[p.length - 1]?.id || 0) + 1 || 1,
           date: date || undefined,
           number,
           sum,
@@ -126,7 +144,14 @@ export default function InvoicesContainer() {
         if (g.number != invoiceNumber) {
           return g
         }
-        g.transactions = [...g.transactions, {date, sum}]
+        g.transactions = [
+          ...g.transactions,
+          {
+            date,
+            sum,
+            id: (g.transactions[g.transactions.length - 1]?.id || 0) + 1 || 1,
+          },
+        ]
         return {
           ...g,
           left: g.left - sum,
@@ -189,6 +214,30 @@ export default function InvoicesContainer() {
     )
   }, [items])
 
+  const deleteTransaction = useCallback(
+    (invoice: number, transaction: number) => {
+      if (!window.confirm('Вы уверены?')) {
+        return
+      }
+
+      setItems((p) => {
+        return p.map((g) => {
+          if (g.id === invoice) {
+            return {
+              ...g,
+              left:
+                g.left -
+                (g.transactions.find((m) => m.id === transaction)?.sum || 0),
+              transactions: g.transactions.filter((j) => j.id !== transaction),
+            }
+          }
+          return g
+        })
+      })
+    },
+    [setItems]
+  )
+
   return (
     <>
       <div
@@ -227,7 +276,7 @@ export default function InvoicesContainer() {
         </div>
 
         <Row>
-          {renderList.map((g, i) => (
+          {renderList.map((g) => (
             <Col sm={6} md={3} xl={2} className='align-self-stretch mb-4'>
               <Card style={{height: '100%'}}>
                 <Card.Body>
@@ -247,8 +296,17 @@ export default function InvoicesContainer() {
                   </Card.Title>
                   <ListGroup variant='flush'>
                     {g.transactions.map((o) => (
-                      <ListGroup.Item>
+                      <ListGroup.Item className='d-flex justify-content-between align-items-center'>
                         {o.date}: {o.sum} сом
+                        <Button
+                          variant='danger'
+                          size='sm'
+                          onClick={() =>
+                            deleteTransaction(g.id || 0, o.id || 0)
+                          }
+                        >
+                          <MdDeleteOutline />
+                        </Button>
                       </ListGroup.Item>
                     ))}
                   </ListGroup>
