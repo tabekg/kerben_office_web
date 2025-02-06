@@ -8,10 +8,10 @@ import {
   Col,
   ListGroup,
   Button,
+  Modal,
 } from 'react-bootstrap'
 import {MdDeleteOutline} from 'react-icons/md'
 import requester from '../utils/requester'
-
 interface ITransaction {
   id?: number
   date: string
@@ -34,6 +34,13 @@ export default function InvoicesContainer() {
   const {t} = useTranslation()
 
   const [showHiddenItems, setShowHiddenItems] = useState(false)
+  const [showModal, setShowModal] = useState(false)
+  const [newInvoice, setNewInvoice] = useState({
+    date: '',
+    number: '',
+    sum: 0,
+    comm: 0,
+  })
 
   const [items, setItems] = useState<IInvoice[]>(
     JSON.parse(localStorage.getItem('__invoices') || '[]')
@@ -105,35 +112,45 @@ export default function InvoicesContainer() {
     }
   }, [items])
 
+  
   const createInvoice = useCallback(() => {
-    const date = window.prompt('Date?')
-    const number = window.prompt('Number?') || 'Untitled'
-
-    if (items.findIndex((g) => g.number === number) > -1) {
-      window.alert('Already exists!')
+    if (items.findIndex((g) => g.number === newInvoice.number) > -1) {
+      window.alert('Квитанция уже существует!')
       return
     }
+    // const date = window.prompt('Date?')
+    // const number = window.prompt('Number?') || 'Untitled'
 
-    const sum = Math.floor(+(window.prompt('Sum?') || 0))
-    const comm = Math.floor(+(window.prompt('Comm?') || 0))
+    // const sum = Math.floor(+(window.prompt('Sum?') || 0))
+    // const comm = Math.floor(+(window.prompt('Comm?') || 0))
 
-    setItems((p) => {
-      return [
-        ...p,
-        {
-          id: (p[p.length - 1]?.id || 0) + 1 || 1,
-          date: date || undefined,
-          number,
-          sum,
-          isHidden: false,
-          comm,
-          total: sum + comm,
-          left: sum,
-          transactions: [],
-        },
-      ]
+    setItems((prevItems) => {
+      const newInvoiceEntry: IInvoice = {
+        id: (prevItems[prevItems.length - 1]?.id || 0) + 1 || 1,
+        date: newInvoice.date,
+        number: newInvoice.number,
+        sum: newInvoice.sum,
+        isHidden: false,
+        comm: newInvoice.comm,
+        total: newInvoice.sum + newInvoice.comm,
+        left: newInvoice.sum,
+        transactions: [],
+      }
+
+      const updatedItems = [...prevItems, newInvoiceEntry]
+
+      setShowModal(false) 
+
+      return updatedItems 
     })
-  }, [items])
+
+    setNewInvoice({
+      date: '',
+      number: '',
+      sum: 0,
+      comm: 0,
+    })
+  }, [items, newInvoice])
 
   const createTransaction = useCallback((invoiceNumber: string) => {
     const date = window.prompt('Date?') || 'No date'
@@ -214,6 +231,11 @@ export default function InvoicesContainer() {
     )
   }, [items])
 
+  const handleChange = (e: any) => {
+    const {name, value} = e.target
+    setNewInvoice((prev) => ({...prev, [name]: value}))
+  }
+
   const deleteTransaction = useCallback(
     (invoice: number, transaction: number) => {
       if (!window.confirm('Вы уверены?')) {
@@ -247,7 +269,7 @@ export default function InvoicesContainer() {
         <div className='d-flex justify-content-between gap-5 mb-3 align-items-center'>
           <div className='d-flex gap-3'>
             <h1 className='h3 text-muted'>Квитанции ({renderList.length})</h1>
-            <Button onClick={() => sendWARemainings()} variant='secondary'>
+            <Button onClick={sendWARemainings} variant='secondary'>
               Отправить остаток
             </Button>
           </div>
@@ -269,15 +291,81 @@ export default function InvoicesContainer() {
                 onChange={(e) => setSearchInput(e.target.value)}
               />
             </InputGroup>
-            <Button style={{whiteSpace: 'nowrap'}} onClick={createInvoice}>
+            <Button
+              style={{whiteSpace: 'nowrap'}}
+              onClick={() => setShowModal(true)}
+            >
               Новая квитанция
             </Button>
           </div>
         </div>
-
+{/* Modal code */}
+        <Modal show={showModal} onHide={() => setShowModal(false)}>
+          <Modal.Header closeButton>
+            <Modal.Title>Создать новую квитанцию</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Form>
+              <Form.Group controlId='formDate'>
+                <Form.Label>Дата</Form.Label>
+                <Form.Control
+                  type='date'
+                  name='date'
+                  value={newInvoice.date}
+                  onChange={handleChange}
+                />
+              </Form.Group>
+              <Form.Group controlId='formNumber'>
+                <Form.Label>Номер</Form.Label>
+                <Form.Control
+                  type='text'
+                  name='number'
+                  value={newInvoice.number}
+                  onChange={handleChange}
+                  placeholder='Введите номер'
+                />
+              </Form.Group>
+              <Form.Group controlId='formSum'>
+                <Form.Label>Сумма</Form.Label>
+                <Form.Control
+                  type='number'
+                  name='sum'
+                  value={newInvoice.sum}
+                  onChange={handleChange}
+                  placeholder='Введите сумму'
+                />
+              </Form.Group>
+              <Form.Group controlId='formComm'>
+                <Form.Label>Комиссия</Form.Label>
+                <Form.Control
+                  type='number'
+                  name='comm'
+                  value={newInvoice.comm}
+                  onChange={handleChange}
+                  placeholder='Введите комиссию'
+                />
+              </Form.Group>
+            </Form>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant='secondary' onClick={() => setShowModal(false)}>
+              Закрыть
+            </Button>
+            <Button variant='primary' onClick={createInvoice}>
+              Создать
+            </Button>
+          </Modal.Footer>
+        </Modal>
+{/* End code */}
         <Row>
           {renderList.map((g) => (
-            <Col sm={6} md={3} xl={2} className='align-self-stretch mb-4'>
+            <Col
+              sm={6}
+              md={3}
+              xl={2}
+              className='align-self-stretch mb-4'
+              key={g.id}
+            >
               <Card style={{height: '100%'}}>
                 <Card.Body>
                   <Card.Title>
@@ -296,7 +384,10 @@ export default function InvoicesContainer() {
                   </Card.Title>
                   <ListGroup variant='flush'>
                     {g.transactions.map((o) => (
-                      <ListGroup.Item className='d-flex justify-content-between align-items-center'>
+                      <ListGroup.Item
+                        className='d-flex justify-content-between align-items-center'
+                        key={o.id}
+                      >
                         {o.date}: {o.sum} сом
                         {!g.isHidden && (
                           <Button
@@ -330,4 +421,4 @@ export default function InvoicesContainer() {
       </div>
     </>
   )
-}
+}  
