@@ -243,7 +243,7 @@ export default function InvoicesContainer() {
 
   const handleChange = (e: any) => {
     const {name, value} = e.target
-    setNewInvoice((prev) => ({...prev, [name]: value}))
+    setNewInvoice((prev) => ({...prev, [name]: name === 'sum' || name === 'comm' ? Number(value): value}))
   }
 
   const deleteTransaction = useCallback(
