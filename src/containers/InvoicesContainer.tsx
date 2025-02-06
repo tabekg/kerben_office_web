@@ -139,10 +139,10 @@ export default function InvoicesContainer() {
 
       const updatedItems = [...prevItems, newInvoiceEntry]
 
-      setShowModal(false) 
-
+      
       return updatedItems 
     })
+    setShowModal(false) 
 
     setNewInvoice({
       date: '',
@@ -151,6 +151,16 @@ export default function InvoicesContainer() {
       comm: 0,
     })
   }, [items, newInvoice])
+
+  //! Валидация формы
+  const isFormValid = useMemo(() => {
+    return (
+      newInvoice.date &&
+      newInvoice.number &&
+      newInvoice.sum > 0 &&
+      newInvoice.comm >= 0
+    )
+  },[newInvoice])
 
   const createTransaction = useCallback((invoiceNumber: string) => {
     const date = window.prompt('Date?') || 'No date'
@@ -299,7 +309,7 @@ export default function InvoicesContainer() {
             </Button>
           </div>
         </div>
-{/* Modal code */}
+        {/* Modal code */}
         <Modal show={showModal} onHide={() => setShowModal(false)}>
           <Modal.Header closeButton>
             <Modal.Title>Создать новую квитанцию</Modal.Title>
@@ -351,12 +361,16 @@ export default function InvoicesContainer() {
             <Button variant='secondary' onClick={() => setShowModal(false)}>
               Закрыть
             </Button>
-            <Button variant='primary' onClick={createInvoice}>
+            <Button
+              variant='primary'
+              onClick={createInvoice}
+              disabled={!isFormValid}
+            >
               Создать
             </Button>
           </Modal.Footer>
         </Modal>
-{/* End code */}
+        {/* End code */}
         <Row>
           {renderList.map((g) => (
             <Col
