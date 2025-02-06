@@ -298,25 +298,29 @@ export default function InvoicesContainer() {
                     {g.transactions.map((o) => (
                       <ListGroup.Item className='d-flex justify-content-between align-items-center'>
                         {o.date}: {o.sum} сом
-                        <Button
-                          variant='danger'
-                          size='sm'
-                          onClick={() =>
-                            deleteTransaction(g.id || 0, o.id || 0)
-                          }
-                        >
-                          <MdDeleteOutline />
-                        </Button>
+                        {!g.isHidden && (
+                          <Button
+                            variant='danger'
+                            size='sm'
+                            onClick={() =>
+                              deleteTransaction(g.id || 0, o.id || 0)
+                            }
+                          >
+                            <MdDeleteOutline />
+                          </Button>
+                        )}
                       </ListGroup.Item>
                     ))}
                   </ListGroup>
                   <div className='d-flex justify-content-end align-items-center mt-3'>
-                    <Button
-                      variant='secondary'
-                      onClick={() => createTransaction(g.number)}
-                    >
-                      Новая транзакция
-                    </Button>
+                    {!g.isHidden && (
+                      <Button
+                        variant='secondary'
+                        onClick={() => createTransaction(g.number)}
+                      >
+                        Новая транзакция
+                      </Button>
+                    )}
                   </div>
                 </Card.Body>
               </Card>
