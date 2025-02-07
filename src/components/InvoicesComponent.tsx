@@ -34,14 +34,10 @@ interface IInvoice {
 
 export default function InvoicesComponent({
   title,
-  data,
-  setInvoicesData,
-  selected,
+  name,
 }: {
   title: string
-  data: IInvoice[]
-  setInvoicesData: any
-  selected: string
+  name: string
 }) {
   const {t} = useTranslation()
 
@@ -54,35 +50,41 @@ export default function InvoicesComponent({
     comm: 0,
   })
 
-  const [items, setItems] = useState<IInvoice[]>(data)
-
-  useEffect(() => {
-    setItems(data)
-  }, [data])
-
-  const [searchInput, setSearchInput] = useState('')
-
-  useEffect(() => {
-    if (items && items.length > 0) {
-      requester
-        .post('/office/invoices', {data: items})
-        .then((res) => {
-          console.log(res)
-        })
-        .catch((e) => window.alert('Ошибка: ' + e))
-    }
-  }, [items])
+  const [items, setItems] = useState<IInvoice[]>(
+    JSON.parse(localStorage.getItem('__' + name) || '[]')
+      .sort(function (a: IInvoice, b: IInvoice) {
+        const a_ = a?.date?.split('.').reverse().join('')
+        const b_ = b?.date?.split('.').reverse().join('')
+        if (!a_ || !b_) {
+          return 0
+        }
+        return a_ > b_ ? 1 : a_ < b_ ? -1 : 0
+        // return a.localeCompare(b);         // <-- alternative
+      })
+      .map((g: IInvoice) => ({
+        ...g,
+        transactions: g.transactions || [],
+        isHidden: !!g.isHidden,
+      }))
+      .map((g: IInvoice, i: number) => {
+        return {
+          ...g,
+          transactions: g.transactions.map((t, it) => ({
+            ...t,
+            id: t.id || it + 1,
+          })),
+          id: g.id || i + 1,
+        }
+      })
+  )
 
   useEffect(() => {
     if (items.length < 1) {
       return
     }
-    localStorage.setItem(
-      `__invoices${selected === '0.4' ? '' : `_${selected}`}`,
-      JSON.stringify(items)
-    )
+    localStorage.setItem('__' + name, JSON.stringify(items))
     const items_sync = JSON.parse(
-      localStorage.getItem(`__invoices_sync`) || '[]'
+      localStorage.getItem('__' + name + '_sync') || '[]'
     )
     if (
       items_sync.length < 1 ||
@@ -90,39 +92,51 @@ export default function InvoicesComponent({
         JSON.stringify(items_sync[items_sync.length - 1])
     ) {
       localStorage.setItem(
-        '__invoices_sync',
+        '__' + name + '_sync',
         JSON.stringify([...items_sync, items])
       )
     }
-  }, [items, selected])
+  }, [items, name])
+
+  const [searchInput, setSearchInput] = useState('')
 
   const createInvoice = useCallback(() => {
     if (items.findIndex((g) => g.number === newInvoice.number) > -1) {
       window.alert('Квитанция уже существует!')
       return
     }
+    // const date = window.prompt('Date?')
+    // const number = window.prompt('Number?') || 'Untitled'
 
-    const newInvoiceEntry: IInvoice = {
-      id: (items[items.length - 1]?.id || 0) + 1 || 1,
-      date: newInvoice.date,
-      number: newInvoice.number,
-      sum: newInvoice.sum,
-      isHidden: false,
-      comm: newInvoice.comm,
-      total: newInvoice.sum + newInvoice.comm,
-      left: newInvoice.sum,
-      transactions: [],
-    }
+    // const sum = Math.floor(+(window.prompt('Sum?') || 0))
+    // const comm = Math.floor(+(window.prompt('Comm?') || 0))
 
-    const updatedItems = [...items, newInvoiceEntry]
-    setItems(updatedItems)
-    setInvoicesData((prevData: any) => ({
-      ...prevData,
-      [selected]: updatedItems,
-    }))
+    setItems((prevItems) => {
+      const newInvoiceEntry: IInvoice = {
+        id: (prevItems[prevItems.length - 1]?.id || 0) + 1 || 1,
+        date: newInvoice.date,
+        number: newInvoice.number,
+        sum: newInvoice.sum,
+        isHidden: false,
+        comm: newInvoice.comm,
+        total: newInvoice.sum + newInvoice.comm,
+        left: newInvoice.sum,
+        transactions: [],
+      }
+
+      const updatedItems = [...prevItems, newInvoiceEntry]
+
+      return updatedItems
+    })
     setShowModal(false)
-    setNewInvoice({date: '', number: '', sum: 0, comm: 0})
-  }, [items, newInvoice, selected, setInvoicesData])
+
+    setNewInvoice({
+      date: '',
+      number: '',
+      sum: 0,
+      comm: 0,
+    })
+  }, [items, newInvoice])
 
   const isFormValid = useMemo(() => {
     return (
@@ -133,33 +147,30 @@ export default function InvoicesComponent({
     )
   }, [newInvoice])
 
-  const createTransaction = useCallback(
-    (invoiceNumber: string) => {
-      const date = window.prompt('Date?') || 'No date'
-      const sum = Math.floor(+(window.prompt('Sum?') || 0))
+  const createTransaction = useCallback((invoiceNumber: string) => {
+    const date = window.prompt('Date?') || 'No date'
+    const sum = Math.floor(+(window.prompt('Sum?') || 0))
 
-      setItems((p) => {
-        const updatedItems = p.map((g) => {
-          if (g.number !== invoiceNumber) {
-            return g
-          }
-          const newTransaction = {
+    setItems((p) => {
+      return p.map((g) => {
+        if (g.number != invoiceNumber) {
+          return g
+        }
+        g.transactions = [
+          ...g.transactions,
+          {
             date,
             sum,
             id: (g.transactions[g.transactions.length - 1]?.id || 0) + 1 || 1,
-          }
-          return {
-            ...g,
-            left: g.left - sum,
-            transactions: [...g.transactions, newTransaction],
-          }
-        })
-        setInvoicesData((prevData : any) => ({...prevData, [selected]: updatedItems}))
-        return updatedItems
+          },
+        ]
+        return {
+          ...g,
+          left: g.left - sum,
+        }
       })
-    },
-    [selected, setInvoicesData]
-  )
+    })
+  }, [])
 
   const totalLeft = useMemo(() => {
     return items.filter((g) => !g.isHidden).reduce((a, b) => a + b.left, 0)
@@ -172,17 +183,15 @@ export default function InvoicesComponent({
   const toggleHidden = useCallback(
     (invoiceId: string) => {
       setItems((p) => {
-        const updatedItems = p.map((g) => {
+        return p.map((g, i) => {
           if (g.number === invoiceId) {
             return {...g, isHidden: !g.isHidden}
           }
           return g
         })
-        setInvoicesData((prevData: any) => ({...prevData, [selected]: updatedItems}))
-        return updatedItems
       })
     },
-    [selected, setInvoicesData]
+    [setItems]
   )
 
   const sendWARemainings = useCallback(() => {
@@ -200,7 +209,7 @@ export default function InvoicesComponent({
       commaNumber(remaining) +
       ' сом'
 
-    ;;['996777171171', '996507454411', '996777599577', '996999466000'].forEach(
+    ;['996777171171', '996507454411', '996777599577', '996999466000'].forEach(
       (phoneNumber) => {
         requester
           .post('/office/wa-send-message', {
@@ -226,34 +235,27 @@ export default function InvoicesComponent({
   }
 
   const deleteTransaction = useCallback(
-    (invoiceId: number, transactionId: number) => {
+    (invoice: number, transaction: number) => {
       if (!window.confirm('Вы уверены?')) {
         return
       }
 
       setItems((p) => {
-        const updatedItems = p.map((g) => {
-          if (g.id === invoiceId) {
-            const transactionToDelete = g.transactions.find(
-              (m) => m.id === transactionId
-            )
-            const leftToRestore = transactionToDelete?.sum || 0
-
+        return p.map((g) => {
+          if (g.id === invoice) {
             return {
               ...g,
-              left: g.left + leftToRestore,
-              transactions: g.transactions.filter(
-                (j) => j.id !== transactionId
-              ),
+              left:
+                g.left +
+                (g.transactions.find((m) => m.id === transaction)?.sum || 0),
+              transactions: g.transactions.filter((j) => j.id !== transaction),
             }
           }
           return g
         })
-        setInvoicesData((prevData: any) => ({...prevData, [selected]: updatedItems}))
-        return updatedItems
       })
     },
-    [selected, setInvoicesData]
+    [setItems]
   )
 
   return (
@@ -285,7 +287,7 @@ export default function InvoicesComponent({
 
             <InputGroup style={{minWidth: 100, maxWidth: 300}}>
               <Form.Control
-                placeholder={t('search')}
+                placeholder={t('search') || ''}
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
               />

@@ -1,48 +1,11 @@
-import {useState, useEffect, useMemo} from 'react'
+import {useState, useMemo} from 'react'
 import InvoicesComponent from '../components/InvoicesComponent'
 
-interface Props {
-  title: string
-  sum: number
-}
-
-const InvoicesContainer = ({title: initialTitle, sum: initialSum}: Props) => {
+const InvoicesContainer = () => {
   const [selected, setSelected] = useState('invoices')
-  const [invoicesData, setInvoicesData] = useState<{[key: string]: any[]}>({
-    invoices: JSON.parse(localStorage.getItem('__invoices') || '[]'),
-    'gps-1': JSON.parse(localStorage.getItem('__invoices_gps-1') || '[]'),
-    'gps-2': JSON.parse(localStorage.getItem('__invoices_gps-2') || '[]'),
-    'gps-3': JSON.parse(localStorage.getItem('__invoices_gps-3') || '[]'),
-    'gps-4': JSON.parse(localStorage.getItem('__invoices_gps-4') || '[]'),
-  })
-
-  useEffect(() => {
-    localStorage.setItem('__invoices', JSON.stringify(invoicesData['invoices']))
-    localStorage.setItem(
-      '__invoices_gps-1',
-      JSON.stringify(invoicesData['gps-1'])
-    )
-    localStorage.setItem(
-      '__invoices_gps-2',
-      JSON.stringify(invoicesData['gps-2'])
-    )
-    localStorage.setItem(
-      '__invoices_gps-3',
-      JSON.stringify(invoicesData['gps-3'])
-    )
-    localStorage.setItem(
-      '__invoices_gps-4',
-      JSON.stringify(invoicesData['gps-4'])
-    )
-  }, [invoicesData])
 
   const handleButtonClick = (buttonLabel: string) => {
     setSelected(buttonLabel)
-  }
-
-  const handleChange = (e: any) => {
-    const {name, value} = e.target
-    setNewInvoice((prev) => ({...prev, [name]: name === 'sum' || name === 'comm' ? Number(value): value}))
   }
 
   const title = useMemo(() => {
@@ -55,16 +18,12 @@ const InvoicesContainer = ({title: initialTitle, sum: initialSum}: Props) => {
         return 'GPS 2'
       case 'gps-3':
         return 'GPS 3'
-      case 'gps-4':
-        return 'GPS 4'
+      case 'terminal':
+        return 'Терминал'
       default:
-        return initialTitle
+        return ''
     }
-  }, [selected, initialTitle])
-
-  const selectedData = useMemo(() => {
-    return invoicesData[selected] || []
-  }, [selected, invoicesData])
+  }, [selected])
 
   return (
     <>
@@ -109,15 +68,34 @@ const InvoicesContainer = ({title: initialTitle, sum: initialSum}: Props) => {
           <button
             type='button'
             className={`btn ${
-              selected === 'gps-4' ? 'btn-primary' : 'btn-outline-primary'
+              selected === 'terminal' ? 'btn-primary' : 'btn-outline-primary'
             }`}
-            onClick={() => handleButtonClick('gps-4')}
+            onClick={() => handleButtonClick('terminal')}
           >
-            GPS 4
+            Терминал
           </button>
         </div>
       </div>
-           <InvoicesComponent title={title} data={selectedData} setInvoicesData={setInvoicesData} selected={selected} />
+
+      {selected === 'invoices' ? (
+        <InvoicesComponent title={title} name={selected} />
+      ) : null}
+
+      {selected === 'terminal' ? (
+        <InvoicesComponent title={title} name={selected} />
+      ) : null}
+
+      {selected === 'gps-1' ? (
+        <InvoicesComponent title={title} name={selected} />
+      ) : null}
+
+      {selected === 'gps-2' ? (
+        <InvoicesComponent title={title} name={selected} />
+      ) : null}
+
+      {selected === 'gps-3' ? (
+        <InvoicesComponent title={title} name={selected} />
+      ) : null}
     </>
   )
 }
