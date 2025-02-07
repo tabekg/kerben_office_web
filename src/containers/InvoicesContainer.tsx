@@ -40,6 +40,11 @@ const InvoicesContainer = ({title: initialTitle, sum: initialSum}: Props) => {
     setSelected(buttonLabel)
   }
 
+  const handleChange = (e: any) => {
+    const {name, value} = e.target
+    setNewInvoice((prev) => ({...prev, [name]: name === 'sum' || name === 'comm' ? Number(value): value}))
+  }
+
   const title = useMemo(() => {
     switch (selected) {
       case 'invoices':
