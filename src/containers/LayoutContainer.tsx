@@ -24,9 +24,9 @@ const LayoutContainer = () => {
               <Nav.Link href='#' onClick={() => navigate('/invoices')}>
                 Квитанции
               </Nav.Link>
-              <Nav.Link href='#' onClick={() => navigate('/gps')}>
+              {/* <Nav.Link href='#' onClick={() => navigate('/gps')}>
                 GPS
-              </Nav.Link>
+              </Nav.Link> */}
               <Nav.Link
                 href='#'
                 onClick={() => navigate('/shipments/completed')}

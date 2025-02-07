@@ -768,6 +768,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/comma-number@npm:^2":
+  version: 2.1.2
+  resolution: "@types/comma-number@npm:2.1.2"
+  checksum: 10c0/29350a1a2b9531724638e8e6ff1db6ab360709e511bbf4d27f6ec0cbf57ae0d3bbbc68376d0de0e309019ebc5d8bcd2527b76ef76ebe4e024572bda43b72a294
+  languageName: node
+  linkType: hard
+
 "@types/google.maps@npm:3.50.5":
   version: 3.50.5
   resolution: "@types/google.maps@npm:3.50.5"
@@ -1174,6 +1181,13 @@ __metadata:
   dependencies:
     delayed-stream: "npm:~1.0.0"
   checksum: 10c0/0dbb829577e1b1e839fa82b40c07ffaf7de8a09b935cadd355a73652ae70a88b4320db322f6634a4ad93424292fa80973ac6480986247f1734a1137debf271d5
+  languageName: node
+  linkType: hard
+
+"comma-number@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "comma-number@npm:2.1.0"
+  checksum: 10c0/088129c6cc06c473340c1d14c8fc6515d76b885e02fe52d5defe25820a5dd7c6ae7aa41ead8d77b8c0001d63696a7ed93f94a2fdcf0eede8b75a34dc277abe0c
   languageName: node
   linkType: hard
 
@@ -2833,11 +2847,13 @@ __metadata:
   resolution: "office-web@workspace:."
   dependencies:
     "@react-google-maps/api": "npm:^2.18.1"
+    "@types/comma-number": "npm:^2"
     "@types/react": "npm:^18.3.3"
     "@types/react-dom": "npm:^18.3.0"
     "@vitejs/plugin-react": "npm:^4.0.0-beta.0"
     axios: "npm:^1.4.0"
     bootstrap: "npm:^5.2.3"
+    comma-number: "npm:^2.1.0"
     eslint: "npm:^8.38.0"
     eslint-plugin-react: "npm:^7.32.2"
     eslint-plugin-react-hooks: "npm:^4.6.0"
