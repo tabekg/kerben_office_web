@@ -29,7 +29,7 @@ interface IInvoice {
   total: number
   left: number
   isHidden?: boolean
-  transactions: ITransaction[]
+  transactions: ITransaction[] // Corrected: transactions should be an array
 }
 
 export default function InvoicesComponent({
@@ -50,33 +50,41 @@ export default function InvoicesComponent({
     comm: 0,
   })
 
-  const [items, setItems] = useState<IInvoice[]>(
-    JSON.parse(localStorage.getItem('__' + name) || '[]')
-      .sort(function (a: IInvoice, b: IInvoice) {
-        const a_ = a?.date?.split('.').reverse().join('')
-        const b_ = b?.date?.split('.').reverse().join('')
-        if (!a_ || !b_) {
-          return 0
-        }
-        return a_ > b_ ? 1 : a_ < b_ ? -1 : 0
-        // return a.localeCompare(b);         // <-- alternative
-      })
-      .map((g: IInvoice) => ({
-        ...g,
-        transactions: g.transactions || [],
-        isHidden: !!g.isHidden,
-      }))
-      .map((g: IInvoice, i: number) => {
-        return {
-          ...g,
-          transactions: g.transactions.map((t, it) => ({
-            ...t,
-            id: t.id || it + 1,
-          })),
-          id: g.id || i + 1,
-        }
-      })
-  )
+  const [showTransactionModal, setShowTransactionModal] = useState(false)
+  const [currentInvoiceNumber, setCurrentInvoiceNumber] = useState('')
+  const [newTransaction, setNewTransaction] = useState({
+    date: '',
+    sum: 0,
+  })
+
+  // Initialize items state with a check for an empty array
+  const [items, setItems] = useState<IInvoice[]>(() => {
+    // Corrected: setItems should handle an array of IInvoice
+    const storedItems = localStorage.getItem('__' + name)
+    if (storedItems) {
+      return JSON.parse(storedItems)
+        .sort(function (a: IInvoice, b: IInvoice) {
+          const a_ = a?.date?.split('.').reverse().join('')
+          const b_ = b?.date?.split('.').reverse().join('')
+          if (!a_ || !b_) {
+            return 0
+          }
+          return a_ > b_ ? 1 : a_ < b_ ? -1 : 0
+        })
+        .map((g: IInvoice, i: number) => {
+          return {
+            ...g,
+            transactions: (g.transactions || []).map((t, it) => ({
+              ...t,
+              id: t.id || it + 1,
+            })),
+            id: g.id || i + 1,
+            isHidden: !!g.isHidden,
+          }
+        })
+    }
+    return [] 
+  })
 
   useEffect(() => {
     if (items.length < 1) {
@@ -84,7 +92,7 @@ export default function InvoicesComponent({
     }
     localStorage.setItem('__' + name, JSON.stringify(items))
     const items_sync = JSON.parse(
-      localStorage.getItem('__' + name + '_sync') || '[]'
+      localStorage.getItem('__' + name + '_sync') || '[]' 
     )
     if (
       items_sync.length < 1 ||
@@ -105,11 +113,6 @@ export default function InvoicesComponent({
       window.alert('Квитанция уже существует!')
       return
     }
-    // const date = window.prompt('Date?')
-    // const number = window.prompt('Number?') || 'Untitled'
-
-    // const sum = Math.floor(+(window.prompt('Sum?') || 0))
-    // const comm = Math.floor(+(window.prompt('Comm?') || 0))
 
     setItems((prevItems) => {
       const newInvoiceEntry: IInvoice = {
@@ -148,29 +151,46 @@ export default function InvoicesComponent({
   }, [newInvoice])
 
   const createTransaction = useCallback((invoiceNumber: string) => {
-    const date = window.prompt('Date?') || 'No date'
-    const sum = Math.floor(+(window.prompt('Sum?') || 0))
+    setCurrentInvoiceNumber(invoiceNumber)
+    setShowTransactionModal(true)
+    setNewTransaction({date: '', sum: 0})
+  }, [])
+
+  const handleTransactionChange = (e: any) => {
+    const {name, value} = e.target
+    setNewTransaction((prev) => ({
+      ...prev,
+      [name]: name === 'sum' ? Number(value) : value,
+    }))
+  }
+
+  const saveTransaction = useCallback(() => {
+    if (!newTransaction.date || newTransaction.sum <= 0) {
+      alert('Пожалуйста, заполните дату и сумму транзакции.')
+      return
+    }
 
     setItems((p) => {
       return p.map((g) => {
-        if (g.number != invoiceNumber) {
+        if (g.number !== currentInvoiceNumber) {
           return g
         }
-        g.transactions = [
-          ...g.transactions,
-          {
-            date,
-            sum,
-            id: (g.transactions[g.transactions.length - 1]?.id || 0) + 1 || 1,
-          },
-        ]
+        const newTransactionEntry = {
+          date: newTransaction.date,
+          sum: newTransaction.sum,
+          id: (g.transactions[g.transactions.length - 1]?.id || 0) + 1 || 1,
+        }
         return {
           ...g,
-          left: g.left - sum,
+          left: g.left - newTransaction.sum,
+          transactions: [...g.transactions, newTransactionEntry],
         }
       })
     })
-  }, [])
+
+    setShowTransactionModal(false)
+    setNewTransaction({date: '', sum: 0})
+  }, [currentInvoiceNumber, newTransaction, setItems])
 
   const totalLeft = useMemo(() => {
     return items.filter((g) => !g.isHidden).reduce((a, b) => a + b.left, 0)
@@ -409,6 +429,59 @@ export default function InvoicesComponent({
                       </ListGroup.Item>
                     ))}
                   </ListGroup>
+                  {/* модалка для транзакции */}
+                  <Modal
+                    show={showTransactionModal}
+                    onHide={() => setShowTransactionModal(false)}
+                  >
+                    <Modal.Header closeButton>
+                      <Modal.Title>
+                        Новая транзакция для квитанции #{currentInvoiceNumber}
+                      </Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                      <Form>
+                        <Form.Group controlId='transactionDate'>
+                          <Form.Label>Дата</Form.Label>
+                          <Form.Control
+                            type='date'
+                            name='date'
+                            value={newTransaction.date}
+                            onChange={handleTransactionChange}
+                          />
+                        </Form.Group>
+                        <Form.Group controlId='transactionSum'>
+                          <Form.Label>Сумма</Form.Label>
+                          <Form.Control
+                            type='number'
+                            name='sum'
+                            value={newTransaction.sum}
+                            onChange={handleTransactionChange}
+                            placeholder='Введите сумму'
+                          />
+                        </Form.Group>
+                      </Form>
+                    </Modal.Body>
+                    <Modal.Footer>
+                      <Button
+                        variant='secondary'
+                        onClick={() => setShowTransactionModal(false)}
+                      >
+                        Закрыть
+                      </Button>
+                      <Button
+                        variant='primary'
+                        onClick={saveTransaction}
+                        disabled={
+                          !newTransaction.date || newTransaction.sum <= 0
+                        } // Кнопка "Сохранить" отключена, если поля не заполнены
+                      >
+                        Сохранить
+                      </Button>
+                    </Modal.Footer>
+                  </Modal>
+
+                  {/* конец */}
                   <div className='d-flex justify-content-end align-items-center mt-3'>
                     {!g.isHidden && (
                       <Button
