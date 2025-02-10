@@ -1,24 +1,18 @@
-import { useState } from 'react'
-import {
-  Button,
-  Form,
-  Modal,
-} from 'react-bootstrap'
-import { useTranslation } from 'react-i18next'
-
+import {useCallback, useMemo, useState} from 'react'
+import {Button, Form, Modal} from 'react-bootstrap'
 
 interface ITransaction {
   id?: number
   date: string
   sum: number
-  comment: string
+  comment?: string
 }
 
 interface TransactionModalProps {
   show: boolean
   onHide: () => void
   invoiceNumber: string
-  onSave: (transaction: Omit<ITransaction, 'id'>) => void 
+  onSave: (transaction: Omit<ITransaction, 'id'>) => Promise<void> | void
 }
 
 const TransactionModal: React.FC<TransactionModalProps> = ({
@@ -27,8 +21,6 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
   invoiceNumber,
   onSave,
 }) => {
-  const {t} = useTranslation() 
-
   const [newTransaction, setNewTransaction] = useState<
     Omit<ITransaction, 'id'>
   >({
@@ -47,27 +39,41 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
     }))
   }
 
-  const handleSave = () => {
-    if (!newTransaction.date || newTransaction.sum <= 0) {
-      alert(t('fill_date_and_sum')) 
+  const handleSave = useCallback(async () => {
+    if (
+      !newTransaction.date ||
+      newTransaction.sum <= 0 ||
+      !newTransaction.comment
+    ) {
+      alert('Заполните все поля')
       return
     }
-    onSave(newTransaction) 
-    setNewTransaction({date: '', sum: 0, comment: ''}) 
+
+    await onSave(newTransaction)
     onHide()
-  }
+
+    setTimeout(() => {
+      setNewTransaction({date: '', sum: 0, comment: ''})
+    }, 300)
+  }, [newTransaction, onSave, onHide])
+
+  const isTransactionFormValid = useMemo(() => {
+    return (
+      newTransaction.date !== '' &&
+      newTransaction.sum > 0 &&
+      newTransaction.comment !== ''
+    )
+  }, [newTransaction])
 
   return (
     <Modal show={show} onHide={onHide}>
       <Modal.Header closeButton>
-        <Modal.Title>
-          {t('new_transaction_for_invoice')} #{invoiceNumber}
-        </Modal.Title>
+        <Modal.Title>Новая транзакция для счета #{invoiceNumber}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Form>
           <Form.Group controlId='transactionDate'>
-            <Form.Label>{t('date')}</Form.Label>{' '}
+            <Form.Label>Дата</Form.Label>
             <Form.Control
               type='date'
               name='date'
@@ -76,43 +82,42 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
             />
           </Form.Group>
           <Form.Group controlId='transactionSum'>
-            <Form.Label>{t('sum')}</Form.Label>{' '}
+            <Form.Label>Сумма</Form.Label>
             <Form.Control
               type='number'
               name='sum'
               value={newTransaction.sum}
               onChange={handleTransactionChange}
-              placeholder={t('enter_sum') || ''} 
+              placeholder={''}
             />
           </Form.Group>
           <Form.Group controlId='transactionComment'>
-            <Form.Label>{t('comment')}</Form.Label>{' '}
+            <Form.Label>Комментарий</Form.Label>
             <Form.Control
-              as='textarea' 
-              rows={3} 
+              as='textarea'
+              rows={3}
               name='comment'
               value={newTransaction.comment}
               onChange={handleTransactionChange}
-              placeholder={t('enter_comment') || ''} 
+              placeholder={''}
             />
           </Form.Group>
         </Form>
       </Modal.Body>
       <Modal.Footer>
         <Button variant='secondary' onClick={onHide}>
-          {t('close')} 
+          Закрыть
         </Button>
         <Button
           variant='primary'
           onClick={handleSave}
-          disabled={!newTransaction.date || newTransaction.sum <= 0}
+          disabled={!isTransactionFormValid}
         >
-          {t('save')} 
+          Сохранить
         </Button>
       </Modal.Footer>
     </Modal>
   )
 }
-
 
 export default TransactionModal
