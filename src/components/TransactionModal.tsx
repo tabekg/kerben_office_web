@@ -6,6 +6,7 @@ interface ITransaction {
   date: string
   sum: number
   comment?: string
+  totalTrucks?: number
 }
 
 interface TransactionModalProps {
@@ -13,6 +14,7 @@ interface TransactionModalProps {
   onHide: () => void
   invoiceNumber: string
   onSave: (transaction: Omit<ITransaction, 'id'>) => Promise<void> | void
+  name: string
 }
 
 const TransactionModal: React.FC<TransactionModalProps> = ({
@@ -20,6 +22,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
   onHide,
   invoiceNumber,
   onSave,
+  name,
 }) => {
   const [newTransaction, setNewTransaction] = useState<
     Omit<ITransaction, 'id'>
@@ -33,10 +36,18 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const {name, value} = e.target
-    setNewTransaction((prev) => ({
-      ...prev,
-      [name]: name === 'sum' ? Number(value) : value,
-    }))
+    setNewTransaction((prev) => {
+      const newState = {
+        ...prev,
+        [name]: ['sum', 'totalTrucks'].includes(name) ? Number(value) : value,
+      }
+
+      if (name === 'totalTrucks') {
+        newState['sum'] = (Number(value) || 0) * 1100
+      }
+
+      return newState
+    })
   }
 
   const handleSave = useCallback(async () => {
@@ -45,7 +56,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
       newTransaction.sum <= 0 ||
       !newTransaction.comment
     ) {
-      alert('Заполните все поля')
+      window.alert('Заполните все поля')
       return
     }
 
@@ -81,6 +92,18 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
               onChange={handleTransactionChange}
             />
           </Form.Group>
+          {name.startsWith('gps') ? (
+            <Form.Group controlId='totalTrucks'>
+              <Form.Label>Количество машин</Form.Label>
+              <Form.Control
+                type='number'
+                name='totalTrucks'
+                value={(newTransaction.totalTrucks || '').toString()}
+                onChange={handleTransactionChange}
+                placeholder={''}
+              />
+            </Form.Group>
+          ) : null}
           <Form.Group controlId='transactionSum'>
             <Form.Label>Сумма</Form.Label>
             <Form.Control
@@ -89,6 +112,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
               value={newTransaction.sum}
               onChange={handleTransactionChange}
               placeholder={''}
+              disabled={!!newTransaction.totalTrucks}
             />
           </Form.Group>
           <Form.Group controlId='transactionComment'>

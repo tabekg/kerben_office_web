@@ -41,7 +41,7 @@ export default function InvoicesComponent({
   name: string
 }) {
   const [showHiddenItems, setShowHiddenItems] = useState(false)
-  const [showModal, setShowModal] = useState(false) 
+  const [showModal, setShowModal] = useState(false)
   const [newInvoice, setNewInvoice] = useState({
     date: '',
     number: '',
@@ -203,7 +203,7 @@ export default function InvoicesComponent({
         .join('\n') +
       `\n\n${'Всего остаток'}: ${commaNumber(remaining)} ${'сом'}`
 
-    ;;['996777171171', '996507454411', '996777599577', '996999466000'].forEach(
+    ;['996777171171', '996507454411', '996777599577', '996999466000'].forEach(
       (phoneNumber) => {
         requester
           .post('/office/wa-send-message', {
@@ -224,36 +224,37 @@ export default function InvoicesComponent({
     }))
   }
 
-const deleteTransaction = useCallback(
-  (invoiceId: number, transactionId: number) => {
-    if (!window.confirm('Вы уверены, что хотите удалить?')) {
-      return
-    }
+  const deleteTransaction = useCallback(
+    (invoiceId: number, transactionId: number) => {
+      if (!window.confirm('Вы уверены, что хотите удалить?')) {
+        return
+      }
 
-    setItems((prevItems) =>
-      prevItems.map((invoice) => {
-        if (invoice.id === invoiceId) {
-          const deletedTransaction = invoice.transactions.find(
-            (t) => t.id === transactionId
-          )
-          return {
-            ...invoice,
-            left: invoice.left + (deletedTransaction?.sum || 0),
-            transactions: invoice.transactions.filter(
-              (t) => t.id !== transactionId
-            ),
+      setItems((prevItems) =>
+        prevItems.map((invoice) => {
+          if (invoice.id === invoiceId) {
+            const deletedTransaction = invoice.transactions.find(
+              (t) => t.id === transactionId
+            )
+            return {
+              ...invoice,
+              left: invoice.left + (deletedTransaction?.sum || 0),
+              transactions: invoice.transactions.filter(
+                (t) => t.id !== transactionId
+              ),
+            }
           }
-        }
-        return invoice
-      })
-    )
-  },
-  [setItems]
-)
+          return invoice
+        })
+      )
+    },
+    [setItems]
+  )
 
   return (
     <>
       <TransactionModal
+        name={name}
         show={showTransactionModal}
         onHide={() => setShowTransactionModal(false)}
         invoiceNumber={currentInvoiceNumber}
@@ -415,16 +416,6 @@ const deleteTransaction = useCallback(
                       </ListGroup.Item>
                     ))}
                   </ListGroup>
-                  {/* модалка для транзакции */}
-
-                  <TransactionModal
-                    show={showTransactionModal}
-                    onHide={() => setShowTransactionModal(false)}
-                    invoiceNumber={currentInvoiceNumber}
-                    onSave={saveTransaction}
-                  />
-
-                  {/* конец */}
                   <div className='d-flex justify-content-end align-items-center mt-3'>
                     {!g.isHidden && (
                       <Button
