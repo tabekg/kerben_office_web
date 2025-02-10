@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useMemo, useState} from 'react'
+import React, {useCallback, useEffect, useMemo, useState} from 'react'
 import {
   Button,
   Card,
@@ -13,15 +13,17 @@ import {useTranslation} from 'react-i18next'
 import {MdDeleteOutline} from 'react-icons/md'
 import requester from '../utils/requester'
 import commaNumber from 'comma-number'
+import TransactionModal from './TransactionModal' 
 
 interface ITransaction {
-  id?: number
+  id: number 
   date: string
   sum: number
+  comment?: string 
 }
 
 interface IInvoice {
-  id?: number
+  id: number 
   date?: string
   number: string
   sum: number
@@ -29,7 +31,7 @@ interface IInvoice {
   total: number
   left: number
   isHidden?: boolean
-  transactions: ITransaction[] // Corrected: transactions should be an array
+  transactions: ITransaction[]
 }
 
 export default function InvoicesComponent({
@@ -42,7 +44,7 @@ export default function InvoicesComponent({
   const {t} = useTranslation()
 
   const [showHiddenItems, setShowHiddenItems] = useState(false)
-  const [showModal, setShowModal] = useState(false)
+  const [showModal, setShowModal] = useState(false) 
   const [newInvoice, setNewInvoice] = useState({
     date: '',
     number: '',
@@ -50,16 +52,10 @@ export default function InvoicesComponent({
     comm: 0,
   })
 
-  const [showTransactionModal, setShowTransactionModal] = useState(false)
-  const [currentInvoiceNumber, setCurrentInvoiceNumber] = useState('')
-  const [newTransaction, setNewTransaction] = useState({
-    date: '',
-    sum: 0,
-  })
+  const [showTransactionModal, setShowTransactionModal] = useState(false) 
+  const [currentInvoiceNumber, setCurrentInvoiceNumber] = useState('') 
 
-  // Initialize items state with a check for an empty array
   const [items, setItems] = useState<IInvoice[]>(() => {
-    // Corrected: setItems should handle an array of IInvoice
     const storedItems = localStorage.getItem('__' + name)
     if (storedItems) {
       return JSON.parse(storedItems)
@@ -76,14 +72,14 @@ export default function InvoicesComponent({
             ...g,
             transactions: (g.transactions || []).map((t, it) => ({
               ...t,
-              id: t.id || it + 1,
+              id: t.id || it + 1, 
             })),
-            id: g.id || i + 1,
+            id: g.id || i + 1, 
             isHidden: !!g.isHidden,
           }
         })
     }
-    return [] 
+    return []
   })
 
   useEffect(() => {
@@ -92,7 +88,7 @@ export default function InvoicesComponent({
     }
     localStorage.setItem('__' + name, JSON.stringify(items))
     const items_sync = JSON.parse(
-      localStorage.getItem('__' + name + '_sync') || '[]' 
+      localStorage.getItem('__' + name + '_sync') || '[]'
     )
     if (
       items_sync.length < 1 ||
@@ -110,7 +106,7 @@ export default function InvoicesComponent({
 
   const createInvoice = useCallback(() => {
     if (items.findIndex((g) => g.number === newInvoice.number) > -1) {
-      window.alert('Квитанция уже существует!')
+      alert(t('invoice_exists')) 
       return
     }
 
@@ -127,19 +123,11 @@ export default function InvoicesComponent({
         transactions: [],
       }
 
-      const updatedItems = [...prevItems, newInvoiceEntry]
-
-      return updatedItems
+      return [...prevItems, newInvoiceEntry]
     })
     setShowModal(false)
-
-    setNewInvoice({
-      date: '',
-      number: '',
-      sum: 0,
-      comm: 0,
-    })
-  }, [items, newInvoice])
+    setNewInvoice({date: '', number: '', sum: 0, comm: 0})
+  }, [items, newInvoice, t])
 
   const isFormValid = useMemo(() => {
     return (
@@ -153,44 +141,32 @@ export default function InvoicesComponent({
   const createTransaction = useCallback((invoiceNumber: string) => {
     setCurrentInvoiceNumber(invoiceNumber)
     setShowTransactionModal(true)
-    setNewTransaction({date: '', sum: 0})
   }, [])
 
-  const handleTransactionChange = (e: any) => {
-    const {name, value} = e.target
-    setNewTransaction((prev) => ({
-      ...prev,
-      [name]: name === 'sum' ? Number(value) : value,
-    }))
-  }
-
-  const saveTransaction = useCallback(() => {
-    if (!newTransaction.date || newTransaction.sum <= 0) {
-      alert('Пожалуйста, заполните дату и сумму транзакции.')
-      return
-    }
-
-    setItems((p) => {
-      return p.map((g) => {
-        if (g.number !== currentInvoiceNumber) {
-          return g
-        }
-        const newTransactionEntry = {
-          date: newTransaction.date,
-          sum: newTransaction.sum,
-          id: (g.transactions[g.transactions.length - 1]?.id || 0) + 1 || 1,
-        }
-        return {
-          ...g,
-          left: g.left - newTransaction.sum,
-          transactions: [...g.transactions, newTransactionEntry],
-        }
-      })
-    })
-
-    setShowTransactionModal(false)
-    setNewTransaction({date: '', sum: 0})
-  }, [currentInvoiceNumber, newTransaction, setItems])
+  const saveTransaction = useCallback(
+    (transaction: Omit<ITransaction, 'id'>) => {
+      setItems((prevItems) =>
+        prevItems.map((invoice) => {
+          if (invoice.number === currentInvoiceNumber) {
+            const newTransaction: ITransaction = {
+              ...transaction, 
+              id:
+                (invoice.transactions[invoice.transactions.length - 1]?.id ||
+                  0) + 1 || 1,
+            }
+            return {
+              ...invoice,
+              left: invoice.left - transaction.sum,
+              transactions: [...invoice.transactions, newTransaction],
+            }
+          }
+          return invoice
+        })
+      )
+      setShowTransactionModal(false) 
+    },
+    [currentInvoiceNumber, setItems]
+  )
 
   const totalLeft = useMemo(() => {
     return items.filter((g) => !g.isHidden).reduce((a, b) => a + b.left, 0)
@@ -202,51 +178,46 @@ export default function InvoicesComponent({
 
   const toggleHidden = useCallback(
     (invoiceId: string) => {
-      setItems((p) => {
-        return p.map((g, i) => {
-          if (g.number === invoiceId) {
-            return {...g, isHidden: !g.isHidden}
-          }
-          return g
-        })
-      })
+      setItems((prevItems) =>
+        prevItems.map((invoice) =>
+          invoice.number === invoiceId
+            ? {...invoice, isHidden: !invoice.isHidden}
+            : invoice
+        )
+      )
     },
     [setItems]
   )
 
-  const sendWARemainings = useCallback(() => {
-    if (!window.confirm('Вы уверены?')) {
-      return
-    }
+   const sendWARemainings = useCallback(() => {
+     const confirmMessage = t('confirm_send') 
+     if (!window.confirm(confirmMessage || 'Are you sure?')) {
+       return
+     }
 
-    const list = items.filter((g) => !g.isHidden)
-    const remaining = list.reduce((a, b) => a + b.left, 0)
+     const list = items.filter((g) => !g.isHidden)
+     const remaining = list.reduce((a, b) => a + b.left, 0)
+     const content =
+       `${t('kerben_remainder')} (${title})\n\n` +
+       list
+         .map((g) => `${g.number}: ${commaNumber(g.left)} ${t('currency')}`)
+         .join('\n') +
+       `\n\n${t('total_remaining')}: ${commaNumber(remaining)} ${t('currency')}`
 
-    const content =
-      `Kerben Остаток (${title})\n\n` +
-      list.map((g) => `${g.number}: ${commaNumber(g.left)} сом`).join('\n') +
-      '\n\nВсего остаток: ' +
-      commaNumber(remaining) +
-      ' сом'
+     ;['996777171171', '996507454411', '996777599577', '996999466000'].forEach(
+       (phoneNumber) => {
+         requester
+           .post('/office/wa-send-message', {
+             content,
+             phone_number: phoneNumber,
+           })
+           .then((res) => console.log(res))
+           .catch((e) => console.error(e)) 
+       }
+     )
+   }, [items, title, t]) 
 
-    ;['996777171171', '996507454411', '996777599577', '996999466000'].forEach(
-      (phoneNumber) => {
-        requester
-          .post('/office/wa-send-message', {
-            content,
-            phone_number: phoneNumber,
-          })
-          .then((res) => {
-            console.log(res)
-          })
-          .catch((e) => {
-            console.log(e)
-          })
-      }
-    )
-  }, [items, title])
-
-  const handleChange = (e: any) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const {name, value} = e.target
     setNewInvoice((prev) => ({
       ...prev,
@@ -254,29 +225,32 @@ export default function InvoicesComponent({
     }))
   }
 
-  const deleteTransaction = useCallback(
-    (invoice: number, transaction: number) => {
-      if (!window.confirm('Вы уверены?')) {
-        return
-      }
+   const deleteTransaction = useCallback(
+     (invoiceId: number, transactionId: number) => {
+       if (!window.confirm(t('confirm_delete') || 'Are you sure?')) {
+         return
+       }
 
-      setItems((p) => {
-        return p.map((g) => {
-          if (g.id === invoice) {
-            return {
-              ...g,
-              left:
-                g.left +
-                (g.transactions.find((m) => m.id === transaction)?.sum || 0),
-              transactions: g.transactions.filter((j) => j.id !== transaction),
-            }
-          }
-          return g
-        })
-      })
-    },
-    [setItems]
-  )
+       setItems((prevItems) =>
+         prevItems.map((invoice) => {
+           if (invoice.id === invoiceId) {
+             const deletedTransaction = invoice.transactions.find(
+               (t) => t.id === transactionId
+             )
+             return {
+               ...invoice,
+               left: invoice.left + (deletedTransaction?.sum || 0),
+               transactions: invoice.transactions.filter(
+                 (t) => t.id !== transactionId
+               ),
+             }
+           }
+           return invoice
+         })
+       )
+     },
+     [setItems, t] 
+   )
 
   return (
     <>
@@ -414,14 +388,20 @@ export default function InvoicesComponent({
                         className='d-flex justify-content-between align-items-center'
                         key={o.id}
                       >
-                        {o.date}: {commaNumber(o.sum)} сом
+                        <div>
+                          {' '}
+                          {o.date}: {commaNumber(o.sum)} {t('currency')}{' '}
+                          {o.comment && ( 
+                            <div style={{fontSize: '0.8rem', color: 'gray'}}>
+                              {o.comment}
+                            </div>
+                          )}
+                        </div>
                         {!g.isHidden && (
                           <Button
                             variant='danger'
                             size='sm'
-                            onClick={() =>
-                              deleteTransaction(g.id || 0, o.id || 0)
-                            }
+                            onClick={() => deleteTransaction(g.id!, o.id!)}
                           >
                             <MdDeleteOutline />
                           </Button>
@@ -430,56 +410,13 @@ export default function InvoicesComponent({
                     ))}
                   </ListGroup>
                   {/* модалка для транзакции */}
-                  <Modal
+
+                  <TransactionModal
                     show={showTransactionModal}
                     onHide={() => setShowTransactionModal(false)}
-                  >
-                    <Modal.Header closeButton>
-                      <Modal.Title>
-                        Новая транзакция для квитанции #{currentInvoiceNumber}
-                      </Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                      <Form>
-                        <Form.Group controlId='transactionDate'>
-                          <Form.Label>Дата</Form.Label>
-                          <Form.Control
-                            type='date'
-                            name='date'
-                            value={newTransaction.date}
-                            onChange={handleTransactionChange}
-                          />
-                        </Form.Group>
-                        <Form.Group controlId='transactionSum'>
-                          <Form.Label>Сумма</Form.Label>
-                          <Form.Control
-                            type='number'
-                            name='sum'
-                            value={newTransaction.sum}
-                            onChange={handleTransactionChange}
-                            placeholder='Введите сумму'
-                          />
-                        </Form.Group>
-                      </Form>
-                    </Modal.Body>
-                    <Modal.Footer>
-                      <Button
-                        variant='secondary'
-                        onClick={() => setShowTransactionModal(false)}
-                      >
-                        Закрыть
-                      </Button>
-                      <Button
-                        variant='primary'
-                        onClick={saveTransaction}
-                        disabled={
-                          !newTransaction.date || newTransaction.sum <= 0
-                        } // Кнопка "Сохранить" отключена, если поля не заполнены
-                      >
-                        Сохранить
-                      </Button>
-                    </Modal.Footer>
-                  </Modal>
+                    invoiceNumber={currentInvoiceNumber}
+                    onSave={saveTransaction}
+                  />
 
                   {/* конец */}
                   <div className='d-flex justify-content-end align-items-center mt-3'>
