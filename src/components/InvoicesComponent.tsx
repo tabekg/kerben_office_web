@@ -41,7 +41,7 @@ export default function InvoicesComponent({
   name: string
 }) {
   const [showHiddenItems, setShowHiddenItems] = useState(false)
-  const [showModal, setShowModal] = useState(false)
+  const [showModal, setShowModal] = useState(false) 
   const [newInvoice, setNewInvoice] = useState({
     date: '',
     number: '',
@@ -103,7 +103,7 @@ export default function InvoicesComponent({
 
   const createInvoice = useCallback(() => {
     if (items.findIndex((g) => g.number === newInvoice.number) > -1) {
-      alert('invoice_exists')
+      window.alert('Квитанция уже существует!')
       return
     }
 
@@ -143,7 +143,6 @@ export default function InvoicesComponent({
   const saveTransaction = useCallback(
     (transaction: Omit<ITransaction, 'id'>) => {
       setShowTransactionModal(false)
-
       setItems((prevItems) =>
         prevItems.map((invoice) => {
           if (invoice.number === currentInvoiceNumber) {
@@ -416,6 +415,16 @@ const deleteTransaction = useCallback(
                       </ListGroup.Item>
                     ))}
                   </ListGroup>
+                  {/* модалка для транзакции */}
+
+                  <TransactionModal
+                    show={showTransactionModal}
+                    onHide={() => setShowTransactionModal(false)}
+                    invoiceNumber={currentInvoiceNumber}
+                    onSave={saveTransaction}
+                  />
+
+                  {/* конец */}
                   <div className='d-flex justify-content-end align-items-center mt-3'>
                     {!g.isHidden && (
                       <Button
