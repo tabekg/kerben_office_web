@@ -14,6 +14,7 @@
     "axios": "^1.4.0",
     "bootstrap": "^5.2.3",
     "comma-number": "^2.1.0",
+    "file-saver": "^2.0.5",
     "i18next": "^22.4.15",
     "moment": "^2.30.1",
     "react": "^18.2.0",
@@ -22,10 +23,12 @@
     "react-i18next": "^12.2.2",
     "react-icons": "^4.8.0",
     "react-router-dom": "^6.18.0",
-    "recompose": "^0.30.0"
+    "recompose": "^0.30.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@types/comma-number": "^2",
+    "@types/file-saver": "^2.0.7",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.0.0-beta.0",

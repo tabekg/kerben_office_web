@@ -53,8 +53,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
   const handleSave = useCallback(async () => {
     if (
       !newTransaction.date ||
-      newTransaction.sum <= 0 ||
-      !newTransaction.comment
+      newTransaction.sum <= 0 
     ) {
       window.alert('Заполните все поля')
       return
@@ -72,7 +71,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
     return (
       newTransaction.date !== '' &&
       newTransaction.sum > 0 &&
-      newTransaction.comment !== ''
+      newTransaction.comment !== '' || newTransaction.comment == ''
     )
   }, [newTransaction])
 
