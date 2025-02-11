@@ -1,3 +1,4 @@
+import commaNumber from 'comma-number'
 import React, {useCallback, useEffect, useMemo, useState} from 'react'
 import {
   Button,
@@ -9,21 +10,19 @@ import {
   Modal,
   Row,
 } from 'react-bootstrap'
-import {useTranslation} from 'react-i18next'
 import {MdDeleteOutline} from 'react-icons/md'
 import requester from '../utils/requester'
-import commaNumber from 'comma-number'
-import TransactionModal from './TransactionModal' 
+import TransactionModal from './TransactionModal'
 
 interface ITransaction {
-  id: number 
+  id: number
   date: string
   sum: number
-  comment?: string 
+  comment?: string
 }
 
 interface IInvoice {
-  id: number 
+  id: number
   date?: string
   number: string
   sum: number
@@ -41,10 +40,8 @@ export default function InvoicesComponent({
   title: string
   name: string
 }) {
-  const {t} = useTranslation()
-
   const [showHiddenItems, setShowHiddenItems] = useState(false)
-  const [showModal, setShowModal] = useState(false) 
+  const [showModal, setShowModal] = useState(false)
   const [newInvoice, setNewInvoice] = useState({
     date: '',
     number: '',
@@ -52,8 +49,8 @@ export default function InvoicesComponent({
     comm: 0,
   })
 
-  const [showTransactionModal, setShowTransactionModal] = useState(false) 
-  const [currentInvoiceNumber, setCurrentInvoiceNumber] = useState('') 
+  const [showTransactionModal, setShowTransactionModal] = useState(false)
+  const [currentInvoiceNumber, setCurrentInvoiceNumber] = useState('')
 
   const [items, setItems] = useState<IInvoice[]>(() => {
     const storedItems = localStorage.getItem('__' + name)
@@ -72,9 +69,9 @@ export default function InvoicesComponent({
             ...g,
             transactions: (g.transactions || []).map((t, it) => ({
               ...t,
-              id: t.id || it + 1, 
+              id: t.id || it + 1,
             })),
-            id: g.id || i + 1, 
+            id: g.id || i + 1,
             isHidden: !!g.isHidden,
           }
         })
@@ -106,7 +103,7 @@ export default function InvoicesComponent({
 
   const createInvoice = useCallback(() => {
     if (items.findIndex((g) => g.number === newInvoice.number) > -1) {
-      alert(t('invoice_exists')) 
+      alert('invoice_exists')
       return
     }
 
@@ -127,7 +124,7 @@ export default function InvoicesComponent({
     })
     setShowModal(false)
     setNewInvoice({date: '', number: '', sum: 0, comm: 0})
-  }, [items, newInvoice, t])
+  }, [items, newInvoice])
 
   const isFormValid = useMemo(() => {
     return (
@@ -145,11 +142,13 @@ export default function InvoicesComponent({
 
   const saveTransaction = useCallback(
     (transaction: Omit<ITransaction, 'id'>) => {
+      setShowTransactionModal(false)
+
       setItems((prevItems) =>
         prevItems.map((invoice) => {
           if (invoice.number === currentInvoiceNumber) {
             const newTransaction: ITransaction = {
-              ...transaction, 
+              ...transaction,
               id:
                 (invoice.transactions[invoice.transactions.length - 1]?.id ||
                   0) + 1 || 1,
@@ -163,23 +162,24 @@ export default function InvoicesComponent({
           return invoice
         })
       )
-      setShowTransactionModal(false) 
     },
     [currentInvoiceNumber, setItems]
   )
 
   const totalLeft = useMemo(() => {
-    return items.filter((g) => !g.isHidden).reduce((a, b) => a + b.left, 0)
+    return (items || [])
+      .filter((g) => !g.isHidden)
+      .reduce((a, b) => a + (b.left || 0), 0)
   }, [items])
 
   const renderList = useMemo(() => {
-    return items.filter((g) => (showHiddenItems ? g.isHidden : !g.isHidden))
+    return (items || []).filter((g) => (showHiddenItems ? true : !g.isHidden))
   }, [items, showHiddenItems])
 
   const toggleHidden = useCallback(
     (invoiceId: string) => {
       setItems((prevItems) =>
-        prevItems.map((invoice) =>
+        (prevItems || []).map((invoice) =>
           invoice.number === invoiceId
             ? {...invoice, isHidden: !invoice.isHidden}
             : invoice
@@ -189,33 +189,33 @@ export default function InvoicesComponent({
     [setItems]
   )
 
-   const sendWARemainings = useCallback(() => {
-     const confirmMessage = t('confirm_send') 
-     if (!window.confirm(confirmMessage || 'Are you sure?')) {
-       return
-     }
+  const sendWARemainings = useCallback(() => {
+    const confirmMessage = 'confirm_send'
+    if (!window.confirm(confirmMessage || 'Are you sure?')) {
+      return
+    }
 
-     const list = items.filter((g) => !g.isHidden)
-     const remaining = list.reduce((a, b) => a + b.left, 0)
-     const content =
-       `${t('kerben_remainder')} (${title})\n\n` +
-       list
-         .map((g) => `${g.number}: ${commaNumber(g.left)} ${t('currency')}`)
-         .join('\n') +
-       `\n\n${t('total_remaining')}: ${commaNumber(remaining)} ${t('currency')}`
+    const list = items.filter((g) => !g.isHidden)
+    const remaining = list.reduce((a, b) => a + b.left, 0)
+    const content =
+      `${'kerben_remainder'} (${title})\n\n` +
+      list
+        .map((g) => `${g.number}: ${commaNumber(g.left)} ${'currency'}`)
+        .join('\n') +
+      `\n\n${'total_remaining'}: ${commaNumber(remaining)} ${'currency'}`
 
-     ;['996777171171', '996507454411', '996777599577', '996999466000'].forEach(
-       (phoneNumber) => {
-         requester
-           .post('/office/wa-send-message', {
-             content,
-             phone_number: phoneNumber,
-           })
-           .then((res) => console.log(res))
-           .catch((e) => console.error(e)) 
-       }
-     )
-   }, [items, title, t]) 
+    ;['996777171171', '996507454411', '996777599577', '996999466000'].forEach(
+      (phoneNumber) => {
+        requester
+          .post('/office/wa-send-message', {
+            content,
+            phone_number: phoneNumber,
+          })
+          .then((res) => console.log(res))
+          .catch((e) => console.error(e))
+      }
+    )
+  }, [items, title])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const {name, value} = e.target
@@ -225,35 +225,42 @@ export default function InvoicesComponent({
     }))
   }
 
-   const deleteTransaction = useCallback(
-     (invoiceId: number, transactionId: number) => {
-       if (!window.confirm(t('confirm_delete') || 'Are you sure?')) {
-         return
-       }
+  const deleteTransaction = useCallback(
+    (invoiceId: number, transactionId: number) => {
+      if (!window.confirm('Are you sure?')) {
+        return
+      }
 
-       setItems((prevItems) =>
-         prevItems.map((invoice) => {
-           if (invoice.id === invoiceId) {
-             const deletedTransaction = invoice.transactions.find(
-               (t) => t.id === transactionId
-             )
-             return {
-               ...invoice,
-               left: invoice.left + (deletedTransaction?.sum || 0),
-               transactions: invoice.transactions.filter(
-                 (t) => t.id !== transactionId
-               ),
-             }
-           }
-           return invoice
-         })
-       )
-     },
-     [setItems, t] 
-   )
+      setItems((prevItems) =>
+        prevItems.map((invoice) => {
+          if (invoice.id === invoiceId) {
+            const deletedTransaction = invoice.transactions.find(
+              (t) => t.id === transactionId
+            )
+            return {
+              ...invoice,
+              left: invoice.left + (deletedTransaction?.sum || 0),
+              transactions: invoice.transactions.filter(
+                (t) => t.id !== transactionId
+              ),
+            }
+          }
+          return invoice
+        })
+      )
+    },
+    [setItems]
+  )
 
   return (
     <>
+      <TransactionModal
+        show={showTransactionModal}
+        onHide={() => setShowTransactionModal(false)}
+        invoiceNumber={currentInvoiceNumber}
+        onSave={saveTransaction}
+      />
+
       <div
         style={{backgroundColor: 'white', flexGrow: 1, gap: 0}}
         className='p-3'
@@ -281,7 +288,7 @@ export default function InvoicesComponent({
 
             <InputGroup style={{minWidth: 100, maxWidth: 300}}>
               <Form.Control
-                placeholder={t('search') || ''}
+                placeholder={''}
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
               />
@@ -390,8 +397,8 @@ export default function InvoicesComponent({
                       >
                         <div>
                           {' '}
-                          {o.date}: {commaNumber(o.sum)} {t('currency')}{' '}
-                          {o.comment && ( 
+                          {o.date}: {commaNumber(o.sum)} сом{' '}
+                          {o.comment && (
                             <div style={{fontSize: '0.8rem', color: 'gray'}}>
                               {o.comment}
                             </div>
@@ -409,21 +416,17 @@ export default function InvoicesComponent({
                       </ListGroup.Item>
                     ))}
                   </ListGroup>
-                  {/* модалка для транзакции */}
-
-                  <TransactionModal
-                    show={showTransactionModal}
-                    onHide={() => setShowTransactionModal(false)}
-                    invoiceNumber={currentInvoiceNumber}
-                    onSave={saveTransaction}
-                  />
-
-                  {/* конец */}
                   <div className='d-flex justify-content-end align-items-center mt-3'>
                     {!g.isHidden && (
                       <Button
                         variant='secondary'
-                        onClick={() => createTransaction(g.number)}
+                        onClick={() => {
+                          console.log(
+                            'Button clicked for invoice number:',
+                            g.number
+                          )
+                          createTransaction(g.number)
+                        }}
                       >
                         Новая транзакция
                       </Button>
