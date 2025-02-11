@@ -5,14 +5,14 @@ interface ITransaction {
   id?: number
   date: string
   sum: number
-  comment?: string 
+  comment?: string
 }
 
 interface TransactionModalProps {
   show: boolean
   onHide: () => void
   invoiceNumber: string
-  onSave: (transaction: Omit<ITransaction, 'id'>) => Promise<void> | void 
+  onSave: (transaction: Omit<ITransaction, 'id'>) => Promise<void> | void
 }
 
 const TransactionModal: React.FC<TransactionModalProps> = ({
@@ -45,7 +45,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
       newTransaction.sum <= 0 ||
       !newTransaction.comment
     ) {
-      alert('fill_all_fields')
+      alert('Заполните все поля')
       return
     }
 
@@ -68,12 +68,12 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
   return (
     <Modal show={show} onHide={onHide}>
       <Modal.Header closeButton>
-        <Modal.Title>new_transaction_for_invoice #{invoiceNumber}</Modal.Title>
+        <Modal.Title>Новая транзакция для счета #{invoiceNumber}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Form>
           <Form.Group controlId='transactionDate'>
-            <Form.Label>date</Form.Label>
+            <Form.Label>Дата</Form.Label>
             <Form.Control
               type='date'
               name='date'
@@ -82,7 +82,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
             />
           </Form.Group>
           <Form.Group controlId='transactionSum'>
-            <Form.Label>sum</Form.Label>
+            <Form.Label>Сумма</Form.Label>
             <Form.Control
               type='number'
               name='sum'
@@ -92,7 +92,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
             />
           </Form.Group>
           <Form.Group controlId='transactionComment'>
-            <Form.Label>comment</Form.Label>
+            <Form.Label>Комментарий</Form.Label>
             <Form.Control
               as='textarea'
               rows={3}
@@ -106,14 +106,14 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
       </Modal.Body>
       <Modal.Footer>
         <Button variant='secondary' onClick={onHide}>
-          close
+          Закрыть
         </Button>
         <Button
           variant='primary'
           onClick={handleSave}
           disabled={!isTransactionFormValid}
         >
-          Save
+          Сохранить
         </Button>
       </Modal.Footer>
     </Modal>

@@ -190,21 +190,21 @@ export default function InvoicesComponent({
   )
 
   const sendWARemainings = useCallback(() => {
-    const confirmMessage = 'confirm_send'
-    if (!window.confirm(confirmMessage || 'Are you sure?')) {
+    const confirmMessage = 'Вы уверены, что хотите отправить?'
+    if (!window.confirm(confirmMessage)) {
       return
     }
 
     const list = items.filter((g) => !g.isHidden)
     const remaining = list.reduce((a, b) => a + b.left, 0)
     const content =
-      `${'kerben_remainder'} (${title})\n\n` +
+      `${'Kerben Остаток'} (${title})\n\n` +
       list
-        .map((g) => `${g.number}: ${commaNumber(g.left)} ${'currency'}`)
+        .map((g) => `${g.number}: ${commaNumber(g.left)} ${'сом'}`)
         .join('\n') +
-      `\n\n${'total_remaining'}: ${commaNumber(remaining)} ${'currency'}`
+      `\n\n${'Всего остаток'}: ${commaNumber(remaining)} ${'сом'}`
 
-    ;['996777171171', '996507454411', '996777599577', '996999466000'].forEach(
+    ;;['996777171171', '996507454411', '996777599577', '996999466000'].forEach(
       (phoneNumber) => {
         requester
           .post('/office/wa-send-message', {
@@ -225,32 +225,32 @@ export default function InvoicesComponent({
     }))
   }
 
-  const deleteTransaction = useCallback(
-    (invoiceId: number, transactionId: number) => {
-      if (!window.confirm('Are you sure?')) {
-        return
-      }
+const deleteTransaction = useCallback(
+  (invoiceId: number, transactionId: number) => {
+    if (!window.confirm('Вы уверены, что хотите удалить?')) {
+      return
+    }
 
-      setItems((prevItems) =>
-        prevItems.map((invoice) => {
-          if (invoice.id === invoiceId) {
-            const deletedTransaction = invoice.transactions.find(
-              (t) => t.id === transactionId
-            )
-            return {
-              ...invoice,
-              left: invoice.left + (deletedTransaction?.sum || 0),
-              transactions: invoice.transactions.filter(
-                (t) => t.id !== transactionId
-              ),
-            }
+    setItems((prevItems) =>
+      prevItems.map((invoice) => {
+        if (invoice.id === invoiceId) {
+          const deletedTransaction = invoice.transactions.find(
+            (t) => t.id === transactionId
+          )
+          return {
+            ...invoice,
+            left: invoice.left + (deletedTransaction?.sum || 0),
+            transactions: invoice.transactions.filter(
+              (t) => t.id !== transactionId
+            ),
           }
-          return invoice
-        })
-      )
-    },
-    [setItems]
-  )
+        }
+        return invoice
+      })
+    )
+  },
+  [setItems]
+)
 
   return (
     <>
@@ -421,10 +421,6 @@ export default function InvoicesComponent({
                       <Button
                         variant='secondary'
                         onClick={() => {
-                          console.log(
-                            'Button clicked for invoice number:',
-                            g.number
-                          )
                           createTransaction(g.number)
                         }}
                       >
