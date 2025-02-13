@@ -256,15 +256,19 @@ export default function InvoicesComponent({
   const [useFormattedData , setUseFormattedData] = useState<any[]>([])
   
   useEffect(() => {
-    // console.log("Updated renderList:", renderList);
     
-    const formattedData = renderList.map(({ date, id, number, sum }) => ({
-      id,
-      Дата : date,
+    const formattedData = renderList.map(({ date, number, sum, transactions }) => ({
+      Дата: date,
       Номер: number,
-      Сумма : sum,
+      Сумма: sum,
+      Остаток: totalLeft,
+      transactions: transactions.map(({ date, sum , comment }) => ({
+        Дата: date,
+        Сумма: sum,
+        Комментарий: comment,
+      }))
     }));
-  
+
     setUseFormattedData(formattedData); 
 
   }, [renderList]);
