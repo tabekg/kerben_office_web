@@ -51,10 +51,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
   }
 
   const handleSave = useCallback(async () => {
-    if (
-      !newTransaction.date ||
-      newTransaction.sum <= 0 
-    ) {
+    if (!newTransaction.date || newTransaction.sum <= 0) {
       window.alert('Заполните все поля')
       return
     }
@@ -68,11 +65,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
   }, [newTransaction, onSave, onHide])
 
   const isTransactionFormValid = useMemo(() => {
-    return (
-      newTransaction.date !== '' &&
-      newTransaction.sum > 0 &&
-      newTransaction.comment !== '' || newTransaction.comment == ''
-    )
+    return newTransaction.date !== '' && newTransaction.sum
   }, [newTransaction])
 
   return (

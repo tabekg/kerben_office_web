@@ -13,7 +13,7 @@ import {
 import {MdDeleteOutline} from 'react-icons/md'
 import requester from '../utils/requester'
 import TransactionModal from './TransactionModal'
-import {exportToExcel} from "../utils/generat-excel"
+import {exportToExcel} from '../utils/generat-excel'
 
 interface ITransaction {
   id: number
@@ -252,32 +252,22 @@ export default function InvoicesComponent({
     [setItems]
   )
 
-  //  -----> Excel generat start <-------
-  const [useFormattedData , setUseFormattedData] = useState<any[]>([])
-  
-  useEffect(() => {
-    
-    const formattedData = renderList.map(({ date, number, sum, transactions }) => ({
-      Дата: date,
-      Номер: number,
-      Сумма: sum,
-      Остаток: totalLeft,
-      transactions: transactions.map(({ date, sum , comment }) => ({
+  const formattedData = useMemo(() => {
+    const list = renderList
+    return {
+      invoices: list.map(({date, left, number, sum}) => ({
         Дата: date,
+        Номер: number,
         Сумма: sum,
-        Комментарий: comment,
-      }))
-    }));
+        Остаток: left,
+      })),
+      transactions: list.map(({transactions}) => transactions).flat(),
+    }
+  }, [renderList])
 
-    setUseFormattedData(formattedData); 
-
-  }, [renderList]);
-
-
-  const handleExportToExcel = () => {
-    exportToExcel(useFormattedData , 'список-квитанций')
-  }
-  //  -----> Excel generat end <-------
+  const handleExportToExcel = useCallback(() => {
+    exportToExcel(formattedData, 'Список-квитанций')
+  }, [formattedData])
 
   return (
     <>
@@ -301,7 +291,11 @@ export default function InvoicesComponent({
             <Button onClick={sendWARemainings} variant='secondary'>
               Отправить остаток
             </Button>
-            {renderList.length > 0 ? <Button onClick={handleExportToExcel} variant='secondary'>Генератор Excel</Button> : ""}
+            {renderList.length > 0 ? (
+              <Button onClick={handleExportToExcel} variant='secondary'>
+                Экспорт в Excel
+              </Button>
+            ) : null}
           </div>
           <div className='d-flex justify-content-end align-items-center gap-3'>
             <Form.Check
