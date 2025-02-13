@@ -13,6 +13,7 @@ import {
 import {MdDeleteOutline} from 'react-icons/md'
 import requester from '../utils/requester'
 import TransactionModal from './TransactionModal'
+import {exportToExcel} from '../utils/generat-excel'
 
 interface ITransaction {
   id: number
@@ -251,6 +252,23 @@ export default function InvoicesComponent({
     [setItems]
   )
 
+  const formattedData = useMemo(() => {
+    const list = renderList
+    return {
+      invoices: list.map(({date, left, number, sum}) => ({
+        Дата: date,
+        Номер: number,
+        Сумма: sum,
+        Остаток: left,
+      })),
+      transactions: list.map(({transactions}) => transactions).flat(),
+    }
+  }, [renderList])
+
+  const handleExportToExcel = useCallback(() => {
+    exportToExcel(formattedData, 'Список-квитанций')
+  }, [formattedData])
+
   return (
     <>
       <TransactionModal
@@ -273,6 +291,11 @@ export default function InvoicesComponent({
             <Button onClick={sendWARemainings} variant='secondary'>
               Отправить остаток
             </Button>
+            {renderList.length > 0 ? (
+              <Button onClick={handleExportToExcel} variant='secondary'>
+                Экспорт в Excel
+              </Button>
+            ) : null}
           </div>
           <div className='d-flex justify-content-end align-items-center gap-3'>
             <Form.Check
