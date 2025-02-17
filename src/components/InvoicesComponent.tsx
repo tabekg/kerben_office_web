@@ -13,7 +13,6 @@ import {
 import {MdDeleteOutline} from 'react-icons/md'
 import requester from '../utils/requester'
 import TransactionModal from './TransactionModal'
-
 import {exportToExcel} from '../utils/generat-excel'
 
 interface ITransaction {
@@ -254,6 +253,7 @@ export default function InvoicesComponent({
     },
     [setItems]
   )
+
 
   const [date, setDate] = useState({
     start: '',
