@@ -205,7 +205,7 @@ export default function HomeContainer() {
             <InputGroup>
               <Form.Control
                 className='mb-3 mt-1'
-                placeholder={t('search')}
+                placeholder={t('search') || 'Поиск'}
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
               />

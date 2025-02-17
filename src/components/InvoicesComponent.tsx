@@ -173,10 +173,16 @@ export default function InvoicesComponent({
   }, [items])
 
   const renderList = useMemo(() => {
-    return (items || []).filter((g) =>
+    let items_ = (items || []).filter((g) =>
       showHiddenItems ? g.isHidden : !g.isHidden
     )
-  }, [items, showHiddenItems])
+
+    if (searchInput) {
+      items_ = items_.filter((g) => g.number.includes(searchInput))
+    }
+
+    return items_
+  }, [items, showHiddenItems, searchInput])
 
   const toggleHidden = useCallback(
     (invoiceId: string) => {
@@ -314,7 +320,7 @@ export default function InvoicesComponent({
 
             <InputGroup style={{minWidth: 100, maxWidth: 300}}>
               <Form.Control
-                placeholder={''}
+                placeholder={'Поиск'}
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
               />
