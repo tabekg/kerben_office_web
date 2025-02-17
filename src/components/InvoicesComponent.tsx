@@ -13,7 +13,8 @@ import {
 import {MdDeleteOutline} from 'react-icons/md'
 import requester from '../utils/requester'
 import TransactionModal from './TransactionModal'
-import {exportToExcel} from "../utils/generat-excel"
+
+import {exportToExcel} from '../utils/generat-excel'
 
 interface ITransaction {
   id: number
@@ -43,6 +44,8 @@ export default function InvoicesComponent({
 }) {
   const [showHiddenItems, setShowHiddenItems] = useState(false)
   const [showModal, setShowModal] = useState(false)
+  const [showModal2, setShowModal2] = useState(false)
+
   const [newInvoice, setNewInvoice] = useState({
     date: '',
     number: '',
@@ -252,32 +255,47 @@ export default function InvoicesComponent({
     [setItems]
   )
 
-  //  -----> Excel generat start <-------
-  const [useFormattedData , setUseFormattedData] = useState<any[]>([])
-  
-  useEffect(() => {
-    
-    const formattedData = renderList.map(({ date, number, sum, transactions }) => ({
-      Дата: date,
-      Номер: number,
-      Сумма: sum,
-      Остаток: totalLeft,
-      transactions: transactions.map(({ date, sum , comment }) => ({
-        Дата: date,
-        Сумма: sum,
-        Комментарий: comment,
-      }))
-    }));
+  const [date, setDate] = useState({
+    start: '',
+    end: '',
+  })
 
-    setUseFormattedData(formattedData); 
+  const handleChangeDate = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const {name, value} = e.target
 
-  }, [renderList]);
-
-
-  const handleExportToExcel = () => {
-    exportToExcel(useFormattedData , 'список-квитанций')
+    setDate((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }))
   }
-  //  -----> Excel generat end <-------
+
+  const formattedData = useMemo(() => {
+    console.log(items)
+    const list = items.filter((el: any) => {
+      const itemDate = new Date(el.date)
+      const startDate = new Date(date.start)
+      const endDate = new Date(date.end)
+
+      return itemDate >= startDate && itemDate <= endDate
+    })
+    console.log(list)
+
+    return {
+      invoices: list.map(({date, left, number, sum}) => ({
+        Дата: date,
+        Номер: number,
+        Сумма: sum,
+        Остаток: left,
+      })),
+      transactions: list.map(({transactions}) => transactions).flat(),
+    }
+  }, [items, date])
+
+  const handleExportToExcel = useCallback(() => {
+    exportToExcel(formattedData, `Квитанции ${title} с ${date.start} по ${date.end}`)
+    setShowModal2(false)
+    setDate({start:"", end: "",})
+  }, [formattedData])
 
   return (
     <>
@@ -301,7 +319,17 @@ export default function InvoicesComponent({
             <Button onClick={sendWARemainings} variant='secondary'>
               Отправить остаток
             </Button>
-            {renderList.length > 0 ? <Button onClick={handleExportToExcel} variant='secondary'>Генератор Excel</Button> : ""}
+
+            {renderList.length > 0 ? (
+              <Button
+                onClick={() => {
+                  setShowModal2(true)
+                }}
+                variant='secondary'
+              >
+                Экспорт в Excel
+              </Button>
+            ) : null}
           </div>
           <div className='d-flex justify-content-end align-items-center gap-3'>
             <Form.Check
@@ -392,6 +420,57 @@ export default function InvoicesComponent({
           </Modal.Footer>
         </Modal>
         {/* End code */}
+
+        {/* modal excel generet start start */}
+        <Modal show={showModal2} onHide={() => setShowModal2(false)}>
+          <Modal.Header closeButton>
+            <Modal.Title>Создать экспорт </Modal.Title>
+          </Modal.Header>
+          {/* modal body  */}
+
+          <Modal.Body>
+            <Form>
+              <Form.Group controlId='formDate'>
+                <Form.Label>Дата с</Form.Label>
+                <Form.Control
+                  type='date'
+                  name='start'
+                  value={date.start}
+                  onChange={handleChangeDate}
+                  min={items[0]?.date}
+                  max={items[items.length - 1]?.date}
+                />
+              </Form.Group>
+              <Form.Group controlId='formDate'>
+                <Form.Label>Дата по</Form.Label>
+                <Form.Control
+                  type='date'
+                  name='end'
+                  value={date.end}
+                  onChange={handleChangeDate}
+                  min={date.start ? date.start : items[0]?.date }
+                  max={items[items.length - 1]?.date}
+                />
+              </Form.Group>
+            </Form>
+          </Modal.Body>
+
+          <Modal.Footer>
+            <Button variant='secondary' onClick={() => setShowModal2(false)}>
+              Закрыть
+            </Button>
+            <Button
+              variant='primary'
+              disabled={!date.start || !date.end}
+              onClick={handleExportToExcel}
+            >
+              Экспорт
+            </Button>
+          </Modal.Footer>
+        </Modal>
+
+        {/* modal excel generet start end */}
+
         <Row>
           {renderList.map((g) => (
             <Col

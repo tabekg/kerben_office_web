@@ -1,45 +1,85 @@
-import * as XLSX from "xlsx";
-import { saveAs } from "file-saver";
+import * as XLSX from 'xlsx'
+import { saveAs } from 'file-saver'
 
-export const exportToExcel = (data: any[], fileName: string) => {
+export const exportToExcel = (
+  data: { invoices: any[]; transactions: any[] },
+  fileName: string
+) => {
+  const sheetData: (string | number | null)[][] = [
+    [],
+    ['', 'Квитанции', '', '', '', '', 'Снятия', '', ''],
+    [
+      '',
+      'Дата',
+      'Номер',
+      'Сумма',
+      'Остаток',
+      '',
+      'Дата',
+      'Сумма',
+      'Комментарий',
+    ],
+  ]
 
-  const sheetData = [
-    ["Квитанции", "", "", "", "", "Снятия", "", ""],
-    ["Дата", "Номер", "Сумма", "Остаток", "", "Дата", "Сумма", "Комментарий"],
-  ];
+  const maxLength = Math.max(data.invoices.length, data.transactions.length)
+  let totalInvoiceSum = 0
+  let totalTransactionSum = 0
+  let currentBalance = 0 
+  let totalBalance = 0   
 
-  data.forEach((item) => {
-    const { Дата, Номер, Сумма, Остаток, transactions } = item;
-    
-    if (transactions.length > 0) {
-      transactions.forEach((t:any, index:number) => {
-        sheetData.push([
-          index === 0 ? Дата : "", 
-          index === 0 ? Номер : "", 
-          index === 0 ? Сумма : "", 
-          index === 0 ? Остаток : "", 
-          "",
-          t.Дата, 
-          t.Сумма,
-          t.Комментарий,
-        ]);
-      });
-    } else {
-      sheetData.push([Дата, Номер, Сумма, Остаток, "", "", "", ""]);
-    }
-  });
+  for (let i = 0; i < maxLength; i++) {
+    const invoice = data.invoices[i]
+    const transaction = data.transactions[i]
 
-  const worksheet = XLSX.utils.aoa_to_sheet(sheetData);
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Лист1");
+    const invoiceSum = invoice?.Сумма ? Number(invoice.Сумма) : 0
+    const transactionSum = transaction?.sum ? Number(transaction.sum) : 0
 
-  const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+    totalInvoiceSum += invoiceSum
+    totalTransactionSum += transactionSum
+
+    currentBalance += invoiceSum  
+
+    sheetData.push([
+      '',
+      invoice?.Дата || null,
+      invoice?.Номер || null,
+      invoiceSum || null,
+      currentBalance || null,  
+      '',
+      transaction?.date || null,
+      transactionSum || null,
+      transaction?.comment || null,
+    ])
+
+    currentBalance -= transactionSum
+  }
+
+  
+  totalBalance = currentBalance  
+
+  sheetData.push([''])
+  sheetData.push([
+    '',
+    'Итоги',
+    '',
+    totalInvoiceSum,    
+    totalBalance,        
+    '',
+    '',
+    totalTransactionSum, 
+    '',
+  ])
+
+  const worksheet = XLSX.utils.aoa_to_sheet(sheetData)
+  const workbook = XLSX.utils.book_new()
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Лист1')
+
+  const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' })
   const excelBlob = new Blob([excelBuffer], {
-    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8",
-  });
-  saveAs(excelBlob, `${fileName}.xlsx`);
-};
-
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8',
+  })
+  saveAs(excelBlob, `${fileName}.xlsx`)
+}
 
 
 
