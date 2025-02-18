@@ -43,6 +43,8 @@ export default function InvoicesComponent({
 }) {
   const [showHiddenItems, setShowHiddenItems] = useState(false)
   const [showModal, setShowModal] = useState(false)
+  const [showModal2, setShowModal2] = useState(false)
+
   const [newInvoice, setNewInvoice] = useState({
     date: '',
     number: '',
@@ -260,8 +262,32 @@ export default function InvoicesComponent({
     [setItems]
   )
 
+
+  const [date, setDate] = useState({
+    start: '',
+    end: '',
+  })
+
+  const handleChangeDate = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const {name, value} = e.target
+
+    setDate((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }))
+  }
+
   const formattedData = useMemo(() => {
-    const list = renderList
+    console.log(items)
+    const list = items.filter((el: any) => {
+      const itemDate = new Date(el.date)
+      const startDate = new Date(date.start)
+      const endDate = new Date(date.end)
+
+      return itemDate >= startDate && itemDate <= endDate
+    })
+    console.log(list)
+
     return {
       invoices: list.map(({date, left, number, sum}) => ({
         Дата: date,
@@ -271,10 +297,12 @@ export default function InvoicesComponent({
       })),
       transactions: list.map(({transactions}) => transactions).flat(),
     }
-  }, [renderList])
+  }, [items, date])
 
   const handleExportToExcel = useCallback(() => {
-    exportToExcel(formattedData, 'Список-квитанций')
+    exportToExcel(formattedData, `Квитанции ${title} с ${date.start} по ${date.end}`)
+    setShowModal2(false)
+    setDate({start:"", end: "",})
   }, [formattedData])
 
   return (
@@ -299,8 +327,13 @@ export default function InvoicesComponent({
             <Button onClick={sendWARemainings} variant='secondary'>
               Отправить остаток
             </Button>
-            {/* {renderList.length > 0 ? (
-              <Button onClick={handleExportToExcel} variant='secondary'>
+            {renderList.length > 0 ? (
+              <Button
+                onClick={() => {
+                  setShowModal2(true)
+                }}
+                variant='secondary'
+              >
                 Экспорт в Excel
               </Button>
             ) : null} */}
@@ -395,6 +428,57 @@ export default function InvoicesComponent({
           </Modal.Footer>
         </Modal>
         {/* End code */}
+
+        {/* modal excel generet start start */}
+        <Modal show={showModal2} onHide={() => setShowModal2(false)}>
+          <Modal.Header closeButton>
+            <Modal.Title>Создать экспорт </Modal.Title>
+          </Modal.Header>
+          {/* modal body  */}
+
+          <Modal.Body>
+            <Form>
+              <Form.Group controlId='formDate'>
+                <Form.Label>Дата с</Form.Label>
+                <Form.Control
+                  type='date'
+                  name='start'
+                  value={date.start}
+                  onChange={handleChangeDate}
+                  min={items[0]?.date}
+                  max={items[items.length - 1]?.date}
+                />
+              </Form.Group>
+              <Form.Group controlId='formDate'>
+                <Form.Label>Дата по</Form.Label>
+                <Form.Control
+                  type='date'
+                  name='end'
+                  value={date.end}
+                  onChange={handleChangeDate}
+                  min={date.start ? date.start : items[0]?.date }
+                  max={items[items.length - 1]?.date}
+                />
+              </Form.Group>
+            </Form>
+          </Modal.Body>
+
+          <Modal.Footer>
+            <Button variant='secondary' onClick={() => setShowModal2(false)}>
+              Закрыть
+            </Button>
+            <Button
+              variant='primary'
+              disabled={!date.start || !date.end}
+              onClick={handleExportToExcel}
+            >
+              Экспорт
+            </Button>
+          </Modal.Footer>
+        </Modal>
+
+        {/* modal excel generet start end */}
+
         <Row>
           {renderList.map((g) => (
             <Col
