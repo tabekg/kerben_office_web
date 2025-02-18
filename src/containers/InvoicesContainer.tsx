@@ -13,11 +13,9 @@ const InvoicesContainer = () => {
       case 'invoices':
         return '0.4'
       case 'gps-1':
-        return 'GPS 1'
+        return 'Каратай'
       case 'gps-2':
-        return 'GPS 2'
-      case 'gps-3':
-        return 'GPS 3'
+        return 'Достук'
       case 'terminal':
         return 'Терминал'
       default:
@@ -45,7 +43,7 @@ const InvoicesContainer = () => {
             }`}
             onClick={() => handleButtonClick('gps-1')}
           >
-            GPS 1
+            Каратай
           </button>
           <button
             type='button'
@@ -54,16 +52,7 @@ const InvoicesContainer = () => {
             }`}
             onClick={() => handleButtonClick('gps-2')}
           >
-            GPS 2
-          </button>
-          <button
-            type='button'
-            className={`btn ${
-              selected === 'gps-3' ? 'btn-primary' : 'btn-outline-primary'
-            }`}
-            onClick={() => handleButtonClick('gps-3')}
-          >
-            GPS 3
+            Достук
           </button>
           <button
             type='button'
@@ -90,10 +79,6 @@ const InvoicesContainer = () => {
       ) : null}
 
       {selected === 'gps-2' ? (
-        <InvoicesComponent title={title} name={selected} />
-      ) : null}
-
-      {selected === 'gps-3' ? (
         <InvoicesComponent title={title} name={selected} />
       ) : null}
     </>

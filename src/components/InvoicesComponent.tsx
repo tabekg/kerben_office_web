@@ -175,8 +175,16 @@ export default function InvoicesComponent({
   }, [items])
 
   const renderList = useMemo(() => {
-    return (items || []).filter((g) => (showHiddenItems ? true : !g.isHidden))
-  }, [items, showHiddenItems])
+    let items_ = (items || []).filter((g) =>
+      showHiddenItems ? g.isHidden : !g.isHidden
+    )
+
+    if (searchInput) {
+      items_ = items_.filter((g) => g.number.includes(searchInput))
+    }
+
+    return items_
+  }, [items, showHiddenItems, searchInput])
 
   const toggleHidden = useCallback(
     (invoiceId: string) => {
@@ -319,7 +327,6 @@ export default function InvoicesComponent({
             <Button onClick={sendWARemainings} variant='secondary'>
               Отправить остаток
             </Button>
-
             {renderList.length > 0 ? (
               <Button
                 onClick={() => {
@@ -329,7 +336,7 @@ export default function InvoicesComponent({
               >
                 Экспорт в Excel
               </Button>
-            ) : null}
+            ) : null} */}
           </div>
           <div className='d-flex justify-content-end align-items-center gap-3'>
             <Form.Check
@@ -337,7 +344,8 @@ export default function InvoicesComponent({
               onChange={(t) => setShowHiddenItems(t.target.checked)}
               type={'checkbox'}
               id={`showIsHIddenItems`}
-              label={`Скрытые`}
+              style={{whiteSpace: 'nowrap'}}
+              label={`Только скрытые`}
             />
             <div style={{whiteSpace: 'nowrap'}}>
               Всего остаток: <strong>{commaNumber(totalLeft, '.')}</strong> сом
@@ -345,7 +353,7 @@ export default function InvoicesComponent({
 
             <InputGroup style={{minWidth: 100, maxWidth: 300}}>
               <Form.Control
-                placeholder={''}
+                placeholder={'Поиск'}
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
               />
