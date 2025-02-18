@@ -262,7 +262,6 @@ export default function InvoicesComponent({
     [setItems]
   )
 
-
   const [date, setDate] = useState({
     start: '',
     end: '',
@@ -278,15 +277,13 @@ export default function InvoicesComponent({
   }
 
   const formattedData = useMemo(() => {
-    console.log(items)
+    const startDate = new Date(date.start)
+    const endDate = new Date(date.end)
+
     const list = items.filter((el: any) => {
       const itemDate = new Date(el.date)
-      const startDate = new Date(date.start)
-      const endDate = new Date(date.end)
-
       return itemDate >= startDate && itemDate <= endDate
     })
-    console.log(list)
 
     return {
       invoices: list.map(({date, left, number, sum}) => ({
@@ -300,10 +297,13 @@ export default function InvoicesComponent({
   }, [items, date])
 
   const handleExportToExcel = useCallback(() => {
-    exportToExcel(formattedData, `Квитанции ${title} с ${date.start} по ${date.end}`)
+    exportToExcel(
+      formattedData,
+      `Квитанции ${title} с ${date.start} по ${date.end}`
+    )
     setShowModal2(false)
-    setDate({start:"", end: "",})
-  }, [formattedData])
+    setDate({start: '', end: ''})
+  }, [formattedData, date, title])
 
   return (
     <>
@@ -336,7 +336,7 @@ export default function InvoicesComponent({
               >
                 Экспорт в Excel
               </Button>
-            ) : null} */}
+            ) : null}
           </div>
           <div className='d-flex justify-content-end align-items-center gap-3'>
             <Form.Check
@@ -366,7 +366,7 @@ export default function InvoicesComponent({
             </Button>
           </div>
         </div>
-        {/* Modal code */}
+
         <Modal show={showModal} onHide={() => setShowModal(false)}>
           <Modal.Header closeButton>
             <Modal.Title>Создать новую квитанцию</Modal.Title>
@@ -427,15 +427,11 @@ export default function InvoicesComponent({
             </Button>
           </Modal.Footer>
         </Modal>
-        {/* End code */}
 
-        {/* modal excel generet start start */}
         <Modal show={showModal2} onHide={() => setShowModal2(false)}>
           <Modal.Header closeButton>
-            <Modal.Title>Создать экспорт </Modal.Title>
+            <Modal.Title>Создать экспорт</Modal.Title>
           </Modal.Header>
-          {/* modal body  */}
-
           <Modal.Body>
             <Form>
               <Form.Group controlId='formDate'>
@@ -445,8 +441,8 @@ export default function InvoicesComponent({
                   name='start'
                   value={date.start}
                   onChange={handleChangeDate}
-                  min={items[0]?.date}
-                  max={items[items.length - 1]?.date}
+                  // min={items[0]?.date}
+                  // max={items[items.length - 1]?.date}
                 />
               </Form.Group>
               <Form.Group controlId='formDate'>
@@ -456,8 +452,8 @@ export default function InvoicesComponent({
                   name='end'
                   value={date.end}
                   onChange={handleChangeDate}
-                  min={date.start ? date.start : items[0]?.date }
-                  max={items[items.length - 1]?.date}
+                  // min={date.start ? date.start : items[0]?.date}
+                  // max={items[items.length - 1]?.date}
                 />
               </Form.Group>
             </Form>
@@ -476,8 +472,6 @@ export default function InvoicesComponent({
             </Button>
           </Modal.Footer>
         </Modal>
-
-        {/* modal excel generet start end */}
 
         <Row>
           {renderList.map((g) => (
