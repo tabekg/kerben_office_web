@@ -14,25 +14,12 @@ import {MdDeleteOutline} from 'react-icons/md'
 import requester from '../utils/requester'
 import TransactionModal from './TransactionModal'
 import {exportToExcel} from '../utils/generat-excel'
-
-interface ITransaction {
-  id: number
-  date: string
-  sum: number
-  comment?: string
-}
-
-interface IInvoice {
-  id: number
-  date?: string
-  number: string
-  sum: number
-  comm: number
-  total: number
-  left: number
-  isHidden?: boolean
-  transactions: ITransaction[]
-}
+import {
+  formatDateDDMMYYYY,
+  formatDateForInput,
+  parseDate,
+} from '../utils/parsers'
+import {IInvoice, ITransaction} from '../types'
 
 export default function InvoicesComponent({
   title,
@@ -262,9 +249,9 @@ export default function InvoicesComponent({
     [setItems]
   )
 
-  const [date, setDate] = useState({
-    start: '',
-    end: '',
+  const [date, setDate] = useState<{start: Date | null; end: Date | null}>({
+    start: null,
+    end: null,
   })
 
   const handleChangeDate = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -272,37 +259,35 @@ export default function InvoicesComponent({
 
     setDate((prevState) => ({
       ...prevState,
-      [name]: value,
+      [name]: parseDate(value),
     }))
   }
 
   const formattedData = useMemo(() => {
-    const startDate = new Date(date.start)
-    const endDate = new Date(date.end)
-
-    const list = items.filter((el: any) => {
-      const itemDate = new Date(el.date)
-      return itemDate >= startDate && itemDate <= endDate
-    })
-
-    return {
-      invoices: list.map(({date, left, number, sum}) => ({
-        Дата: date,
-        Номер: number,
-        Сумма: sum,
-        Остаток: left,
-      })),
-      transactions: list.map(({transactions}) => transactions).flat(),
+    if (date.start === null || date.end === null) {
+      return []
     }
+
+    return items.filter((el: any) => {
+      const itemDate = parseDate(el.date || '')?.getTime()
+      if (!itemDate) {
+        return false
+      }
+      return (
+        itemDate >= date.start!.getTime() && itemDate <= date.end!.getTime()
+      )
+    })
   }, [items, date])
 
   const handleExportToExcel = useCallback(() => {
     exportToExcel(
       formattedData,
-      `Квитанции ${title} с ${date.start} по ${date.end}`
+      `Квитанции ${title} с ${formatDateDDMMYYYY(
+        date.start!
+      )} по ${formatDateDDMMYYYY(date.end!)}`
     )
     setShowModal2(false)
-    setDate({start: '', end: ''})
+    setDate({start: null, end: null})
   }, [formattedData, date, title])
 
   return (
@@ -439,7 +424,7 @@ export default function InvoicesComponent({
                 <Form.Control
                   type='date'
                   name='start'
-                  value={date.start}
+                  value={date.start ? formatDateForInput(date.start) : ''}
                   onChange={handleChangeDate}
                   // min={items[0]?.date}
                   // max={items[items.length - 1]?.date}
@@ -450,7 +435,7 @@ export default function InvoicesComponent({
                 <Form.Control
                   type='date'
                   name='end'
-                  value={date.end}
+                  value={date.end ? formatDateForInput(date.end) : ''}
                   onChange={handleChangeDate}
                   // min={date.start ? date.start : items[0]?.date}
                   // max={items[items.length - 1]?.date}
