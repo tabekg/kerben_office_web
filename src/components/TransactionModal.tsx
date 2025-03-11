@@ -104,7 +104,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
               value={newTransaction.sum}
               onChange={handleTransactionChange}
               placeholder={''}
-              disabled={!!newTransaction.totalTrucks}
+              // disabled={!!newTransaction.totalTrucks}
             />
           </Form.Group>
           <Form.Group controlId='transactionComment'>
