@@ -70,6 +70,26 @@ export default function InvoicesComponent({
   })
 
   useEffect(() => {
+    if (items && items.length > 0) {
+      requester
+        .post('/office/invoices' + (name === 'invoices' ? '' : '/' + name), {
+          data: items,
+        })
+        .then((res) => {
+          console.log(res)
+        })
+        .catch((e) => console.log(e))
+    } else {
+      // requester
+      //   .get('/office/invoices')
+      //   .then((res) => {
+      //     if (res.status === 'success') {
+      //       setItems()
+      //     }
+      //   })
+      //   .catch((e) => window.alert('Ошибка: ' + e))
+    }
+
     if (items.length < 1) {
       return
     }
