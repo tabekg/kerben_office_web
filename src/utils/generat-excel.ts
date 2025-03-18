@@ -45,9 +45,13 @@ export const exportToExcel = async (
 
   worksheet.addRow(['', '', 'ДТ', 'КТ', 'ДТ', 'КТ'])
 
-  data.forEach((item, index) => {
+  let numb = 0
+
+  data.forEach((item) => {
+    numb++
+
     worksheet.addRow([
-      index + 1,
+      numb,
       `№${item.number} от ${formatDateDDMMYYYY(parseDate(item.date!)!)}`,
       item.sum,
       '',
@@ -56,8 +60,10 @@ export const exportToExcel = async (
     ])
 
     item.transactions.forEach((transaction) => {
+      numb++
+
       worksheet.addRow([
-        worksheet.rowCount,
+        numb,
         `${formatDateDDMMYYYY(parseDate(transaction.date)!)}: №${item.number}`,
         '',
         transaction.sum,
@@ -102,7 +108,7 @@ export const exportToExcel = async (
     )}\nсоставляет ${itogoOboroty - itogoOboroty2} сом.`,
   ])
   worksheet.mergeCells(`A${row.number}:F${row.number}`)
-  row.height = 60
+  row.height = 65
   worksheet.getCell(`A${row.number}`).alignment = {
     wrapText: true,
     vertical: 'middle',
