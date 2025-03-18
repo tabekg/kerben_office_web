@@ -304,7 +304,8 @@ export default function InvoicesComponent({
       formattedData,
       `Квитанции ${title} с ${formatDateDDMMYYYY(
         date.start!
-      )} по ${formatDateDDMMYYYY(date.end!)}`
+      )} по ${formatDateDDMMYYYY(date.end!)}`,
+      date
     )
     setShowModal2(false)
     setDate({start: null, end: null})
