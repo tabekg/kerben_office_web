@@ -94,19 +94,20 @@ export default function InvoicesComponent({
       return
     }
     localStorage.setItem('__' + name, JSON.stringify(items))
-    const items_sync = JSON.parse(
-      localStorage.getItem('__' + name + '_sync') || '[]'
-    )
-    if (
-      items_sync.length < 1 ||
-      JSON.stringify(items) !==
-        JSON.stringify(items_sync[items_sync.length - 1])
-    ) {
-      localStorage.setItem(
-        '__' + name + '_sync',
-        JSON.stringify([...items_sync, items])
-      )
-    }
+
+    // const items_sync = JSON.parse(
+    //   localStorage.getItem('__' + name + '_sync') || '[]'
+    // )
+    // if (
+    //   items_sync.length < 1 ||
+    //   JSON.stringify(items) !==
+    //     JSON.stringify(items_sync[items_sync.length - 1])
+    // ) {
+    //   localStorage.setItem(
+    //     '__' + name + '_sync',
+    //     JSON.stringify([...items_sync, items])
+    //   )
+    // }
   }, [items, name])
 
   const [searchInput, setSearchInput] = useState('')
