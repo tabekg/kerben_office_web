@@ -20,13 +20,12 @@ import {
 import requester from '../utils/requester'
 import AddDriverModalComponent from '../components/AddDriverModalComponent'
 import MyVerticallyCenteredModal from './Modal-window'
-import {getLastRouteInfoByShipment} from '../utils/index'
+import {getLastRouteInfoByShipment} from '../utils'
 import {useTranslation} from 'react-i18next'
 import moment from 'moment'
 import ShipmentItemComponent from '../components/ShipmentItemComponent'
 import {
   EShipmentHistoryStatus,
-  EShipmentStatus,
   IShipment,
   IShipmentInfo,
 } from '../types/shipment'

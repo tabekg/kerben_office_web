@@ -42,58 +42,61 @@ export default function InvoicesComponent({
   const [showTransactionModal, setShowTransactionModal] = useState(false)
   const [currentInvoiceNumber, setCurrentInvoiceNumber] = useState('')
 
-  const [items, setItems] = useState<IInvoice[]>(() => {
-    const storedItems = localStorage.getItem('__' + name)
-    if (storedItems) {
-      return JSON.parse(storedItems)
-        .sort(function (a: IInvoice, b: IInvoice) {
-          const a_ = a?.date?.split('.').reverse().join('')
-          const b_ = b?.date?.split('.').reverse().join('')
-          if (!a_ || !b_) {
-            return 0
-          }
-          return a_ > b_ ? 1 : a_ < b_ ? -1 : 0
-        })
-        .map((g: IInvoice, i: number) => {
-          return {
-            ...g,
-            transactions: (g.transactions || []).map((t, it) => ({
-              ...t,
-              id: t.id || it + 1,
-            })),
-            id: g.id || i + 1,
-            isHidden: !!g.isHidden,
-          }
-        })
-    }
-    return []
-  })
+  const [items, setItems] = useState<IInvoice[]>([])
 
   useEffect(() => {
-    if (items && items.length > 0) {
-      requester
-        .post('/office/invoices' + (name === 'invoices' ? '' : '/' + name), {
-          data: items,
-        })
-        .then((res) => {
-          console.log(res)
-        })
-        .catch((e) => console.log(e))
-    } else {
-      // requester
-      //   .get('/office/invoices')
-      //   .then((res) => {
-      //     if (res.status === 'success') {
-      //       setItems()
-      //     }
-      //   })
-      //   .catch((e) => window.alert('Ошибка: ' + e))
-    }
+    requester
+      .get('/office/invoices' + (name === 'invoices' ? '' : '/' + name), {
+        data: items,
+      })
+      .then((res) => {
+        if (res.status === 'success') {
+          const invoices = res.payload as IInvoice[]
 
-    if (items.length < 1) {
+          setItems(
+            invoices
+              .sort(function (a: IInvoice, b: IInvoice) {
+                const a_ = a?.date?.split('.').reverse().join('')
+                const b_ = b?.date?.split('.').reverse().join('')
+                if (!a_ || !b_) {
+                  return 0
+                }
+                return a_ > b_ ? 1 : a_ < b_ ? -1 : 0
+              })
+              .map((g: IInvoice, i: number) => {
+                return {
+                  ...g,
+                  transactions: (g.transactions || []).map((t, it) => ({
+                    ...t,
+                    id: t.id || it + 1,
+                  })),
+                  id: g.id || i + 1,
+                  isHidden: !!g.isHidden,
+                }
+              })
+          )
+        }
+      })
+      .catch((e) => console.log(e))
+  }, [])
+
+  useEffect(() => {
+    if (!items || items.length < 1) {
       return
     }
-    localStorage.setItem('__' + name, JSON.stringify(items))
+    requester
+      .post('/office/invoices' + (name === 'invoices' ? '' : '/' + name), {
+        data: items,
+      })
+      .then((res) => {
+        console.log(res)
+      })
+      .catch((e) => {
+        console.log(e)
+        window.alert('Ошибка записи данных на сервер!')
+      })
+
+    // localStorage.setItem('__' + name, JSON.stringify(items))
 
     // const items_sync = JSON.parse(
     //   localStorage.getItem('__' + name + '_sync') || '[]'
