@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='utf-8'>
+  <meta name='viewport' content='width=device-width, initial-scale=1'>
+  <title>CMR Form</title>
+</head>
+<body>
+<h1>CMR form</h1>
+<div style='display: flex; gap: 12px; flex-direction: column'>
+  <div>
+    Truck number
+    <input id='truckNumber' type='text' />
+  </div>
+  <div>
+    Invoice
+    <input id='invoice' type='text' />
+  </div>
+  <div>
+    Weight
+    <input id='weight' type='text' />
+  </div>
+  <div>
+    Quantity
+    <input id='quantity' type='text' />
+  </div>
+  <div>
+    Date
+    <input id='date' type='text' />
+  </div>
+  <div>
+    Container
+    <input id='container' type='text' />
+  </div>
+  <button onclick='copy()'>Copy</button>
+</div>
+
+<script type='text/javascript'>
+  function copy() {
+    try {
+      const truckNumber = document.getElementById('truckNumber').value.toUpperCase()
+      const invoice = document.getElementById('invoice').value
+      const weight = document.getElementById('weight').value
+      const quantity = document.getElementById('quantity').value
+      const date = document.getElementById('date').value
+      const container = document.getElementById('container').value.toUpperCase()
+
+      const object = {truckNumber, invoice, weight, quantity, date, container}
+
+      const url = 'https://office.kerben.besoft.kg/cmr-page/cmr.html?' + Object.entries(object)
+        .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+        .join('&')
+
+      setClipboard(url).then(res => {
+        window.alert('Copied!')
+      })
+    } catch (e) {
+      window.alert('Error: ' + e.toString())
+    }
+  }
+
+  async function setClipboard(text) {
+    try {
+      const type = 'text/plain'
+      const clipboardItemData = {
+        [type]: text,
+      }
+      const clipboardItem = new ClipboardItem(clipboardItemData)
+      await navigator.clipboard.write([clipboardItem])
+    } catch (e) {
+      window.alert('Error: ' + e.toString())
+    }
+  }
+</script>
+</body>
+</html>
