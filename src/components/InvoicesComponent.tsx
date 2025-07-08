@@ -225,7 +225,7 @@ export default function InvoicesComponent({
         .join('\n') +
       `\n\n${'Всего остаток'}: ${commaNumber(remaining)} ${'сом'}`
 
-    ;['996777171171', '996507454411', '996777599577', '996999466000'].forEach(
+    ;['996777171171', '996507454411', '996777599577', '996995006222'].forEach(
       (phoneNumber) => {
         requester
           .post('/office/wa-send-message', {
