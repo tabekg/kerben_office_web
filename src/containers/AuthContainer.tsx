@@ -21,7 +21,7 @@ export default function AuthContainer() {
     setLoading(true)
     requester
       .post('/auth', {
-        roles: ['SUPER_ADMIN'],
+        roles: ['SUPER_ADMIN', 'ACCOUNTANT'],
         phone_number: phoneNumber.slice(1),
         password,
       })

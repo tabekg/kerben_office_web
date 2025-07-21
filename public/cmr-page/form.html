@@ -32,7 +32,8 @@
     Container
     <input id='container' type='text' />
   </div>
-  <button onclick='copy()'>Copy</button>
+  <p id='link'></p>
+  <button onclick='copy()'>Copy and show</button>
 </div>
 
 <script type='text/javascript'>
@@ -61,6 +62,7 @@
 
   async function setClipboard(text) {
     try {
+      document.getElementById('link').innerHTML = text
       const type = 'text/plain'
       const clipboardItemData = {
         [type]: text,
