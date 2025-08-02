@@ -1,46 +1,35 @@
-import React, {useState, useMemo, useEffect} from 'react'
+import React, {useState, useEffect} from 'react'
 import requester from '../utils/requester'
-import {Button, Card, Col, ListGroup, Row} from 'react-bootstrap'
-import commaNumber from 'comma-number'
-import {MdDeleteOutline} from 'react-icons/md'
-
-interface ICategory {
-  id: number
-  title: string
-}
+import {Button, Card, Col, Row} from 'react-bootstrap'
+import CashierNewCategoryModal from '../components/CashierNewCategoryModal'
+import {ICategory} from '../models/cashier'
 
 const AccountantContainer = () => {
   const [selected, setSelected] = useState(0)
   const [categories, setCategories] = useState<ICategory[]>([])
+  const [newCategory, setNewCategory] = useState<boolean>(false)
+  const [response, setResponse] = useState<any>({})
 
   useEffect(() => {
     requester
-      .get('/office/cashier/category')
+      .get('/office/cashier')
       .then((res) => {
         if (res.status === 'success') {
-          setCategories(res.payload)
+          setCategories(res.payload.categories)
+          setResponse(res.payload)
         }
       })
       .catch((e) => console.log(e))
   }, [])
 
-  const title = useMemo(() => {
-    switch (selected) {
-      case 'invoices':
-        return '0.4'
-      case 'gps-1':
-        return 'Каратай'
-      case 'gps-2':
-        return 'Достук'
-      case 'terminal':
-        return 'Терминал'
-      default:
-        return ''
-    }
-  }, [selected])
-
   return (
     <>
+      <CashierNewCategoryModal
+        show={newCategory}
+        onHide={() => setNewCategory(false)}
+        categories={categories.filter((g) => !g.parent)}
+      />
+
       <div
         className='p-3 d-flex align-items-center justify-content-between gap-5'
         style={{backgroundColor: 'white'}}
@@ -55,20 +44,24 @@ const AccountantContainer = () => {
           >
             Все
           </button>
-          {categories.map((g) => (
-            <button
-              type='button'
-              className={`btn ${
-                selected === g.id ? 'btn-primary' : 'btn-outline-primary'
-              }`}
-              onClick={() => setSelected(g.id)}
-            >
-              {g.title}
-            </button>
-          ))}
+          {categories
+            .filter((g) => !g.parent)
+            .map((g) => (
+              <button
+                type='button'
+                className={`btn ${
+                  selected === g.id ? 'btn-primary' : 'btn-outline-primary'
+                }`}
+                onClick={() => setSelected(g.id)}
+              >
+                {g.title}
+              </button>
+            ))}
         </div>
 
-        <div>Сумма: KGS, USD</div>
+        <div>
+          Сумма: {response?.sum_kgs} KGS, {response?.sum_usd} USD
+        </div>
 
         <div className='btn-group'>
           <button
@@ -100,7 +93,7 @@ const AccountantContainer = () => {
           <button
             type='button'
             className={`btn btn-outline-primary`}
-            onClick={() => console.log('terminal')}
+            onClick={() => setNewCategory(true)}
           >
             Новая категория
           </button>
@@ -120,77 +113,39 @@ const AccountantContainer = () => {
         className='p-3'
       >
         <Row>
-          {[
-            {
-              id: 1,
-              number: '1',
-              date: '2',
-              left: 1,
-              isHidden: false,
-              total: 2,
-              comm: 3,
-              transactions: [],
-            },
-          ].map((g) => (
-            <Col
-              sm={6}
-              md={3}
-              xl={2}
-              className='align-self-stretch mb-4'
-              key={g.id}
-            >
-              <Card style={{height: '100%'}}>
-                <Card.Body>
-                  <Card.Title>
-                    {g.date} #{g.number}
-                    <div>
-                      {commaNumber(g.left)} сом /{' '}
-                      {commaNumber(g.total - g.comm)} сом
-                    </div>
-                  </Card.Title>
-                  <ListGroup variant='flush'>
-                    {g.transactions.map((o) => (
-                      <ListGroup.Item
-                        className='d-flex justify-content-between align-items-center'
-                        key={o.id}
-                      >
-                        <div>
-                          {' '}
-                          {o.date}: {commaNumber(o.sum)} сом{' '}
-                          {o.comment && (
-                            <div style={{fontSize: '0.8rem', color: 'gray'}}>
-                              {o.comment}
-                            </div>
-                          )}
-                        </div>
-                        {!g.isHidden && (
-                          <Button
-                            variant='danger'
-                            size='sm'
-                            onClick={() => console.log(g.id!, o.id!)}
-                          >
-                            <MdDeleteOutline />
-                          </Button>
-                        )}
-                      </ListGroup.Item>
-                    ))}
-                  </ListGroup>
-                  <div className='d-flex justify-content-end align-items-center mt-3'>
-                    {!g.isHidden && (
+          {categories
+            .filter((g) => (selected ? g.parent?.id === selected : g.parent))
+            .map((g) => (
+              <Col
+                sm={6}
+                md={3}
+                xl={2}
+                className='align-self-stretch mb-4'
+                key={g.id}
+              >
+                <Card style={{height: '100%'}}>
+                  <Card.Body>
+                    <Card.Title>
+                      {g.parent ? `${g.parent.title} / ` : null}
+                      {g.title}
+                      {/*<div>*/}
+                      {/*  {commaNumber(1000)} сом / {commaNumber(2000)} сом*/}
+                      {/*</div>*/}
+                    </Card.Title>
+                    <div className='d-flex justify-content-end align-items-center mt-3'>
                       <Button
                         variant='secondary'
                         onClick={() => {
-                          console.log(g.number)
+                          console.log(1)
                         }}
                       >
                         Новая транзакция
                       </Button>
-                    )}
-                  </div>
-                </Card.Body>
-              </Card>
-            </Col>
-          ))}
+                    </div>
+                  </Card.Body>
+                </Card>
+              </Col>
+            ))}
         </Row>
       </div>
     </>
