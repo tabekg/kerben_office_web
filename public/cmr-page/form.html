@@ -8,6 +8,8 @@
 <body>
 <h1>CMR form</h1>
 <div style='display: flex; gap: 12px; flex-direction: column'>
+  <div><textarea id="textarea"></textarea></div>
+
   <div>
     Truck number
     <input id='truckNumber' type='text' />
@@ -18,7 +20,7 @@
   </div>
   <div>
     Weight
-    <input id='weight' type='text' />
+    <input id='weight' type='text' /> <button onclick="weight.value += '.000';">.000</button>
   </div>
   <div>
     Quantity
@@ -26,7 +28,7 @@
   </div>
   <div>
     Date
-    <input id='date' type='text' />
+    <input id='date' type='text' /> <span style="gap: 4px; display: inline-flex;" id="dateButtons"></span>
   </div>
   <div>
     Container
@@ -37,6 +39,39 @@
 </div>
 
 <script type='text/javascript'>
+  function tap(s) {
+      const r = s.split('\n').map(l => l.split('\t'))
+      const invoice = r[1][2].split('№')[1].trim().replace(' от ', '_')
+      const truckNumber = r[19][2];
+      const quantity = r.find(k => k[0].startsWith('Итого'))[4]
+      const weight = r.find(k => k[0].startsWith('Итого'))[6]
+
+      return {invoice, truckNumber, quantity, weight}
+  }
+
+  const textarea = document.getElementById('textarea')
+
+  textarea.oninput = (e) => {
+    try {
+      const t = tap(e.target.value)
+      document.getElementById('truckNumber').value = t.truckNumber + '/'
+      document.getElementById('invoice').value = t.invoice
+      document.getElementById('quantity').value = t.quantity
+      document.getElementById('weight').value = t.weight
+    } catch (e) {
+      window.alert('Ката!!!')
+    }
+  }
+
+  const dateButtons = document.getElementById('dateButtons')
+
+  for (let i = 0; i < 3; i++) {
+    const date = new Date()
+    date.setDate(new Date().getDate() - i);
+    const t = `${date.getDate()}.${(date.getMonth()+1).toString().padStart(2, '0')}.${date.getFullYear()}`
+    dateButtons.innerHTML += `<button onClick="date.value = '${t}';">${t}</button>`
+  }
+
   function copy() {
     try {
       const truckNumber = document.getElementById('truckNumber').value.toUpperCase()
@@ -53,7 +88,7 @@
         .join('&')
 
       setClipboard(url).then(res => {
-        window.alert('Copied!')
+        //window.alert('Copied!')
       })
     } catch (e) {
       window.alert('Error: ' + e.toString())
@@ -62,7 +97,6 @@
 
   async function setClipboard(text) {
     try {
-      document.getElementById('link').innerHTML = text
       const type = 'text/plain'
       const clipboardItemData = {
         [type]: text,
@@ -70,7 +104,8 @@
       const clipboardItem = new ClipboardItem(clipboardItemData)
       await navigator.clipboard.write([clipboardItem])
     } catch (e) {
-      window.alert('Error: ' + e.toString())
+      //window.alert('Error: ' + e.toString())
+      document.getElementById('link').innerHTML = text
     }
   }
 </script>
