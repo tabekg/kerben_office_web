@@ -11,7 +11,12 @@
   <div><textarea id="textarea"></textarea></div>
 
   <div>
-    Truck number
+    Получатель
+    <label><input checked value='ООО "ALLIANCE HOLDING"' type='radio' name='receiver'/> ООО "ALLIANCE HOLDING"</label>
+    <label><input value='ООО "BARAKA HOLDING"' type='radio' name='receiver'/> ООО "BARAKA HOLDING"</label>
+  </div>
+  <div>
+    Номер машин
     <input id='truckNumber' type='text' />
   </div>
   <div>
@@ -79,9 +84,10 @@
       const weight = document.getElementById('weight').value
       const quantity = document.getElementById('quantity').value
       const date = document.getElementById('date').value
+      const receiver = document.querySelector('input[name="receiver"]:checked')?.value
       const container = document.getElementById('container').value.toUpperCase()
 
-      const object = {truckNumber, invoice, weight, quantity, date, container}
+      const object = {truckNumber, invoice, weight, quantity, date, container, receiver}
 
       const url = 'https://office.kerben.besoft.kg/cmr-page/cmr.html?' + Object.entries(object)
         .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
