@@ -15,11 +15,6 @@
   box-shadow: var(--shadow-sm);
 }
 
-.card.hidden {
-  opacity: 0.6;
-  background-color: var(--color-bg-tertiary);
-}
-
 .card.empty {
   border-color: var(--color-error-200);
   background-color: var(--color-error-50);
@@ -35,14 +30,19 @@
   border-bottom: var(--border-width-1) solid var(--color-border-light);
 }
 
-.headerLeft {
+.invoiceInfo {
   display: flex;
-  align-items: center;
-  gap: var(--spacing-2);
+  flex-direction: column;
   min-width: 0;
 }
 
-.toggleButton {
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.deleteInvoiceButton {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -58,20 +58,14 @@
   flex-shrink: 0;
 }
 
-.toggleButton:hover {
-  background-color: var(--color-bg-hover);
-  color: var(--color-text-secondary);
+.deleteInvoiceButton:hover {
+  background-color: var(--color-error-100);
+  color: var(--color-error-600);
 }
 
-.toggleButton svg {
+.deleteInvoiceButton svg {
   width: 1.25rem;
   height: 1.25rem;
-}
-
-.invoiceInfo {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
 }
 
 .date {

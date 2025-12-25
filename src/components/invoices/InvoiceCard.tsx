@@ -1,19 +1,19 @@
 import { useMemo } from 'react'
-import { MdDeleteOutline, MdVisibility, MdVisibilityOff, MdAdd } from 'react-icons/md'
+import { MdDeleteOutline, MdAdd } from 'react-icons/md'
 import { Button, Badge } from '../ui'
 import { IInvoice, ITransaction } from '../../types'
 import styles from './InvoiceCard.module.css'
 
 interface InvoiceCardProps {
   invoice: IInvoice
-  onToggleHidden: (number: string) => void
+  onDelete: (id: number) => void
   onAddTransaction: (number: string) => void
   onDeleteTransaction: (invoiceId: number, transactionId: number) => void
 }
 
 export default function InvoiceCard({
   invoice,
-  onToggleHidden,
+  onDelete,
   onAddTransaction,
   onDeleteTransaction,
 }: InvoiceCardProps) {
@@ -34,27 +34,25 @@ export default function InvoiceCard({
   }, [progress])
 
   const isEmpty = invoice.left <= 0
-  const isHidden = invoice.isHidden
 
   return (
-    <div className={`${styles.card} ${isHidden ? styles.hidden : ''} ${isEmpty ? styles.empty : ''}`}>
+    <div className={`${styles.card} ${isEmpty ? styles.empty : ''}`}>
       {/* Header */}
       <div className={styles.header}>
-        <div className={styles.headerLeft}>
-          <button
-            className={styles.toggleButton}
-            onClick={() => onToggleHidden(invoice.number)}
-            title={isHidden ? 'Показать' : 'Скрыть'}
-          >
-            {isHidden ? <MdVisibility /> : <MdVisibilityOff />}
-          </button>
-          <div className={styles.invoiceInfo}>
-            <span className={styles.date}>{invoice.date}</span>
-            <span className={styles.number}>#{invoice.number}</span>
-          </div>
+        <div className={styles.invoiceInfo}>
+          <span className={styles.date}>{invoice.date}</span>
+          <span className={styles.number}>#{invoice.number}</span>
         </div>
-        {isEmpty && <Badge variant="danger" size="sm">Израсходовано</Badge>}
-        {isHidden && <Badge variant="secondary" size="sm">Скрыто</Badge>}
+        <div className={styles.headerRight}>
+          {isEmpty && <Badge variant="danger" size="sm">Израсходовано</Badge>}
+          <button
+            className={styles.deleteInvoiceButton}
+            onClick={() => onDelete(invoice.id)}
+            title="Удалить квитанцию"
+          >
+            <MdDeleteOutline />
+          </button>
+        </div>
       </div>
 
       {/* Amount Info */}
@@ -96,7 +94,6 @@ export default function InvoiceCard({
                 key={t.id}
                 transaction={t}
                 onDelete={() => onDeleteTransaction(invoice.id, t.id)}
-                disabled={isHidden}
               />
             ))}
           </div>
@@ -104,19 +101,17 @@ export default function InvoiceCard({
       )}
 
       {/* Actions */}
-      {!isHidden && (
-        <div className={styles.actions}>
-          <Button
-            variant="ghost"
-            size="sm"
-            leftIcon={<MdAdd />}
-            onClick={() => onAddTransaction(invoice.number)}
-            fullWidth
-          >
-            Добавить транзакцию
-          </Button>
-        </div>
-      )}
+      <div className={styles.actions}>
+        <Button
+          variant="ghost"
+          size="sm"
+          leftIcon={<MdAdd />}
+          onClick={() => onAddTransaction(invoice.number)}
+          fullWidth
+        >
+          Добавить транзакцию
+        </Button>
+      </div>
     </div>
   )
 }
@@ -124,10 +119,9 @@ export default function InvoiceCard({
 interface TransactionItemProps {
   transaction: ITransaction
   onDelete: () => void
-  disabled?: boolean
 }
 
-function TransactionItem({ transaction, onDelete, disabled }: TransactionItemProps) {
+function TransactionItem({ transaction, onDelete }: TransactionItemProps) {
   return (
     <div className={styles.transactionItem}>
       <div className={styles.transactionInfo}>
@@ -139,15 +133,13 @@ function TransactionItem({ transaction, onDelete, disabled }: TransactionItemPro
           <span className={styles.transactionComment}>{transaction.comment}</span>
         )}
       </div>
-      {!disabled && (
-        <button
-          className={styles.deleteButton}
-          onClick={onDelete}
-          title="Удалить транзакцию"
-        >
-          <MdDeleteOutline />
-        </button>
-      )}
+      <button
+        className={styles.deleteButton}
+        onClick={onDelete}
+        title="Удалить транзакцию"
+      >
+        <MdDeleteOutline />
+      </button>
     </div>
   )
 }
