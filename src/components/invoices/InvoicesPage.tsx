@@ -37,9 +37,9 @@ export default function InvoicesPage({ title, name }: InvoicesPageProps) {
   const [showExportModal, setShowExportModal] = useState(false)
   const [currentInvoiceNumber, setCurrentInvoiceNumber] = useState('')
 
-  // Load data
-  useEffect(() => {
-    setLoading(true)
+  // Load data function
+  const loadData = useCallback((showLoader = true) => {
+    if (showLoader) setLoading(true)
     isFirstLoad.current = true
     
     requester
@@ -60,7 +60,7 @@ export default function InvoicesPage({ title, name }: InvoicesPageProps) {
                   ...t,
                   id: t.id || it + 1,
                 })),
-                id: i + 1,  // Всегда уникальный id на основе индекса
+                id: i + 1,
                 isHidden: !!g.isHidden,
               }))
           )
@@ -74,6 +74,34 @@ export default function InvoicesPage({ title, name }: InvoicesPageProps) {
         }, 100)
       })
   }, [name])
+
+  // Initial load
+  useEffect(() => {
+    loadData()
+  }, [loadData])
+
+  // Refresh on tab/window focus
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && !saving) {
+        loadData(false)
+      }
+    }
+
+    const handleFocus = () => {
+      if (!saving) {
+        loadData(false)
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    window.addEventListener('focus', handleFocus)
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+      window.removeEventListener('focus', handleFocus)
+    }
+  }, [loadData, saving])
 
   // Save data on change
   useEffect(() => {
