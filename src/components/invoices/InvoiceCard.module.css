@@ -7,7 +7,6 @@
   border-radius: var(--radius-lg);
   overflow: hidden;
   transition: var(--transition-default);
-  height: 100%;
 }
 
 .card:hover {
