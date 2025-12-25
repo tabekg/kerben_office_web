@@ -1,87 +1,49 @@
-import {useState, useMemo} from 'react'
-import InvoicesComponent from '../components/InvoicesComponent'
+import { useState, useMemo } from 'react'
+import { InvoicesPage } from '../components/invoices'
+import styles from './InvoicesContainer.module.css'
 
-const InvoicesContainer = () => {
-  const [selected, setSelected] = useState('invoices')
+type TabKey = 'invoices' | 'gps-1' | 'gps-2' | 'terminal'
 
-  const handleButtonClick = (buttonLabel: string) => {
-    setSelected(buttonLabel)
-  }
+interface Tab {
+  key: TabKey
+  label: string
+  title: string
+}
 
-  const title = useMemo(() => {
-    switch (selected) {
-      case 'invoices':
-        return '0.4'
-      case 'gps-1':
-        return 'Каратай'
-      case 'gps-2':
-        return 'Достук'
-      case 'terminal':
-        return 'Терминал'
-      default:
-        return ''
-    }
-  }, [selected])
+const TABS: Tab[] = [
+  { key: 'invoices', label: '0.4', title: '0.4' },
+  { key: 'gps-1', label: 'Каратай', title: 'Каратай' },
+  { key: 'gps-2', label: 'Достук', title: 'Достук' },
+  { key: 'terminal', label: 'Терминал', title: 'Терминал' },
+]
+
+export default function InvoicesContainer() {
+  const [activeTab, setActiveTab] = useState<TabKey>('invoices')
+
+  const currentTab = useMemo(
+    () => TABS.find((t) => t.key === activeTab) || TABS[0],
+    [activeTab]
+  )
 
   return (
-    <>
-      <div className='container mt-4'>
-        <div className='btn-group d-flex gap-2 mb-4'>
-          <button
-            type='button'
-            className={`btn ${
-              selected === 'invoices' ? 'btn-primary' : 'btn-outline-primary'
-            }`}
-            onClick={() => handleButtonClick('invoices')}
-          >
-            0.4
-          </button>
-          <button
-            type='button'
-            className={`btn ${
-              selected === 'gps-1' ? 'btn-primary' : 'btn-outline-primary'
-            }`}
-            onClick={() => handleButtonClick('gps-1')}
-          >
-            Каратай
-          </button>
-          <button
-            type='button'
-            className={`btn ${
-              selected === 'gps-2' ? 'btn-primary' : 'btn-outline-primary'
-            }`}
-            onClick={() => handleButtonClick('gps-2')}
-          >
-            Достук
-          </button>
-          <button
-            type='button'
-            className={`btn ${
-              selected === 'terminal' ? 'btn-primary' : 'btn-outline-primary'
-            }`}
-            onClick={() => handleButtonClick('terminal')}
-          >
-            Терминал
-          </button>
-        </div>
+    <div className={styles.container}>
+      {/* Tabs */}
+      <div className={styles.tabsContainer}>
+        <nav className={styles.tabs}>
+          {TABS.map((tab) => (
+            <button
+              key={tab.key}
+              className={`${styles.tab} ${activeTab === tab.key ? styles.active : ''}`}
+              onClick={() => setActiveTab(tab.key)}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </nav>
       </div>
 
-      {selected === 'invoices' ? (
-        <InvoicesComponent title={title} name={selected} />
-      ) : null}
-
-      {selected === 'terminal' ? (
-        <InvoicesComponent title={title} name={selected} />
-      ) : null}
-
-      {selected === 'gps-1' ? (
-        <InvoicesComponent title={title} name={selected} />
-      ) : null}
-
-      {selected === 'gps-2' ? (
-        <InvoicesComponent title={title} name={selected} />
-      ) : null}
-    </>
+      {/* Content */}
+      <InvoicesPage title={currentTab.title} name={currentTab.key} />
+    </div>
   )
 }
-export default InvoicesContainer

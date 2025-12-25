@@ -1,0 +1,139 @@
+/* ========== Badge Base ========== */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-1);
+  font-family: var(--font-family-sans);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-none);
+  white-space: nowrap;
+  border-radius: var(--radius-default);
+  transition: var(--transition-colors);
+}
+
+/* ========== Sizes ========== */
+.size-sm {
+  padding: var(--spacing-0-5) var(--spacing-2);
+  font-size: var(--font-size-xs);
+}
+
+.size-md {
+  padding: var(--spacing-1) var(--spacing-2-5);
+  font-size: var(--font-size-xs);
+}
+
+.size-lg {
+  padding: var(--spacing-1-5) var(--spacing-3);
+  font-size: var(--font-size-sm);
+}
+
+/* ========== Pill ========== */
+.pill {
+  border-radius: var(--radius-full);
+}
+
+/* ========== Dot ========== */
+.dot {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border-radius: var(--radius-full);
+}
+
+.dot.size-sm {
+  width: 6px;
+  height: 6px;
+}
+
+.dot.size-lg {
+  width: 10px;
+  height: 10px;
+}
+
+/* ========== Variants ========== */
+
+/* Default */
+.variant-default {
+  background-color: var(--color-neutral-100);
+  color: var(--color-neutral-700);
+}
+
+/* Primary */
+.variant-primary {
+  background-color: var(--color-primary-100);
+  color: var(--color-primary-700);
+}
+
+/* Secondary */
+.variant-secondary {
+  background-color: var(--color-secondary-100);
+  color: var(--color-secondary-700);
+}
+
+/* Success */
+.variant-success {
+  background-color: var(--color-success-100);
+  color: var(--color-success-700);
+}
+
+/* Warning */
+.variant-warning {
+  background-color: var(--color-warning-100);
+  color: var(--color-warning-800);
+}
+
+/* Danger */
+.variant-danger {
+  background-color: var(--color-error-100);
+  color: var(--color-error-700);
+}
+
+/* Info */
+.variant-info {
+  background-color: var(--color-info-100);
+  color: var(--color-info-700);
+}
+
+/* Online (Status) */
+.variant-online {
+  background-color: var(--color-success-100);
+  color: var(--color-success-700);
+}
+
+.variant-online.dot {
+  background-color: var(--color-status-online);
+}
+
+/* Offline (Status) */
+.variant-offline {
+  background-color: var(--color-error-100);
+  color: var(--color-error-700);
+}
+
+.variant-offline.dot {
+  background-color: var(--color-status-offline);
+}
+
+/* Pending (Status) */
+.variant-pending {
+  background-color: var(--color-warning-100);
+  color: var(--color-warning-800);
+}
+
+.variant-pending.dot {
+  background-color: var(--color-status-pending);
+}
+
+/* ========== Icon ========== */
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.icon svg {
+  width: 1em;
+  height: 1em;
+}

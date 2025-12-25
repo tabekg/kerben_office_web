@@ -1,0 +1,54 @@
+/* ========== Container ========== */
+.container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  background-color: var(--color-bg-secondary);
+}
+
+/* ========== Tabs Container ========== */
+.tabsContainer {
+  background-color: var(--color-bg-primary);
+  border-bottom: var(--border-width-1) solid var(--color-border-light);
+  padding: 0 var(--spacing-6);
+}
+
+/* ========== Tabs ========== */
+.tabs {
+  display: flex;
+  gap: var(--spacing-1);
+}
+
+.tab {
+  position: relative;
+  padding: var(--spacing-3) var(--spacing-4);
+  border: none;
+  background: none;
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: var(--transition-colors);
+  white-space: nowrap;
+}
+
+.tab:hover {
+  color: var(--color-text-primary);
+}
+
+.tab.active {
+  color: var(--color-primary-600);
+}
+
+.tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: var(--color-primary-600);
+  border-radius: var(--radius-full) var(--radius-full) 0 0;
+}

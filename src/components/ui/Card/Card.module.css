@@ -1,0 +1,121 @@
+/* ========== Card Base ========== */
+.card {
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-lg);
+  background-color: var(--color-bg-card);
+  overflow: hidden;
+}
+
+/* ========== Variants ========== */
+.variant-default {
+  border: var(--border-width-1) solid var(--color-border-light);
+  box-shadow: var(--shadow-card);
+}
+
+.variant-outlined {
+  border: var(--border-width-1) solid var(--color-border-default);
+  box-shadow: none;
+}
+
+.variant-elevated {
+  border: none;
+  box-shadow: var(--shadow-lg);
+}
+
+.variant-filled {
+  border: none;
+  background-color: var(--color-bg-tertiary);
+  box-shadow: none;
+}
+
+/* ========== Clickable ========== */
+.clickable {
+  cursor: pointer;
+  transition: var(--transition-default);
+}
+
+.clickable:hover {
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-2px);
+}
+
+.clickable:active {
+  transform: translateY(0);
+}
+
+.variant-filled.clickable:hover {
+  background-color: var(--color-secondary-200);
+}
+
+/* ========== No Padding ========== */
+.noPadding .header,
+.noPadding .body,
+.noPadding .footer {
+  padding: 0;
+}
+
+/* ========== Card Header ========== */
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--spacing-4);
+  padding: var(--spacing-4);
+  border-bottom: var(--border-width-1) solid var(--color-border-light);
+}
+
+.headerContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.title {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  line-height: var(--line-height-snug);
+}
+
+.subtitle {
+  margin: var(--spacing-1) 0 0 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-normal);
+}
+
+.headerAction {
+  flex-shrink: 0;
+}
+
+/* ========== Card Body ========== */
+.body {
+  flex: 1;
+  padding: var(--spacing-4);
+}
+
+/* ========== Card Footer ========== */
+.footer {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-4);
+  border-top: var(--border-width-1) solid var(--color-border-light);
+}
+
+.align-left {
+  justify-content: flex-start;
+}
+
+.align-center {
+  justify-content: center;
+}
+
+.align-right {
+  justify-content: flex-end;
+}
+
+.align-between {
+  justify-content: space-between;
+}

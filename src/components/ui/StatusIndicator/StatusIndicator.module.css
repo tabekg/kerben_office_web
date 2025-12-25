@@ -1,0 +1,133 @@
+/* ========== Base ========== */
+.indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+  transition: var(--transition-colors);
+}
+
+/* ========== Sizes ========== */
+.size-sm {
+  width: 2rem;
+  height: 2rem;
+}
+
+.size-md {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.size-lg {
+  width: 3rem;
+  height: 3rem;
+}
+
+/* ========== Icon Sizing ========== */
+.indicator svg,
+.indicator .material-symbols-outlined {
+  font-size: 1.25em;
+}
+
+.size-sm svg,
+.size-sm .material-symbols-outlined {
+  font-size: 1rem;
+}
+
+.size-lg svg,
+.size-lg .material-symbols-outlined {
+  font-size: 1.5rem;
+}
+
+/* ========== Status Colors ========== */
+
+/* Online */
+.status-online {
+  background-color: var(--color-success-100);
+  color: var(--color-success-700);
+}
+
+/* Offline */
+.status-offline {
+  background-color: var(--color-error-100);
+  color: var(--color-error-700);
+}
+
+/* Pending */
+.status-pending {
+  background-color: var(--color-warning-100);
+  color: var(--color-warning-700);
+}
+
+/* On Way */
+.status-on-way {
+  background-color: var(--color-primary-100);
+  color: var(--color-primary-700);
+}
+
+/* Completed */
+.status-completed {
+  background-color: var(--color-success-100);
+  color: var(--color-success-700);
+}
+
+/* Archived */
+.status-archived {
+  background-color: var(--color-secondary-100);
+  color: var(--color-secondary-600);
+}
+
+/* Overload */
+.status-overload {
+  background-color: #fff7ed;
+  color: #c2410c;
+}
+
+/* Created */
+.status-created {
+  background-color: var(--color-info-100);
+  color: var(--color-info-700);
+}
+
+/* Changed Driver */
+.status-changed-driver {
+  background-color: #faf5ff;
+  color: #7c3aed;
+}
+
+/* ========== Pulse Animation ========== */
+.pulse {
+  position: relative;
+}
+
+.pulse::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  animation: pulse-animation 2s infinite;
+}
+
+.status-online.pulse::before {
+  background-color: var(--color-success-500);
+}
+
+.status-offline.pulse::before {
+  background-color: var(--color-error-500);
+}
+
+@keyframes pulse-animation {
+  0% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}

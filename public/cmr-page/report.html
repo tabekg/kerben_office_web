@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title></title>
+	<style>
+		* {
+			box-sizing: border-box;
+		}
+		body {
+			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+			background: #f0f2f5;
+			margin: 0;
+			padding: 20px;
+		}
+		.container {
+			display: flex;
+			flex-direction: column;
+			gap: 16px;
+			max-width: 600px;
+			margin: 0 auto;
+			background: white;
+			padding: 24px;
+			border-radius: 12px;
+			box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+		}
+		textarea {
+			width: 100%;
+			padding: 12px;
+			border: 1px solid #ddd;
+			border-radius: 8px;
+			font-size: 14px;
+			resize: vertical;
+		}
+		textarea:focus {
+			outline: none;
+			border-color: #4a90d9;
+		}
+		input[type="date"] {
+			padding: 10px 12px;
+			border: 1px solid #ddd;
+			border-radius: 8px;
+			font-size: 14px;
+			flex: 1;
+		}
+		input[type="date"]:focus {
+			outline: none;
+			border-color: #4a90d9;
+		}
+		button {
+			padding: 10px 16px;
+			border: none;
+			border-radius: 8px;
+			font-size: 14px;
+			cursor: pointer;
+			transition: all 0.2s;
+		}
+		.btn-month {
+			background: #e8f0fe;
+			color: #1a73e8;
+		}
+		.btn-month:hover {
+			background: #d2e3fc;
+		}
+		.btn-nav {
+			background: #f5f5f5;
+			color: #333;
+		}
+		.btn-nav:hover {
+			background: #e8e8e8;
+		}
+		.btn-copy {
+			background: #1a73e8;
+			color: white;
+			padding: 12px;
+		}
+		.btn-copy:hover {
+			background: #1557b0;
+		}
+		.date-row {
+			display: flex;
+			gap: 8px;
+			align-items: center;
+		}
+		.month-row {
+			display: flex;
+			gap: 8px;
+		}
+		pre {
+			background: #f8f9fa;
+			padding: 16px;
+			border-radius: 8px;
+			white-space: pre-wrap;
+			margin: 0;
+			min-height: 60px;
+			border: 1px solid #eee;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<textarea id="content" rows="8" placeholder="Вставьте ссылки сюда..."></textarea>
+		
+		<div class="month-row">
+			<button class="btn-month" id="btnPrevMonth" onclick="setFirstOfPrevMonth()"></button>
+			<button class="btn-month" id="btnCurrentMonth" onclick="setFirstOfCurrentMonth()"></button>
+		</div>
+		
+		<div class="date-row">
+			<button class="btn-nav" onclick="prevDay()">← Пред</button>
+			<input id="date" type="date">
+			<button class="btn-nav" onclick="nextDay()">След →</button>
+		</div>
+
+		<button class="btn-copy" id="copy">Скопировать результат</button>
+		<pre id="result"></pre>
+	</div>
+
+	<script type="text/javascript">
+		const content = document.getElementById('content')
+		const date = document.getElementById('date')
+		const result = document.getElementById('result')
+		const copyBtn = document.getElementById('copy')
+		const btnPrevMonth = document.getElementById('btnPrevMonth')
+		const btnCurrentMonth = document.getElementById('btnCurrentMonth')
+
+		const months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 
+						'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря']
+
+		function updateMonthButtons() {
+			const now = new Date()
+			const currentMonth = now.getMonth()
+			const prevMonth = currentMonth === 0 ? 11 : currentMonth - 1
+			
+			btnCurrentMonth.textContent = `1 ${months[currentMonth]}`
+			btnPrevMonth.textContent = `1 ${months[prevMonth]}`
+		}
+
+		// Инициализация
+		date.value = toInputFormat(new Date())
+		updateMonthButtons()
+
+		function toInputFormat(d) {
+			return d.toISOString().split('T')[0]
+		}
+
+		function setFirstOfCurrentMonth() {
+			const now = new Date()
+			date.value = toInputFormat(new Date(now.getFullYear(), now.getMonth(), 1))
+			update()
+		}
+
+		function setFirstOfPrevMonth() {
+			const now = new Date()
+			date.value = toInputFormat(new Date(now.getFullYear(), now.getMonth() - 1, 1))
+			update()
+		}
+
+		function prevDay() {
+			if (!date.value) return
+			const d = new Date(date.value)
+			d.setDate(d.getDate() - 1)
+			date.value = toInputFormat(d)
+			update()
+		}
+
+		function nextDay() {
+			if (!date.value) return
+			const d = new Date(date.value)
+			d.setDate(d.getDate() + 1)
+			date.value = toInputFormat(d)
+			update()
+		}
+
+		function formatDate(dateStr) {
+			const [year, month, day] = dateStr.split('-')
+			return `${day}.${month}.${year}`
+		}
+
+		function handle(text, dateValue) {
+			const formattedDate = formatDate(dateValue)
+			const items = text.split('\n').filter(g => !!g).map(g => g.split('https://office.kerben.besoft.kg/cmr-page/cmr.html')[1]).map(g => new URLSearchParams(g))
+			const output = items.map(g => [g.get('truckNumber'), g.get('invoice').replace('_', ' от '), formattedDate].join('\t'))
+			const resultText = output.join('\n')
+			result.textContent = resultText
+			return resultText
+		}
+
+		function update() {
+			if (!content.value || !date.value) {
+				return
+			}
+			handle(content.value, date.value)
+		}
+
+		content.oninput = update
+		date.oninput = update
+
+		copyBtn.onclick = () => {
+			const text = result.textContent
+			if (!text) {
+				alert('Нет данных для копирования')
+				return
+			}
+			navigator.clipboard.writeText(text).then(() => {
+				copyBtn.textContent = 'Скопировано!'
+				setTimeout(() => {
+					copyBtn.textContent = 'Скопировать результат'
+				}, 2000)
+			})
+		}
+	</script>
+</body>
+</html>

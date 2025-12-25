@@ -4,116 +4,321 @@
   <meta charset='utf-8'>
   <meta name='viewport' content='width=device-width, initial-scale=1'>
   <title>CMR Form</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f0f2f5;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 24px;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .form-row {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-row label.main-label {
+      font-weight: 500;
+      color: #555;
+      font-size: 14px;
+    }
+    .form-row label.main-label.required::after {
+      content: ' *';
+      color: #e53935;
+    }
+    .input-group {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      resize: vertical;
+      min-height: 100px;
+    }
+    textarea:focus, input[type="text"]:focus {
+      outline: none;
+      border-color: #4a90d9;
+    }
+    input[type="text"] {
+      flex: 1;
+      padding: 10px 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    .radio-group {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .radio-group label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+    .radio-group label:hover {
+      background: #f8f9fa;
+    }
+    .radio-group input[type="radio"] {
+      margin: 0;
+    }
+    .radio-group input[type="radio"]:checked + span {
+      color: #1a73e8;
+    }
+    .radio-group label:has(input:checked) {
+      border-color: #1a73e8;
+      background: #e8f0fe;
+    }
+    button {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-small {
+      background: #f5f5f5;
+      color: #333;
+      padding: 8px 12px;
+    }
+    .btn-small:hover {
+      background: #e8e8e8;
+    }
+    .btn-date {
+      background: #e8f0fe;
+      color: #1a73e8;
+    }
+    .btn-date:hover {
+      background: #d2e3fc;
+    }
+    .btn-primary {
+      background: #1a73e8;
+      color: white;
+      padding: 14px 24px;
+      font-size: 16px;
+      width: 100%;
+      margin-top: 8px;
+    }
+    .btn-primary:hover:not(:disabled) {
+      background: #1557b0;
+    }
+    .btn-primary:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    #link {
+      background: #f8f9fa;
+      padding: 12px;
+      border-radius: 8px;
+      word-break: break-all;
+      font-size: 13px;
+      color: #1a73e8;
+      margin: 0;
+      min-height: 20px;
+    }
+    .date-buttons {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+  </style>
 </head>
 <body>
-<h1>CMR form</h1>
-<div style='display: flex; gap: 12px; flex-direction: column'>
-  <div><textarea id="textarea"></textarea></div>
+  <h1>CMR Form</h1>
+  <div class='container'>
+    <div class="form-row">
+      <label class="main-label">Данные из Excel</label>
+      <textarea id="textarea" placeholder="Вставьте данные из Excel сюда..."></textarea>
+    </div>
 
-  <div>
-    Получатель
-    <label><input checked value='ООО "ALLIANCE HOLDING"' type='radio' name='receiver'/> ООО "ALLIANCE HOLDING"</label>
-    <label><input value='ООО "BARAKA HOLDING"' type='radio' name='receiver'/> ООО "BARAKA HOLDING"</label>
-  </div>
-  <div>
-    Номер машин
-    <input id='truckNumber' type='text' />
-  </div>
-  <div>
-    Invoice
-    <input id='invoice' type='text' />
-  </div>
-  <div>
-    Weight
-    <input id='weight' type='text' /> <button onclick="weight.value += '.000';">.000</button>
-  </div>
-  <div>
-    Quantity
-    <input id='quantity' type='text' />
-  </div>
-  <div>
-    Date
-    <input id='date' type='text' /> <span style="gap: 4px; display: inline-flex;" id="dateButtons"></span>
-  </div>
-  <div>
-    Container
-    <input id='container' type='text' />
-  </div>
-  <p id='link'></p>
-  <button onclick='copy()'>Copy and show</button>
-</div>
+    <div class="form-row">
+      <label class="main-label required">Получатель</label>
+      <div class="radio-group">
+        <label>
+          <input checked value='ООО "ALLIANCE HOLDING"' type='radio' name='receiver'/>
+          <span>ООО "ALLIANCE HOLDING"</span>
+        </label>
+        <label>
+          <input value='ООО "BARAKA HOLDING"' type='radio' name='receiver'/>
+          <span>ООО "BARAKA HOLDING"</span>
+        </label>
+      </div>
+    </div>
 
-<script type='text/javascript'>
-  function tap(s) {
+    <div class="form-row">
+      <label class="main-label required">Номер машины</label>
+      <input id='truckNumber' type='text' placeholder="Например: AB1234CD"/>
+    </div>
+
+    <div class="form-row">
+      <label class="main-label required">Invoice</label>
+      <input id='invoice' type='text' placeholder="Номер инвойса"/>
+    </div>
+
+    <div class="form-row">
+      <label class="main-label required">Weight</label>
+      <div class="input-group">
+        <input id='weight' type='text' placeholder="Вес"/>
+        <button class="btn-small" onclick="weight.value += '.000'; validate()">.000</button>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <label class="main-label required">Quantity</label>
+      <input id='quantity' type='text' placeholder="Количество"/>
+    </div>
+
+    <div class="form-row">
+      <label class="main-label required">Date</label>
+      <div class="input-group">
+        <input id='date' type='text' placeholder="ДД.ММ.ГГГГ"/>
+        <div class="date-buttons" id="dateButtons"></div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <label class="main-label">Container</label>
+      <input id='container' type='text' placeholder="Номер контейнера (необязательно)"/>
+    </div>
+
+    <p id='link'></p>
+    <button class="btn-primary" id="copyBtn" onclick='copy()' disabled>Скопировать ссылку</button>
+  </div>
+
+  <script type='text/javascript'>
+    const requiredFields = ['truckNumber', 'invoice', 'weight', 'quantity', 'date']
+    const copyBtn = document.getElementById('copyBtn')
+
+    function validate() {
+      const allFilled = requiredFields.every(id => document.getElementById(id).value.trim() !== '')
+      copyBtn.disabled = !allFilled
+    }
+
+    // Добавляем валидацию на все поля
+    requiredFields.forEach(id => {
+      document.getElementById(id).addEventListener('input', validate)
+    })
+
+    function tap(s) {
       const r = s.split('\n').map(l => l.split('\t'))
       const invoice = r[1][2].split('№')[1].trim().replace(' от ', '_')
       const truckNumber = r[19][2];
       const quantity = r.find(k => k[0].startsWith('Итого'))[4]
       const weight = r.find(k => k[0].startsWith('Итого'))[6]
-
       return {invoice, truckNumber, quantity, weight}
-  }
-
-  const textarea = document.getElementById('textarea')
-
-  textarea.oninput = (e) => {
-    try {
-      const t = tap(e.target.value)
-      document.getElementById('truckNumber').value = t.truckNumber + '/'
-      document.getElementById('invoice').value = t.invoice
-      document.getElementById('quantity').value = t.quantity
-      document.getElementById('weight').value = t.weight
-    } catch (e) {
-      window.alert('Ката!!!')
     }
-  }
 
-  const dateButtons = document.getElementById('dateButtons')
-
-  for (let i = 0; i < 3; i++) {
-    const date = new Date()
-    date.setDate(new Date().getDate() - i);
-    const t = `${date.getDate()}.${(date.getMonth()+1).toString().padStart(2, '0')}.${date.getFullYear()}`
-    dateButtons.innerHTML += `<button onClick="date.value = '${t}';">${t}</button>`
-  }
-
-  function copy() {
-    try {
-      const truckNumber = document.getElementById('truckNumber').value.toUpperCase()
-      const invoice = document.getElementById('invoice').value
-      const weight = document.getElementById('weight').value
-      const quantity = document.getElementById('quantity').value
-      const date = document.getElementById('date').value
-      const receiver = document.querySelector('input[name="receiver"]:checked')?.value
-      const container = document.getElementById('container').value.toUpperCase()
-
-      const object = {truckNumber, invoice, weight, quantity, date, container, receiver}
-
-      const url = 'https://office.kerben.besoft.kg/cmr-page/cmr.html?' + Object.entries(object)
-        .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
-        .join('&')
-
-      setClipboard(url).then(res => {
-        //window.alert('Copied!')
-      })
-    } catch (e) {
-      window.alert('Error: ' + e.toString())
-    }
-  }
-
-  async function setClipboard(text) {
-    try {
-      const type = 'text/plain'
-      const clipboardItemData = {
-        [type]: text,
+    const textarea = document.getElementById('textarea')
+    textarea.oninput = (e) => {
+      try {
+        const t = tap(e.target.value)
+        document.getElementById('truckNumber').value = t.truckNumber + '/'
+        document.getElementById('invoice').value = t.invoice
+        document.getElementById('quantity').value = t.quantity
+        document.getElementById('weight').value = t.weight
+        validate()
+      } catch (e) {
+        window.alert('Ката!!!')
       }
-      const clipboardItem = new ClipboardItem(clipboardItemData)
-      await navigator.clipboard.write([clipboardItem])
-    } catch (e) {
-      //window.alert('Error: ' + e.toString())
-      document.getElementById('link').innerHTML = text
     }
-  }
-</script>
+
+    const dateButtons = document.getElementById('dateButtons')
+    for (let i = 0; i < 3; i++) {
+      const date = new Date()
+      date.setDate(new Date().getDate() - i);
+      const t = `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth()+1).toString().padStart(2, '0')}.${date.getFullYear()}`
+      const btn = document.createElement('button')
+      btn.className = 'btn-date'
+      btn.textContent = t
+      btn.onclick = () => {
+        document.getElementById('date').value = t
+        validate()
+      }
+      dateButtons.appendChild(btn)
+    }
+
+    function resetForm() {
+      document.getElementById('textarea').value = ''
+      document.getElementById('truckNumber').value = ''
+      document.getElementById('invoice').value = ''
+      document.getElementById('weight').value = ''
+      document.getElementById('quantity').value = ''
+      document.getElementById('date').value = ''
+      document.getElementById('container').value = ''
+      document.getElementById('link').innerHTML = ''
+      document.querySelector('input[name="receiver"][value=\'ООО "ALLIANCE HOLDING"\']').checked = true
+      validate()
+    }
+
+    function copy() {
+      try {
+        const truckNumber = document.getElementById('truckNumber').value.toUpperCase()
+        const invoice = document.getElementById('invoice').value
+        const weight = document.getElementById('weight').value
+        const quantity = document.getElementById('quantity').value
+        const date = document.getElementById('date').value
+        const receiver = document.querySelector('input[name="receiver"]:checked')?.value
+        const container = document.getElementById('container').value.toUpperCase()
+        const object = {truckNumber, invoice, weight, quantity, date, container, receiver}
+        const url = 'https://office.kerben.besoft.kg/cmr-page/cmr.html?' + Object.entries(object)
+          .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+          .join('&')
+        setClipboard(url).then(() => {
+          copyBtn.textContent = 'Скопировано!'
+          setTimeout(() => {
+            copyBtn.textContent = 'Скопировать ссылку'
+            resetForm()
+          }, 1500)
+        })
+      } catch (e) {
+        window.alert('Error: ' + e.toString())
+      }
+    }
+
+    async function setClipboard(text) {
+      try {
+        const type = 'text/plain'
+        const clipboardItemData = {
+          [type]: text,
+        }
+        const clipboardItem = new ClipboardItem(clipboardItemData)
+        await navigator.clipboard.write([clipboardItem])
+      } catch (e) {
+        document.getElementById('link').innerHTML = text
+      }
+    }
+
+    // Начальная валидация
+    validate()
+  </script>
 </body>
 </html>
