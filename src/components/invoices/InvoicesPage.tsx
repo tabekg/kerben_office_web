@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useEffect } from 'react'
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react'
 import { MdSearch, MdAdd, MdFileDownload, MdSend, MdFilterList } from 'react-icons/md'
 import { Button, Badge, Spinner } from '../ui'
 import InvoiceCard from './InvoiceCard'
@@ -9,8 +9,10 @@ import { IInvoice, ITransaction } from '../../types'
 import requester from '../../utils/requester'
 import { exportToExcel } from '../../utils/generat-excel'
 import { formatDateDDMMYYYY, parseDate } from '../../utils/parsers'
-import commaNumber from 'comma-number'
 import styles from './InvoicesPage.module.css'
+
+// Форматирование числа с разделителями
+const formatNumber = (num: number) => num.toLocaleString('ru-RU')
 
 interface InvoicesPageProps {
   title: string
@@ -24,6 +26,9 @@ export default function InvoicesPage({ title, name }: InvoicesPageProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [showHidden, setShowHidden] = useState(false)
   
+  // Флаг для предотвращения сохранения при первой загрузке
+  const isFirstLoad = useRef(true)
+  
   // Modals
   const [showInvoiceModal, setShowInvoiceModal] = useState(false)
   const [showTransactionModal, setShowTransactionModal] = useState(false)
@@ -33,6 +38,8 @@ export default function InvoicesPage({ title, name }: InvoicesPageProps) {
   // Load data
   useEffect(() => {
     setLoading(true)
+    isFirstLoad.current = true // Сбрасываем при смене таба
+    
     requester
       .get('/office/invoices' + (name === 'invoices' ? '' : '/' + name))
       .then((res) => {
@@ -58,17 +65,25 @@ export default function InvoicesPage({ title, name }: InvoicesPageProps) {
         }
       })
       .catch(console.error)
-      .finally(() => setLoading(false))
+      .finally(() => {
+        setLoading(false)
+        // Разрешаем сохранение после завершения загрузки
+        setTimeout(() => {
+          isFirstLoad.current = false
+        }, 100)
+      })
   }, [name])
 
-  // Save data on change
+  // Save data on change - только после инициализации
   useEffect(() => {
-    if (!items.length || loading) return
+    // Не сохраняем если:
+    // - ещё загружаем
+    // - это первая загрузка
+    if (loading || isFirstLoad.current) return
     
     requester
       .post('/office/invoices' + (name === 'invoices' ? '' : '/' + name), { data: items })
       .catch(() => {
-        // TODO: Replace with toast notification
         console.error('Ошибка сохранения')
       })
   }, [items, name, loading])
@@ -187,8 +202,8 @@ export default function InvoicesPage({ title, name }: InvoicesPageProps) {
     const remaining = list.reduce((a, b) => a + b.left, 0)
     const content =
       `Kerben Остаток (${title})\n\n` +
-      list.map((g) => `${g.number}: ${commaNumber(g.left)} сом`).join('\n') +
-      `\n\nВсего остаток: ${commaNumber(remaining)} сом`
+      list.map((g) => `${g.number}: ${formatNumber(g.left)} сом`).join('\n') +
+      `\n\nВсего остаток: ${formatNumber(remaining)} сом`
 
     const phoneNumbers = [
       '996777171171',
@@ -230,7 +245,7 @@ export default function InvoicesPage({ title, name }: InvoicesPageProps) {
           <div className={styles.stats}>
             <span className={styles.statLabel}>Остаток:</span>
             <span className={styles.statValue}>
-              {commaNumber(totalRemaining)} <small>сом</small>
+              {formatNumber(totalRemaining)} <small>сом</small>
             </span>
           </div>
         </div>
