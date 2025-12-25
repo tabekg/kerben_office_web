@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react'
-import { MdSearch, MdAdd, MdFileDownload, MdSend } from 'react-icons/md'
+import { MdSearch, MdAdd, MdFileDownload, MdSend, MdSync } from 'react-icons/md'
 import { Button, Badge, Spinner } from '../ui'
 import InvoiceCard from './InvoiceCard'
 import InvoiceFormModal from './InvoiceFormModal'
@@ -23,6 +23,7 @@ export default function InvoicesPage({ title, name }: InvoicesPageProps) {
   // State
   const [items, setItems] = useState<IInvoice[]>([])
   const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   
   // Флаг для предотвращения сохранения при первой загрузке
@@ -75,10 +76,15 @@ export default function InvoicesPage({ title, name }: InvoicesPageProps) {
   useEffect(() => {
     if (loading || isFirstLoad.current) return
     
+    setSaving(true)
+    
     requester
       .post('/office/invoices' + (name === 'invoices' ? '' : '/' + name), { data: items })
       .catch(() => {
         console.error('Ошибка сохранения')
+      })
+      .finally(() => {
+        setSaving(false)
       })
   }, [items, name, loading])
 
@@ -226,6 +232,12 @@ export default function InvoicesPage({ title, name }: InvoicesPageProps) {
         </div>
 
         <div className={styles.headerRight}>
+          {saving && (
+            <div className={styles.savingIndicator}>
+              <MdSync className={styles.savingIcon} />
+              <span>Синхронизация...</span>
+            </div>
+          )}
           <div className={styles.stats}>
             <span className={styles.statLabel}>Остаток:</span>
             <span className={styles.statValue}>
