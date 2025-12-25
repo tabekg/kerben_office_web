@@ -60,7 +60,7 @@ export default function InvoicesPage({ title, name }: InvoicesPageProps) {
                   ...t,
                   id: t.id || it + 1,
                 })),
-                id: g.id || i + 1,
+                id: i + 1,  // Всегда уникальный id на основе индекса
                 isHidden: !!g.isHidden,
               }))
           )
