@@ -15,5 +15,6 @@ export interface IInvoice {
   comm: number
   total: number
   left: number
+  isHidden?: boolean
   transactions: ITransaction[]
 }

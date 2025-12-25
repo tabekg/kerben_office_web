@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react'
-import { MdSearch, MdAdd, MdFileDownload, MdSend, MdSync, MdError, MdRefresh } from 'react-icons/md'
+import { MdSearch, MdAdd, MdFileDownload, MdSend, MdSync, MdError, MdRefresh, MdFilterList } from 'react-icons/md'
 import { Button, Badge, Spinner } from '../ui'
 import InvoiceCard from './InvoiceCard'
 import InvoiceFormModal from './InvoiceFormModal'
@@ -26,6 +26,7 @@ export default function InvoicesPage({ title, name }: InvoicesPageProps) {
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [showHidden, setShowHidden] = useState(false)
   
   // Флаг для предотвращения сохранения при первой загрузке
   const isFirstLoad = useRef(true)
@@ -60,6 +61,7 @@ export default function InvoicesPage({ title, name }: InvoicesPageProps) {
                   id: t.id || it + 1,
                 })),
                 id: g.id || i + 1,
+                isHidden: !!g.isHidden,
               }))
           )
         }
@@ -118,15 +120,18 @@ export default function InvoicesPage({ title, name }: InvoicesPageProps) {
 
   // Filtered list
   const filteredItems = useMemo(() => {
-    if (!searchQuery) return items
-    return items.filter((item) => 
-      item.number.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-  }, [items, searchQuery])
+    return items
+      .filter((item) => (showHidden ? item.isHidden : !item.isHidden))
+      .filter((item) => 
+        !searchQuery || item.number.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+  }, [items, showHidden, searchQuery])
 
-  // Stats
+  // Stats - только активные (не скрытые)
   const totalRemaining = useMemo(() => {
-    return items.reduce((acc, item) => acc + (item.left || 0), 0)
+    return items
+      .filter((g) => !g.isHidden)
+      .reduce((acc, item) => acc + (item.left || 0), 0)
   }, [items])
 
   // Handlers
@@ -144,6 +149,7 @@ export default function InvoicesPage({ title, name }: InvoicesPageProps) {
       comm: data.comm,
       total: data.sum + data.comm,
       left: data.sum,
+      isHidden: false,
       transactions: [],
     }
     setItems((prev) => [...prev, newInvoice])
@@ -193,9 +199,14 @@ export default function InvoicesPage({ title, name }: InvoicesPageProps) {
     )
   }, [])
 
-  const handleDeleteInvoice = useCallback((invoiceId: number) => {
-    if (!window.confirm('Удалить квитанцию?')) return
-    setItems((prev) => prev.filter((invoice) => invoice.id !== invoiceId))
+  const handleToggleHidden = useCallback((invoiceNumber: string) => {
+    setItems((prev) =>
+      prev.map((invoice) =>
+        invoice.number === invoiceNumber
+          ? { ...invoice, isHidden: !invoice.isHidden }
+          : invoice
+      )
+    )
   }, [])
 
   const handleExport = useCallback((startDate: Date, endDate: Date) => {
@@ -217,10 +228,11 @@ export default function InvoicesPage({ title, name }: InvoicesPageProps) {
   const handleSendWhatsApp = useCallback(() => {
     if (!window.confirm('Отправить остатки в WhatsApp?')) return
 
-    const remaining = items.reduce((a, b) => a + b.left, 0)
+    const list = items.filter((g) => !g.isHidden)
+    const remaining = list.reduce((a, b) => a + b.left, 0)
     const content =
       `Kerben Остаток (${title})\n\n` +
-      items.map((g) => `${g.number}: ${formatNumber(g.left)} сом`).join('\n') +
+      list.map((g) => `${g.number}: ${formatNumber(g.left)} сом`).join('\n') +
       `\n\nВсего остаток: ${formatNumber(remaining)} сом`
 
     const phoneNumbers = [
@@ -299,6 +311,16 @@ export default function InvoicesPage({ title, name }: InvoicesPageProps) {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
+
+          {/* Filter */}
+          <Button
+            variant={showHidden ? 'primary' : 'outline'}
+            size="sm"
+            leftIcon={<MdFilterList />}
+            onClick={() => setShowHidden(!showHidden)}
+          >
+            {showHidden ? 'Скрытые' : 'Активные'}
+          </Button>
         </div>
 
         <div className={styles.toolbarRight}>
@@ -337,7 +359,7 @@ export default function InvoicesPage({ title, name }: InvoicesPageProps) {
             <InvoiceCard
               key={invoice.id}
               invoice={invoice}
-              onDelete={handleDeleteInvoice}
+              onToggleHidden={handleToggleHidden}
               onAddTransaction={handleAddTransaction}
               onDeleteTransaction={handleDeleteTransaction}
             />
@@ -347,11 +369,13 @@ export default function InvoicesPage({ title, name }: InvoicesPageProps) {
         <div className={styles.emptyState}>
           <div className={styles.emptyIcon}>📄</div>
           <h3 className={styles.emptyTitle}>
-            {searchQuery ? 'Ничего не найдено' : 'Нет квитанций'}
+            {searchQuery ? 'Ничего не найдено' : showHidden ? 'Нет скрытых квитанций' : 'Нет квитанций'}
           </h3>
           <p className={styles.emptyDescription}>
             {searchQuery
               ? 'Попробуйте изменить поисковый запрос'
+              : showHidden
+              ? 'Скрытые квитанции появятся здесь'
               : 'Создайте первую квитанцию, нажав кнопку выше'}
           </p>
         </div>
