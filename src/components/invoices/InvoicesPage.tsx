@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react'
-import { MdSearch, MdAdd, MdFileDownload, MdSend, MdSync } from 'react-icons/md'
+import { MdSearch, MdAdd, MdFileDownload, MdSend, MdSync, MdError, MdRefresh } from 'react-icons/md'
 import { Button, Badge, Spinner } from '../ui'
 import InvoiceCard from './InvoiceCard'
 import InvoiceFormModal from './InvoiceFormModal'
@@ -24,6 +24,7 @@ export default function InvoicesPage({ title, name }: InvoicesPageProps) {
   const [items, setItems] = useState<IInvoice[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   
   // Флаг для предотвращения сохранения при первой загрузке
@@ -77,16 +78,43 @@ export default function InvoicesPage({ title, name }: InvoicesPageProps) {
     if (loading || isFirstLoad.current) return
     
     setSaving(true)
+    setSaveError(false)
+    
+    // Сохраняем в localStorage как backup
+    const storageKey = `invoices_backup_${name}`
+    localStorage.setItem(storageKey, JSON.stringify(items))
     
     requester
       .post('/office/invoices' + (name === 'invoices' ? '' : '/' + name), { data: items })
+      .then(() => {
+        // Успешно - удаляем backup
+        localStorage.removeItem(storageKey)
+      })
       .catch(() => {
-        console.error('Ошибка сохранения')
+        setSaveError(true)
       })
       .finally(() => {
         setSaving(false)
       })
   }, [items, name, loading])
+
+  // Повторная попытка сохранения
+  const handleRetry = useCallback(() => {
+    setSaving(true)
+    setSaveError(false)
+    
+    requester
+      .post('/office/invoices' + (name === 'invoices' ? '' : '/' + name), { data: items })
+      .then(() => {
+        localStorage.removeItem(`invoices_backup_${name}`)
+      })
+      .catch(() => {
+        setSaveError(true)
+      })
+      .finally(() => {
+        setSaving(false)
+      })
+  }, [items, name])
 
   // Filtered list
   const filteredItems = useMemo(() => {
@@ -236,6 +264,16 @@ export default function InvoicesPage({ title, name }: InvoicesPageProps) {
             <div className={styles.savingIndicator}>
               <MdSync className={styles.savingIcon} />
               <span>Синхронизация...</span>
+            </div>
+          )}
+          {saveError && !saving && (
+            <div className={styles.errorIndicator}>
+              <MdError className={styles.errorIcon} />
+              <span>Ошибка сохранения</span>
+              <button className={styles.retryButton} onClick={handleRetry}>
+                <MdRefresh />
+                Повторить
+              </button>
             </div>
           )}
           <div className={styles.stats}>

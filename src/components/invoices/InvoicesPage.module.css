@@ -75,6 +75,50 @@
   }
 }
 
+/* ========== Error Indicator ========== */
+.errorIndicator {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-1-5) var(--spacing-3);
+  background-color: var(--color-error-50);
+  border: 1px solid var(--color-error-200);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  color: var(--color-error-700);
+}
+
+.errorIcon {
+  width: 1rem;
+  height: 1rem;
+  color: var(--color-error-500);
+}
+
+.retryButton {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  padding: var(--spacing-1) var(--spacing-2);
+  margin-left: var(--spacing-2);
+  border: none;
+  border-radius: var(--radius-sm);
+  background-color: var(--color-error-100);
+  color: var(--color-error-700);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: var(--transition-colors);
+}
+
+.retryButton:hover {
+  background-color: var(--color-error-200);
+}
+
+.retryButton svg {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
 /* ========== Stats ========== */
 .stats {
   display: flex;
