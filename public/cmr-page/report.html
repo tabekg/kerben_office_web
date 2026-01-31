@@ -179,9 +179,26 @@
 		}
 
 		function handle(text, dateValue) {
-			const formattedDate = formatDate(dateValue)
-			const items = text.split('\n').filter(g => !!g).map(g => g.split('https://office.kerben.besoft.kg/cmr-page/cmr.html')[1]).map(g => new URLSearchParams(g))
-			const output = items.map(g => [g.get('truckNumber'), g.get('invoice').replace('_', ' от '), formattedDate].join('\t'))
+			const fallbackDate = formatDate(dateValue)
+			const lines = text.split('\n').filter(g => !!g.trim())
+
+			let currentDate = fallbackDate
+			const output = []
+
+			for (const line of lines) {
+				if (line.includes('https://office.kerben.besoft.kg/cmr-page/cmr.html')) {
+					const urlPart = line.split('https://office.kerben.besoft.kg/cmr-page/cmr.html')[1]
+					const params = new URLSearchParams(urlPart)
+					output.push([params.get('truckNumber'), params.get('invoice').replace('_', ' от '), currentDate].join('\t'))
+				} else {
+					// Строка без ссылки — проверяем на дату
+					const match = line.match(/(\d{2}\.\d{2}\.\d{4})/)
+					if (match) {
+						currentDate = match[1]
+					}
+				}
+			}
+
 			const resultText = output.join('\n')
 			result.textContent = resultText
 			return resultText
