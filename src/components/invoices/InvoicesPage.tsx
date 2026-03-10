@@ -3,7 +3,8 @@ import {
   MdSearch,
   MdAdd,
   MdFileDownload,
-  MdSend,
+  MdContentCopy,
+  // MdSend,
   MdSync,
   MdError,
   MdRefresh,
@@ -286,9 +287,7 @@ export default function InvoicesPage({title, name}: InvoicesPageProps) {
     [items, title]
   )
 
-  const handleSendWhatsApp = useCallback(() => {
-    if (!window.confirm('Отправить остатки в WhatsApp?')) return
-
+  const copyRemaining = useCallback(() => {
     const list = items.filter((g) => !g.isHidden)
     const remaining = list.reduce((a, b) => a + b.left, 0)
     const content =
@@ -296,21 +295,34 @@ export default function InvoicesPage({title, name}: InvoicesPageProps) {
       list.map((g) => `${g.number}: ${formatNumber(g.left)} сом`).join('\n') +
       `\n\nВсего остаток: ${formatNumber(remaining)} сом`
 
-    const phoneNumbers = [
-      '996777171171',
-      '996507454411',
-      '996777599577',
-      '996995006222',
-      '996501226228',
-      '996707191906',
-    ]
-
-    phoneNumbers.forEach((phoneNumber) => {
-      requester
-        .post('/office/wa-send-message', {content, phone_number: phoneNumber})
-        .catch(console.error)
-    })
+    navigator.clipboard.writeText(content)
   }, [items, title])
+
+  // const handleSendWhatsApp = useCallback(() => {
+  //   if (!window.confirm('Отправить остатки в WhatsApp?')) return
+  //
+  //   const list = items.filter((g) => !g.isHidden)
+  //   const remaining = list.reduce((a, b) => a + b.left, 0)
+  //   const content =
+  //     `Kerben Остаток (${title})\n\n` +
+  //     list.map((g) => `${g.number}: ${formatNumber(g.left)} сом`).join('\n') +
+  //     `\n\nВсего остаток: ${formatNumber(remaining)} сом`
+  //
+  //   const phoneNumbers = [
+  //     '996777171171',
+  //     '996507454411',
+  //     '996777599577',
+  //     '996995006222',
+  //     '996501226228',
+  //     '996707191906',
+  //   ]
+  //
+  //   phoneNumbers.forEach((phoneNumber) => {
+  //     requester
+  //       .post('/office/wa-send-message', {content, phone_number: phoneNumber})
+  //       .catch(console.error)
+  //   })
+  // }, [items, title])
 
   const existingNumbers = useMemo(() => items.map((i) => i.number), [items])
 
@@ -391,10 +403,10 @@ export default function InvoicesPage({title, name}: InvoicesPageProps) {
           <Button
             variant='ghost'
             size='sm'
-            leftIcon={<MdSend />}
-            onClick={handleSendWhatsApp}
+            leftIcon={<MdContentCopy />}
+            onClick={copyRemaining}
           >
-            WhatsApp
+            Остаток
           </Button>
           <Button
             variant='ghost'
