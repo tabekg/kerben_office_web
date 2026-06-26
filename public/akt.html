@@ -9,7 +9,7 @@
         --page-w: 210mm;
         --page-h: 297mm;
         --pad-x: 22mm;
-        --pad-y: 18mm;
+        --pad-y: 16mm;
       }
 
       *, *::before, *::after { box-sizing: border-box; }
@@ -26,103 +26,86 @@
         padding: var(--pad-y) var(--pad-x);
         background: #fff;
         font-family: "Times New Roman", Times, serif;
-        font-size: 15pt;
+        font-size: 14pt;
         color: #000;
-        line-height: 1.55;
+        line-height: 1.4;
         box-shadow: 0 4px 14px rgba(0,0,0,.10);
       }
 
-      /* Title block */
       .title {
         text-align: center;
         font-weight: bold;
-        font-size: 22pt;
-        letter-spacing: .02em;
-        line-height: 1.2;
-        margin-bottom: 18mm;
+        font-size: 20pt;
+        line-height: 1.1;
+        margin-bottom: 4mm;
       }
       .title small {
         display: block;
         font-size: 14pt;
         font-weight: bold;
-        margin-top: 2mm;
-        letter-spacing: 0;
+        margin-top: 1mm;
       }
 
-      /* Header row: date and company */
       .meta-row {
         display: flex;
         justify-content: space-between;
-        align-items: flex-end;
-        margin-bottom: 12mm;
+        align-items: baseline;
+        gap: 8mm;
+        margin: 8mm 0 8mm;
       }
-      .meta-row .date-block {
-        white-space: nowrap;
-      }
-      .meta-row .company {
-        text-align: right;
-        font-weight: 600;
-      }
+      .meta-row .company { font-weight: 600; white-space: nowrap; }
 
-      /* Inline "fill" — text with bottom border (replaces the old underscores) */
-      .fill {
-        display: inline-block;
-        min-width: 4em;
-        padding: 0 .2em;
-        border-bottom: 1px solid #000;
-        line-height: 1.2;
-      }
-      .fill.grow { flex: 1; min-width: 6em; }
-      .fill.short { min-width: 3em; }
-      .fill.empty {
-        min-width: 9em;
-      }
-
-      /* Body paragraphs */
-      .body p { margin: 0 0 4mm; }
-      .row-line {
+      /* The core building block: a line with label + underlined fill.
+         Multiple labels and fills can sit on the same row. */
+      .line {
         display: flex;
         align-items: baseline;
-        gap: .5em;
-        margin-bottom: 4mm;
+        gap: .35em;
+        margin: 0 0 3mm;
       }
-      .row-line .label {
-        white-space: nowrap;
+      .line .label { white-space: nowrap; }
+      .line .fill {
+        flex: 1;
+        min-width: 2em;
+        border-bottom: 1px solid #000;
+        padding: 0 .25em 1pt;
+        line-height: 1.25;
       }
+      .line .fill.shrink { flex: 0 1 auto; }
+      .line .fill.fixed-sm { flex: 0 0 14mm; text-align: center; }
+      .line .fill.fixed-md { flex: 0 0 28mm; text-align: center; }
+      .line .fill.fixed-lg { flex: 0 0 55mm; text-align: center; }
+
+      .body { margin-top: 6mm; }
 
       /* Signatures */
-      .signatures {
-        margin-top: 18mm;
-      }
+      .signatures { margin-top: 14mm; }
       .sig {
         display: grid;
-        grid-template-columns: 32mm 1fr 2mm 70mm;
-        gap: 8mm;
+        grid-template-columns: 38mm 1fr 6mm 70mm;
+        gap: 6mm;
         align-items: end;
-        margin-bottom: 12mm;
+        margin-bottom: 10mm;
       }
-      .sig .role {
-        font-weight: 500;
-      }
+      .sig .role { font-weight: 500; line-height: 1; }
       .sig .sign-line {
         border-bottom: 1px solid #000;
-        height: 1em;
+        height: 0;
       }
       .sig .name {
         text-align: center;
         border-bottom: 1px solid #000;
-        padding: 0 .3em;
-        line-height: 1.4;
+        padding: 0 .3em 1pt;
+        line-height: 1.25;
       }
       .sig .caption {
         grid-column: 4 / 5;
         text-align: center;
-        font-size: 11pt;
+        font-size: 10pt;
         margin-top: 1mm;
         color: #333;
       }
 
-      /* Floating print button (non-print) */
       .print-btn {
         position: fixed;
         right: 24px;
@@ -161,41 +144,58 @@
       </div>
 
       <div class="meta-row">
-        <div class="date-block">
-          от&nbsp;«<span id="dayText" class="fill short"></span>»&nbsp;<span id="monthText" class="fill short"></span>&nbsp;<span id="yearText" class="fill short"></span>&nbsp;г.
+        <div>
+          от&nbsp;«<span id="dayText"></span>»&nbsp;<span id="monthText"></span>&nbsp;<span id="yearText"></span>&nbsp;г.
         </div>
         <div class="company" id="companyText"></div>
       </div>
 
       <div class="body">
-        <p>
-          Мы, нижеподписавшиеся, инспектор <span id="pointText"></span>
-        </p>
-        <p>
-          <span id="inspectorText" class="fill empty"></span>,
-        </p>
-        <p>
-          представитель фирмы: <span id="repText" class="fill empty"></span>,
-        </p>
-        <p>
-          составили настоящий акт о производстве перегруза с авто машин:
-          <span id="iden21Text" class="fill empty"></span>
-        </p>
-        <p>
-          на автомашины: <span id="iden18Text" class="fill empty"></span>
-        </p>
-        <p>
-          отправитель: <span id="senderText" class="fill"></span>;
-          получатель: <span id="get8Text" class="fill grow"></span>
-        </p>
-        <p>
-          количество перегруженного груза составило: <span class="fill">СОГЛАСНО ИНВОЙСУ</span>
-          № <span id="invoiceNoText" class="fill short"></span>
-          от <span id="invoiceDateText" class="fill short"></span>
-        </p>
-        <p>
-          груз опломбирован <span id="gtiText"></span>: <span id="plombText" class="fill grow"></span>
-        </p>
+        <div class="line">
+          <span class="label">Мы, нижеподписавшиеся, инспектор</span>
+          <span class="fill" id="pointText"></span>
+        </div>
+
+        <div class="line">
+          <span class="fill" id="inspectorText"></span>
+          <span class="label">,</span>
+          <span class="label">представитель&nbsp;фирмы:</span>
+          <span class="fill" id="repText"></span>
+          <span class="label">,</span>
+        </div>
+
+        <div class="line">
+          <span class="label">составили настоящий акт о производстве перегруза с авто машин:</span>
+          <span class="fill" id="iden21Text"></span>
+        </div>
+
+        <div class="line">
+          <span class="label">на автомашины:</span>
+          <span class="fill" id="iden18Text"></span>
+        </div>
+
+        <div class="line">
+          <span class="label">отправитель:</span>
+          <span class="fill" id="senderText"></span>
+          <span class="label">; получатель:</span>
+          <span class="fill" id="get8Text"></span>
+        </div>
+
+        <div class="line">
+          <span class="label">количество перегруженного груза составило:</span>
+          <span class="fill shrink">СОГЛАСНО ИНВОЙСУ</span>
+          <span class="label">№</span>
+          <span class="fill fixed-md" id="invoiceNoText"></span>
+          <span class="label">от</span>
+          <span class="fill fixed-md" id="invoiceDateText"></span>
+        </div>
+
+        <div class="line">
+          <span class="label">груз опломбирован</span>
+          <span class="fill shrink" id="gtiText"></span>
+          <span class="label">:</span>
+          <span class="fill" id="plombText"></span>
+        </div>
       </div>
 
       <div class="signatures">
@@ -226,11 +226,10 @@
       function pad(n) { return String(n).padStart(2, "0"); }
 
       function splitDate(dateStr) {
-        // "27.03.2025" -> {day:"27", month:"03", year:"2025"}
-        if (!dateStr) return {day: "", month: "", year: ""};
+        if (!dateStr) return { day: "", month: "", year: "" };
         const m = dateStr.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
-        if (!m) return {day: dateStr, month: "", year: ""};
-        return {day: pad(m[1]), month: pad(m[2]), year: m[3]};
+        if (!m) return { day: dateStr, month: "", year: "" };
+        return { day: pad(m[1]), month: pad(m[2]), year: m[3] };
       }
 
       const q = new URLSearchParams(window.location.search);
