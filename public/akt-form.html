@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>АКТ перегрузки — заполнение</title>
+    <title>Генератор ссылки на АКТ</title>
     <style>
       * { box-sizing: border-box; }
       body {
@@ -49,75 +49,104 @@
         border: 1px solid #d1d5db;
         border-radius: 8px;
         background: #fff;
-        color: inherit;
-        transition: border-color .15s, box-shadow .15s;
       }
       input:focus, textarea:focus {
         outline: none;
         border-color: #2563eb;
         box-shadow: 0 0 0 3px rgba(37,99,235,.15);
       }
-      textarea { min-height: 64px; resize: vertical; font-family: inherit; }
+      textarea { min-height: 60px; resize: vertical; font-family: inherit; }
       .actions {
         display: flex;
         gap: 10px;
-        justify-content: flex-end;
+        flex-wrap: wrap;
         margin-top: 8px;
       }
-      button {
+      button, .btn {
         font: inherit;
         font-size: 14px;
         font-weight: 600;
-        padding: 10px 20px;
+        padding: 10px 18px;
         border-radius: 8px;
-        border: none;
+        border: 1px solid transparent;
         cursor: pointer;
-        transition: background .15s;
+        text-decoration: none;
+        display: inline-block;
       }
-      button.primary { background: #2563eb; color: #fff; }
-      button.primary:hover { background: #1d4ed8; }
-      button.ghost { background: transparent; color: #4b5563; }
-      button.ghost:hover { background: #e5e7eb; }
-      .field-full { grid-column: 1 / -1; }
+      .btn.primary { background: #2563eb; color: #fff; }
+      .btn.primary:hover { background: #1d4ed8; }
+      .btn.secondary { background: #fff; color: #374151; border-color: #d1d5db; }
+      .btn.secondary:hover { background: #f3f4f6; }
+      .btn.ghost { background: transparent; color: #4b5563; }
+      .btn.ghost:hover { background: #e5e7eb; }
+      .link-box {
+        margin-top: 16px;
+        padding: 14px;
+        background: #f3f4f6;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 12px;
+        word-break: break-all;
+        color: #374151;
+        display: none;
+      }
+      .link-box.shown { display: block; }
+      .toast {
+        position: fixed;
+        bottom: 24px;
+        left: 50%;
+        transform: translateX(-50%) translateY(20px);
+        background: #111827;
+        color: #fff;
+        padding: 10px 18px;
+        border-radius: 8px;
+        font-size: 14px;
+        opacity: 0;
+        transition: all .2s;
+        pointer-events: none;
+        z-index: 100;
+      }
+      .toast.shown { opacity: 1; transform: translateX(-50%) translateY(0); }
     </style>
   </head>
   <body>
     <div class="wrap">
-      <h1>АКТ перегрузки товара</h1>
-      <p class="sub">Заполните поля и нажмите «Открыть акт» — откроется готовая печатная форма.</p>
+      <h1>Генератор ссылки на АКТ</h1>
+      <p class="sub">Заполните поля и скопируйте ссылку. Она откроет готовый акт.</p>
 
       <form id="form">
         <div class="card">
           <h2>Данные из декларации</h2>
           <div class="row one">
             <div>
-              <label>Дата акта <span class="hint">формат: ДД.ММ.ГГГГ</span></label>
+              <label>Дата акта <span class="hint">ДД.ММ.ГГГГ</span></label>
               <input type="text" name="date" id="date" placeholder="27.03.2025" />
             </div>
           </div>
           <div class="row">
             <div>
-              <label>Авто отправления (iden21) <span class="hint">с каких машин</span></label>
+              <label>Авто отправления (iden21)</label>
               <input type="text" name="iden21" placeholder="06KG245AС/06KG242PA" required />
             </div>
             <div>
-              <label>Авто прибытия (iden18) <span class="hint">на какие машины</span></label>
-              <input type="text" name="iden18" placeholder="1: 01M005432/3724AA" required />
+              <label>Авто прибытия (iden18)</label>
+              <input type="text" name="iden18" placeholder="01M005432/3724AA" required />
             </div>
           </div>
           <div class="row one">
             <div>
               <label>Получатель (get8)</label>
-              <textarea name="get8" placeholder='ИП ООО "БАРАКА ХОЛДИНГ", УЗБЕКИСТАН, Г. ТАШКЕНТ,' required></textarea>
+              <textarea name="get8" placeholder='ИП ООО "БАРАКА ХОЛДИНГ", УЗБЕКИСТАН, …' required></textarea>
             </div>
           </div>
           <div class="row">
             <div>
-              <label>Инвойс № <span class="hint">номер</span></label>
+              <label>Инвойс №</label>
               <input type="text" name="invoice_no" placeholder="9980" required />
             </div>
             <div>
-              <label>Инвойс от <span class="hint">дата</span></label>
+              <label>Инвойс от</label>
               <input type="text" name="invoice_date" placeholder="19.03.2025" required />
             </div>
           </div>
@@ -137,7 +166,7 @@
               <input type="text" name="inspector" value="АКБАРОВ А." />
             </div>
             <div>
-              <label>Представитель фирмы</label>
+              <label>Представитель</label>
               <input type="text" name="rep" value="СУЛАЙМАНОВ К." />
             </div>
             <div>
@@ -156,14 +185,18 @@
         </div>
 
         <div class="actions">
-          <button type="button" class="ghost" id="reset">Сбросить</button>
-          <button type="submit" class="primary">Открыть акт →</button>
+          <button type="submit" class="btn primary">Скопировать ссылку</button>
+          <a id="openLink" class="btn secondary" href="#" target="_blank" rel="noopener" style="display:none">Открыть акт ↗</a>
+          <button type="button" class="btn ghost" id="reset">Сбросить</button>
         </div>
+
+        <div class="link-box" id="linkBox"></div>
       </form>
     </div>
 
+    <div class="toast" id="toast">Ссылка скопирована</div>
+
     <script>
-      // Default date = today
       (function () {
         const d = new Date();
         const pad = (n) => String(n).padStart(2, "0");
@@ -171,18 +204,60 @@
           pad(d.getDate()) + "." + pad(d.getMonth() + 1) + "." + d.getFullYear();
       })();
 
-      document.getElementById("form").addEventListener("submit", function (e) {
-        e.preventDefault();
-        const fd = new FormData(this);
+      const form = document.getElementById("form");
+      const linkBox = document.getElementById("linkBox");
+      const openLink = document.getElementById("openLink");
+      const toast = document.getElementById("toast");
+
+      function showToast(text) {
+        toast.textContent = text;
+        toast.classList.add("shown");
+        setTimeout(() => toast.classList.remove("shown"), 1800);
+      }
+
+      function buildUrl() {
+        const fd = new FormData(form);
         const params = new URLSearchParams();
         for (const [k, v] of fd.entries()) {
           if (v) params.set(k, v);
         }
-        window.location.href = "akt.html?" + params.toString();
+        const base = window.location.href.replace(/\/akt-form\.html.*$/, "/akt.html");
+        return base + "?" + params.toString();
+      }
+
+      form.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const url = buildUrl();
+        linkBox.textContent = url;
+        linkBox.classList.add("shown");
+        openLink.href = url;
+        openLink.style.display = "inline-block";
+
+        try {
+          await navigator.clipboard.writeText(url);
+          showToast("Ссылка скопирована");
+        } catch {
+          // Fallback for non-secure contexts
+          const ta = document.createElement("textarea");
+          ta.value = url;
+          document.body.appendChild(ta);
+          ta.select();
+          try {
+            document.execCommand("copy");
+            showToast("Ссылка скопирована");
+          } catch {
+            showToast("Не удалось скопировать — выделите ссылку вручную");
+          }
+          document.body.removeChild(ta);
+        }
       });
 
       document.getElementById("reset").addEventListener("click", function () {
-        if (confirm("Очистить все поля?")) document.getElementById("form").reset();
+        if (confirm("Очистить все поля?")) {
+          form.reset();
+          linkBox.classList.remove("shown");
+          openLink.style.display = "none";
+        }
       });
     </script>
   </body>
