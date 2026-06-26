@@ -197,17 +197,52 @@
     <div class="toast" id="toast">Ссылка скопирована</div>
 
     <script>
-      (function () {
-        const d = new Date();
-        const pad = (n) => String(n).padStart(2, "0");
-        document.getElementById("date").value =
-          pad(d.getDate()) + "." + pad(d.getMonth() + 1) + "." + d.getFullYear();
-      })();
-
+      const LS_KEY = "akt";
       const form = document.getElementById("form");
       const linkBox = document.getElementById("linkBox");
       const openLink = document.getElementById("openLink");
       const toast = document.getElementById("toast");
+
+      function todayStr() {
+        const d = new Date();
+        const pad = (n) => String(n).padStart(2, "0");
+        return pad(d.getDate()) + "." + pad(d.getMonth() + 1) + "." + d.getFullYear();
+      }
+
+      function readState() {
+        try { return JSON.parse(localStorage.getItem(LS_KEY) || "{}") || {}; }
+        catch { return {}; }
+      }
+
+      function writeState(obj) {
+        localStorage.setItem(LS_KEY, JSON.stringify(obj));
+      }
+
+      function getFormData() {
+        const fd = new FormData(form);
+        const obj = {};
+        for (const [k, v] of fd.entries()) obj[k] = v;
+        return obj;
+      }
+
+      function applyState(state) {
+        for (const el of form.elements) {
+          if (!el.name) continue;
+          if (state[el.name] !== undefined) el.value = state[el.name];
+        }
+      }
+
+      // Init: restore from LS, fill missing date with today
+      (function init() {
+        const saved = readState();
+        if (!saved.date) saved.date = todayStr();
+        applyState(saved);
+        writeState(getFormData());
+      })();
+
+      // Live save on every input change
+      form.addEventListener("input", () => writeState(getFormData()));
+      form.addEventListener("change", () => writeState(getFormData()));
 
       function showToast(text) {
         toast.textContent = text;
@@ -216,11 +251,9 @@
       }
 
       function buildUrl() {
-        const fd = new FormData(form);
+        const data = getFormData();
         const params = new URLSearchParams();
-        for (const [k, v] of fd.entries()) {
-          if (v) params.set(k, v);
-        }
+        for (const k in data) if (data[k]) params.set(k, data[k]);
         const base = window.location.href.replace(/\/akt-form\.html.*$/, "/akt.html");
         return base + "?" + params.toString();
       }
@@ -237,7 +270,6 @@
           await navigator.clipboard.writeText(url);
           showToast("Ссылка скопирована");
         } catch {
-          // Fallback for non-secure contexts
           const ta = document.createElement("textarea");
           ta.value = url;
           document.body.appendChild(ta);
@@ -253,11 +285,14 @@
       });
 
       document.getElementById("reset").addEventListener("click", function () {
-        if (confirm("Очистить все поля?")) {
-          form.reset();
-          linkBox.classList.remove("shown");
-          openLink.style.display = "none";
-        }
+        if (!confirm("Очистить все поля?")) return;
+        form.reset();
+        // form.reset() restores defaults (value="...") but clears unset inputs.
+        // Refill date with today.
+        document.getElementById("date").value = todayStr();
+        writeState(getFormData());
+        linkBox.classList.remove("shown");
+        openLink.style.display = "none";
       });
     </script>
   </body>
