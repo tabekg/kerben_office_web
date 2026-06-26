@@ -12,42 +12,54 @@
         background: #f5f6f8;
         color: #1f2329;
       }
-      .wrap { max-width: 760px; margin: 32px auto; padding: 0 20px 60px; }
+      .wrap { max-width: 800px; margin: 32px auto; padding: 0 20px 80px; }
       h1 { margin: 0 0 4px; font-size: 22px; }
       .sub { color: #6b7280; margin-bottom: 24px; font-size: 14px; }
       .card {
         background: #fff;
         border: 1px solid #e5e7eb;
         border-radius: 12px;
-        padding: 22px 24px;
-        margin-bottom: 18px;
+        padding: 20px 22px;
+        margin-bottom: 16px;
         box-shadow: 0 1px 2px rgba(0,0,0,.03);
       }
       .card h2 {
-        margin: 0 0 16px;
+        margin: 0 0 14px;
         font-size: 14px;
         text-transform: uppercase;
         letter-spacing: .05em;
         color: #6b7280;
         font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
       }
-      .row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+      .card h2 .badge {
+        background: #2563eb;
+        color: #fff;
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-weight: 600;
+      }
+      .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
       .row.one { grid-template-columns: 1fr; }
+      .row.three { grid-template-columns: 1fr 1fr 1fr; }
       label {
         display: block;
-        font-size: 13px;
+        font-size: 12px;
         font-weight: 500;
-        margin-bottom: 6px;
+        margin-bottom: 5px;
         color: #374151;
       }
-      label .hint { color: #9ca3af; font-weight: 400; margin-left: 6px; font-size: 12px; }
+      label .hint { color: #9ca3af; font-weight: 400; margin-left: 5px; font-size: 11px; }
       input, textarea {
         width: 100%;
         font: inherit;
         font-size: 14px;
-        padding: 9px 12px;
+        padding: 8px 11px;
         border: 1px solid #d1d5db;
-        border-radius: 8px;
+        border-radius: 7px;
         background: #fff;
       }
       input:focus, textarea:focus {
@@ -55,14 +67,31 @@
         border-color: #2563eb;
         box-shadow: 0 0 0 3px rgba(37,99,235,.15);
       }
-      textarea { min-height: 60px; resize: vertical; font-family: inherit; }
-      .actions {
+      textarea { min-height: 54px; resize: vertical; font-family: inherit; }
+
+      .count-row { display: flex; align-items: center; gap: 12px; }
+      .count-row input { max-width: 80px; text-align: center; font-size: 16px; font-weight: 600; }
+      .count-row .btn { padding: 8px 12px; font-size: 16px; min-width: 38px; }
+
+      .act-card { border-left: 3px solid #2563eb; }
+
+      .sticky-bar {
+        position: sticky;
+        bottom: 16px;
+        margin-top: 16px;
+        padding: 14px;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(0,0,0,.08);
         display: flex;
         gap: 10px;
+        align-items: center;
         flex-wrap: wrap;
-        margin-top: 8px;
       }
-      button, .btn {
+      .sticky-bar .spacer { flex: 1; }
+
+      .btn {
         font: inherit;
         font-size: 14px;
         font-weight: 600;
@@ -72,6 +101,7 @@
         cursor: pointer;
         text-decoration: none;
         display: inline-block;
+        text-align: center;
       }
       .btn.primary { background: #2563eb; color: #fff; }
       .btn.primary:hover { background: #1d4ed8; }
@@ -79,22 +109,25 @@
       .btn.secondary:hover { background: #f3f4f6; }
       .btn.ghost { background: transparent; color: #4b5563; }
       .btn.ghost:hover { background: #e5e7eb; }
+
       .link-box {
-        margin-top: 16px;
-        padding: 14px;
+        margin-top: 14px;
+        padding: 12px;
         background: #f3f4f6;
         border: 1px solid #e5e7eb;
         border-radius: 8px;
         font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-        font-size: 12px;
+        font-size: 11px;
         word-break: break-all;
         color: #374151;
         display: none;
+        max-height: 100px;
+        overflow-y: auto;
       }
       .link-box.shown { display: block; }
       .toast {
         position: fixed;
-        bottom: 24px;
+        bottom: 100px;
         left: 50%;
         transform: translateX(-50%) translateY(20px);
         background: #111827;
@@ -105,7 +138,7 @@
         opacity: 0;
         transition: all .2s;
         pointer-events: none;
-        z-index: 100;
+        z-index: 200;
       }
       .toast.shown { opacity: 1; transform: translateX(-50%) translateY(0); }
     </style>
@@ -113,57 +146,11 @@
   <body>
     <div class="wrap">
       <h1>Генератор ссылки на АКТ</h1>
-      <p class="sub">Заполните поля и скопируйте ссылку. Она откроет готовый акт.</p>
+      <p class="sub">Заполните поля и нажмите кнопку — одна ссылка на все акты сразу.</p>
 
       <form id="form">
         <div class="card">
-          <h2>Данные из декларации</h2>
-          <div class="row one">
-            <div>
-              <label>Дата акта <span class="hint">ДД.ММ.ГГГГ</span></label>
-              <input type="text" name="date" id="date" placeholder="27.03.2025" />
-            </div>
-          </div>
-          <div class="row">
-            <div>
-              <label>Авто отправления (iden21)</label>
-              <input type="text" name="iden21" placeholder="06KG245AС/06KG242PA" required />
-            </div>
-            <div>
-              <label>Авто прибытия (iden18)</label>
-              <input type="text" name="iden18" placeholder="01M005432/3724AA" required />
-            </div>
-          </div>
-          <div class="row one">
-            <div>
-              <label>Получатель (get8)</label>
-              <textarea name="get8" placeholder='ИП ООО "БАРАКА ХОЛДИНГ", УЗБЕКИСТАН, …' required></textarea>
-            </div>
-          </div>
-          <div class="row">
-            <div>
-              <label>Инвойс №</label>
-              <input type="text" name="invoice_no" placeholder="9980" required />
-            </div>
-            <div>
-              <label>Инвойс от</label>
-              <input type="text" name="invoice_date" placeholder="19.03.2025" required />
-            </div>
-          </div>
-          <div class="row">
-            <div>
-              <label>Орган пломбирования <span class="hint">подпись перед №</span></label>
-              <input type="text" name="gti" value="ГТИ КР" />
-            </div>
-            <div>
-              <label>Номера пломб <span class="hint">через запятую</span></label>
-              <input type="text" name="plomb" placeholder="412,412,412" required />
-            </div>
-          </div>
-        </div>
-
-        <div class="card">
-          <h2>Подписанты и реквизиты</h2>
+          <h2>Общие реквизиты <span class="hint" style="text-transform:none;letter-spacing:0;color:#9ca3af;font-weight:400;font-size:11px;">для всех актов</span></h2>
           <div class="row">
             <div>
               <label>Инспектор</label>
@@ -185,12 +172,29 @@
               <label>Отправитель</label>
               <input type="text" name="sender" value="КНР" />
             </div>
+            <div>
+              <label>Орган пломбирования</label>
+              <input type="text" name="gti" value="ГТИ КР" />
+            </div>
           </div>
         </div>
 
-        <div class="actions">
+        <div class="card">
+          <h2>Количество актов</h2>
+          <div class="count-row">
+            <button type="button" class="btn secondary" id="decBtn">−</button>
+            <input type="number" id="count" min="1" max="50" value="1" />
+            <button type="button" class="btn secondary" id="incBtn">+</button>
+            <span style="color:#6b7280;font-size:13px;">актов</span>
+          </div>
+        </div>
+
+        <div id="acts"></div>
+
+        <div class="sticky-bar">
           <button type="submit" class="btn primary">Скопировать ссылку</button>
-          <a id="openLink" class="btn secondary" href="#" target="_blank" rel="noopener" style="display:none">Открыть акт ↗</a>
+          <a id="openLink" class="btn secondary" href="#" target="_blank" rel="noopener" style="display:none">Открыть ↗</a>
+          <div class="spacer"></div>
           <button type="button" class="btn ghost" id="reset">Сбросить</button>
         </div>
 
@@ -202,7 +206,12 @@
 
     <script>
       const LS_KEY = "akt";
+      const COMMON_FIELDS = ["inspector", "rep", "point", "company", "sender", "gti"];
+      const ACT_FIELDS = ["date", "iden21", "iden18", "get8", "invoice_no", "invoice_date", "plomb"];
+
       const form = document.getElementById("form");
+      const actsContainer = document.getElementById("acts");
+      const countInput = document.getElementById("count");
       const linkBox = document.getElementById("linkBox");
       const openLink = document.getElementById("openLink");
       const toast = document.getElementById("toast");
@@ -214,39 +223,148 @@
       }
 
       function readState() {
-        try { return JSON.parse(localStorage.getItem(LS_KEY) || "{}") || {}; }
-        catch { return {}; }
+        try {
+          const s = JSON.parse(localStorage.getItem(LS_KEY) || "{}") || {};
+          if (!s.acts) s.acts = [];
+          if (!s.count) s.count = 1;
+          return s;
+        } catch {
+          return { acts: [], count: 1 };
+        }
       }
-
       function writeState(obj) {
         localStorage.setItem(LS_KEY, JSON.stringify(obj));
       }
 
-      function getFormData() {
-        const fd = new FormData(form);
-        const obj = {};
-        for (const [k, v] of fd.entries()) obj[k] = v;
-        return obj;
+      function readCommon() {
+        const o = {};
+        for (const f of COMMON_FIELDS) {
+          const el = form.elements[f];
+          if (el) o[f] = el.value;
+        }
+        return o;
+      }
+      function readActs() {
+        const acts = [];
+        for (const card of actsContainer.querySelectorAll(".act-card")) {
+          const a = {};
+          for (const f of ACT_FIELDS) {
+            const el = card.querySelector(`[data-field="${f}"]`);
+            if (el) a[f] = el.value;
+          }
+          acts.push(a);
+        }
+        return acts;
+      }
+      function readAll() {
+        return {
+          ...readCommon(),
+          count: +countInput.value || 1,
+          acts: readActs(),
+        };
       }
 
-      function applyState(state) {
-        for (const el of form.elements) {
-          if (!el.name) continue;
-          if (state[el.name] !== undefined) el.value = state[el.name];
+      function renderActs(count, data) {
+        actsContainer.innerHTML = "";
+        const existing = data && data.acts ? data.acts : [];
+        for (let i = 0; i < count; i++) {
+          const a = existing[i] || {};
+          if (!a.date) a.date = todayStr();
+          const card = document.createElement("div");
+          card.className = "card act-card";
+          card.dataset.i = i;
+          card.innerHTML = `
+            <h2>Акт <span class="badge">#${i + 1}</span></h2>
+            <div class="row one">
+              <div>
+                <label>Дата акта <span class="hint">ДД.ММ.ГГГГ</span></label>
+                <input type="text" data-field="date" value="${esc(a.date)}" placeholder="27.03.2025" />
+              </div>
+            </div>
+            <div class="row">
+              <div>
+                <label>Авто отправления (iden21)</label>
+                <input type="text" data-field="iden21" value="${esc(a.iden21)}" placeholder="06KG245AС/06KG242PA" />
+              </div>
+              <div>
+                <label>Авто прибытия (iden18)</label>
+                <input type="text" data-field="iden18" value="${esc(a.iden18)}" placeholder="01M005432/3724AA" />
+              </div>
+            </div>
+            <div class="row one">
+              <div>
+                <label>Получатель</label>
+                <textarea data-field="get8" placeholder='ИП ООО "БАРАКА ХОЛДИНГ", УЗБЕКИСТАН, …'>${esc(a.get8)}</textarea>
+              </div>
+            </div>
+            <div class="row">
+              <div>
+                <label>Инвойс №</label>
+                <input type="text" data-field="invoice_no" value="${esc(a.invoice_no)}" placeholder="9980" />
+              </div>
+              <div>
+                <label>Инвойс от</label>
+                <input type="text" data-field="invoice_date" value="${esc(a.invoice_date)}" placeholder="19.03.2025" />
+              </div>
+            </div>
+            <div class="row one">
+              <div>
+                <label>Номера пломб <span class="hint">через запятую</span></label>
+                <input type="text" data-field="plomb" value="${esc(a.plomb)}" placeholder="412,412,412" />
+              </div>
+            </div>
+          `;
+          actsContainer.appendChild(card);
         }
       }
 
-      // Init: restore from LS, fill missing date with today
-      (function init() {
-        const saved = readState();
-        if (!saved.date) saved.date = todayStr();
-        applyState(saved);
-        writeState(getFormData());
-      })();
+      function esc(s) {
+        return String(s == null ? "" : s)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
 
-      // Live save on every input change
-      form.addEventListener("input", () => writeState(getFormData()));
-      form.addEventListener("change", () => writeState(getFormData()));
+      function applyCommon(state) {
+        for (const f of COMMON_FIELDS) {
+          if (state[f] !== undefined && form.elements[f]) form.elements[f].value = state[f];
+        }
+      }
+
+      function init() {
+        const saved = readState();
+        countInput.value = saved.count || 1;
+        applyCommon(saved);
+        renderActs(saved.count || 1, saved);
+        writeState(readAll());
+      }
+      init();
+
+      countInput.addEventListener("input", () => {
+        let n = +countInput.value || 1;
+        if (n < 1) n = 1;
+        if (n > 50) n = 50;
+        countInput.value = n;
+        const cur = readAll();
+        renderActs(n, cur);
+        writeState(readAll());
+      });
+      document.getElementById("decBtn").addEventListener("click", () => {
+        let n = +countInput.value || 1;
+        if (n > 1) n--;
+        countInput.value = n;
+        countInput.dispatchEvent(new Event("input"));
+      });
+      document.getElementById("incBtn").addEventListener("click", () => {
+        let n = +countInput.value || 1;
+        if (n < 50) n++;
+        countInput.value = n;
+        countInput.dispatchEvent(new Event("input"));
+      });
+
+      form.addEventListener("input", () => writeState(readAll()));
+      form.addEventListener("change", () => writeState(readAll()));
 
       function showToast(text) {
         toast.textContent = text;
@@ -255,9 +373,13 @@
       }
 
       function buildUrl() {
-        const data = getFormData();
+        const state = readAll();
         const params = new URLSearchParams();
-        for (const k in data) if (data[k]) params.set(k, data[k]);
+        for (const f of COMMON_FIELDS) if (state[f]) params.set(f, state[f]);
+        params.set("n", String(state.acts.length));
+        for (const act of state.acts) {
+          for (const f of ACT_FIELDS) params.append(f, act[f] || "");
+        }
         const base = window.location.href.replace(/\/akt-form\.html.*$/, "/akt.html");
         return base + "?" + params.toString();
       }
@@ -272,7 +394,7 @@
 
         try {
           await navigator.clipboard.writeText(url);
-          showToast("Ссылка скопирована");
+          showToast(`Ссылка скопирована (${countInput.value} акт${countInput.value == 1 ? "" : countInput.value < 5 ? "а" : "ов"})`);
         } catch {
           const ta = document.createElement("textarea");
           ta.value = url;
@@ -290,13 +412,8 @@
 
       document.getElementById("reset").addEventListener("click", function () {
         if (!confirm("Очистить все поля?")) return;
-        form.reset();
-        // form.reset() restores defaults (value="...") but clears unset inputs.
-        // Refill date with today.
-        document.getElementById("date").value = todayStr();
-        writeState(getFormData());
-        linkBox.classList.remove("shown");
-        openLink.style.display = "none";
+        localStorage.removeItem(LS_KEY);
+        location.reload();
       });
     </script>
   </body>

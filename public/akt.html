@@ -30,6 +30,16 @@
         color: #000;
         line-height: 1.6;
         box-shadow: 0 4px 14px rgba(0,0,0,.10);
+        position: relative;
+      }
+
+      .page-num {
+        position: absolute;
+        top: 6mm;
+        right: 8mm;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-size: 10pt;
+        color: #9ca3af;
       }
 
       .title {
@@ -57,9 +67,6 @@
       }
       .meta-row .company { font-weight: 700; white-space: nowrap; }
 
-      /* Body is one long justified paragraph that flows naturally.
-         The underlined "fill" is just an inline span with a bottom border.
-         Word breaks happen at spaces, no flex weirdness. */
       .body {
         text-align: justify;
         text-justify: inter-word;
@@ -75,7 +82,6 @@
       }
       .body .v.wrap { white-space: normal; }
 
-      /* Signatures */
       .signatures { margin-top: 18mm; }
       .sig {
         display: grid;
@@ -85,10 +91,7 @@
         margin-bottom: 12mm;
       }
       .sig .role { line-height: 1; }
-      .sig .sign-line {
-        border-bottom: 1px solid #000;
-        height: 0;
-      }
+      .sig .sign-line { border-bottom: 1px solid #000; height: 0; }
       .sig .name {
         text-align: center;
         border-bottom: 1px solid #000;
@@ -126,115 +129,121 @@
           margin: 0;
           box-shadow: none;
           min-height: auto;
+          page-break-after: always;
         }
+        .page:last-child { page-break-after: auto; }
+        .page-num { display: none; }
         .print-btn { display: none; }
         @page { size: A4; margin: 0; }
       }
     </style>
   </head>
   <body>
-    <div class="page">
-      <div class="title">
-        АКТ
-        <small>перегрузки товара</small>
-      </div>
-
-      <div class="meta-row">
-        <div id="dateText"></div>
-        <div class="company" id="companyText"></div>
-      </div>
-
-      <p class="body">
-        Мы, нижеподписавшиеся, инспектор <span class="v" id="pointText"></span>
-        <span class="v" id="inspectorText"></span>, представитель фирмы
-        <span class="v" id="repText"></span>, составили настоящий акт о производстве
-        перегруза с авто машин <span class="v" id="iden21Text"></span> на автомашины
-        <span class="v" id="iden18Text"></span>. Отправитель —
-        <span class="v" id="senderText"></span>; получатель —
-        <span class="v wrap" id="get8Text"></span>. Количество перегруженного груза
-        составило: <span class="v">согласно инвойсу №&nbsp;<span id="invoiceNoText"></span>
-        от&nbsp;<span id="invoiceDateText"></span></span>. Груз опломбирован
-        <span class="v"><span id="gtiText"></span>&nbsp;<span id="plombText"></span></span>.
-      </p>
-
-      <div class="signatures">
-        <div class="sig">
-          <div class="role">Инспектор</div>
-          <div class="sign-line"></div>
-          <div></div>
-          <div class="name" id="inspectorSignText"></div>
-          <div class="caption">(подпись и Ф.И.О.)</div>
-        </div>
-
-        <div class="sig">
-          <div class="role">Представитель</div>
-          <div class="sign-line"></div>
-          <div></div>
-          <div class="name" id="repSignText"></div>
-          <div class="caption">(подпись и Ф.И.О.)</div>
-        </div>
-      </div>
-    </div>
-
-    <button class="print-btn" onclick="window.print()">Печать</button>
+    <div id="pages"></div>
+    <button class="print-btn" onclick="window.print()" id="printBtn">Печать</button>
 
     <script>
-      function setText(id, value) {
-        document.getElementById(id).textContent = value || "";
-      }
       function pad(n) { return String(n).padStart(2, "0"); }
 
-      // Original backend format: moment().format('«__DD__»___MM______ YYYY')
       function formatActDate(dateStr) {
         if (!dateStr) return "";
         const m = dateStr.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
         if (!m) return dateStr;
-        const dd = pad(m[1]);
-        const mm = pad(m[2]);
-        const yyyy = m[3];
-        return "от «__" + dd + "__»___" + mm + "______ " + yyyy + "г.";
+        return "от «__" + pad(m[1]) + "__»___" + pad(m[2]) + "______ " + m[3] + "г.";
+      }
+
+      function renderGet8(get8) {
+        if (!get8) return "";
+        return get8.startsWith('ИП ООО "БАРАКА ХОЛДИНГ", УЗБЕКИСТАН')
+          ? 'ИП ООО "БАРАКА ХОЛДИНГ", УЗБЕКИСТАН'
+          : get8;
+      }
+
+      function esc(s) {
+        return String(s == null ? "" : s)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+
+      function renderPage(idx, total, act, common) {
+        const dateText = formatActDate(act.date);
+        const get8 = renderGet8(act.get8 || "");
+        const pageNum = total > 1 ? `<div class="page-num">${idx + 1} / ${total}</div>` : "";
+        return `
+          <div class="page">
+            ${pageNum}
+            <div class="title">АКТ<small>перегрузки товара</small></div>
+            <div class="meta-row">
+              <div>${esc(dateText)}</div>
+              <div class="company">${esc(common.company)}</div>
+            </div>
+            <p class="body">
+              Мы, нижеподписавшиеся, инспектор <span class="v">${esc(common.point)}</span>
+              <span class="v">${esc(common.inspector)}</span>, представитель фирмы
+              <span class="v">${esc(common.rep)}</span>, составили настоящий акт о производстве
+              перегруза с авто машин <span class="v">${esc(act.iden21 || "")}</span> на автомашины
+              <span class="v">${esc(act.iden18 || "")}</span>. Отправитель —
+              <span class="v">${esc(common.sender)}</span>; получатель —
+              <span class="v wrap">${esc(get8)}</span>. Количество перегруженного груза составило:
+              <span class="v">согласно инвойсу №&nbsp;${esc(act.invoice_no || "")} от&nbsp;${esc(act.invoice_date || "")}</span>.
+              Груз опломбирован <span class="v">${esc(common.gti)}&nbsp;${esc(act.plomb || "")}</span>.
+            </p>
+            <div class="signatures">
+              <div class="sig">
+                <div class="role">Инспектор</div>
+                <div class="sign-line"></div>
+                <div></div>
+                <div class="name">${esc(common.inspector)}</div>
+                <div class="caption">(подпись и Ф.И.О.)</div>
+              </div>
+              <div class="sig">
+                <div class="role">Представитель</div>
+                <div class="sign-line"></div>
+                <div></div>
+                <div class="name">${esc(common.rep)}</div>
+                <div class="caption">(подпись и Ф.И.О.)</div>
+              </div>
+            </div>
+          </div>
+        `;
       }
 
       const q = new URLSearchParams(window.location.search);
-
       if (![...q.keys()].length) {
         window.location.replace("akt-form.html");
       }
 
-      const iden21 = q.get("iden21") || "";
-      const iden18 = q.get("iden18") || "";
-      const get8 = q.get("get8") || "";
-      const invoiceNo = q.get("invoice_no") || "";
-      const invoiceDate = q.get("invoice_date") || "";
-      const plomb = q.get("plomb") || "";
-      const dateStr = q.get("date") || "";
+      const common = {
+        inspector: q.get("inspector") || "АКБАРОВ А.",
+        rep: q.get("rep") || "СУЛАЙМАНОВ К.",
+        point: q.get("point") || "ЦТП «ОШ» ЮЗТ",
+        company: q.get("company") || "ПТЗК «АВТОЭКСПРЕСС ИНВЕСТ»",
+        sender: q.get("sender") || "КНР",
+        gti: q.get("gti") || "ГТИ КР",
+      };
 
-      const inspector = q.get("inspector") || "АКБАРОВ А.";
-      const rep = q.get("rep") || "СУЛАЙМАНОВ К.";
-      const point = q.get("point") || "ЦТП «ОШ» ЮЗТ";
-      const company = q.get("company") || "ПТЗК «АВТОЭКСПРЕСС ИНВЕСТ»";
-      const sender = q.get("sender") || "КНР";
-      const gti = q.get("gti") || "ГТИ КР";
+      const ACT_FIELDS = ["date", "iden21", "iden18", "get8", "invoice_no", "invoice_date", "plomb"];
+      const arrays = {};
+      for (const f of ACT_FIELDS) arrays[f] = q.getAll(f);
 
-      const get8Render = get8.startsWith('ИП ООО "БАРАКА ХОЛДИНГ", УЗБЕКИСТАН')
-        ? 'ИП ООО "БАРАКА ХОЛДИНГ", УЗБЕКИСТАН'
-        : get8;
+      // Determine count: max of array lengths or explicit n param.
+      const declared = parseInt(q.get("n") || "0", 10) || 0;
+      const maxLen = Math.max(declared, ...ACT_FIELDS.map((f) => arrays[f].length));
+      const count = Math.max(1, maxLen);
 
-      setText("dateText", formatActDate(dateStr));
-      setText("companyText", company);
-      setText("pointText", point);
-      setText("inspectorText", inspector);
-      setText("repText", rep);
-      setText("iden21Text", iden21);
-      setText("iden18Text", iden18);
-      setText("senderText", sender);
-      setText("get8Text", get8Render);
-      setText("invoiceNoText", invoiceNo);
-      setText("invoiceDateText", invoiceDate);
-      setText("gtiText", gti);
-      setText("plombText", plomb);
-      setText("inspectorSignText", inspector);
-      setText("repSignText", rep);
+      const acts = [];
+      for (let i = 0; i < count; i++) {
+        const a = {};
+        for (const f of ACT_FIELDS) a[f] = arrays[f][i] || "";
+        acts.push(a);
+      }
+
+      document.title = count > 1 ? `АКТЫ перегрузки товара (${count})` : "АКТ перегрузки товара";
+
+      const html = acts.map((a, i) => renderPage(i, count, a, common)).join("");
+      document.getElementById("pages").innerHTML = html;
     </script>
   </body>
 </html>
