@@ -372,11 +372,17 @@
         persist();
       })();
 
-      // Add: duplicate the last act
+      // Fields that must NOT be carried over when duplicating —
+      // vehicle plates and invoice details are always unique per act.
+      const UNIQUE_FIELDS = ["iden21", "iden18", "invoice_no", "invoice_date"];
+
+      // Add: duplicate the last act, except unique fields
       addBtn.addEventListener("click", () => {
         const acts = readActsFromDom();
         const last = acts[acts.length - 1] || freshAct();
-        acts.push({ ...last });
+        const next = { ...last };
+        for (const f of UNIQUE_FIELDS) next[f] = "";
+        acts.push(next);
         renderAll(acts);
         persist();
         // Scroll to the new card

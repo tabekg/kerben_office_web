@@ -219,6 +219,28 @@
         "date", "iden21", "iden18", "get8", "invoice_no", "invoice_date", "plomb",
         "inspector", "rep", "point", "company", "sender", "gti",
       ];
+
+      // Fallback values when a field is empty.
+      // Sourced from backend/transit_declaration_web_new/src/assets/init.json.
+      function todayStr() {
+        const p = (n) => String(n).padStart(2, "0");
+        const d = new Date();
+        return p(d.getDate()) + "." + p(d.getMonth() + 1) + "." + d.getFullYear();
+      }
+      // iden21/iden18/invoice_no/invoice_date are always per-shipment unique —
+      // never substitute defaults for them, leave blank if not provided.
+      const DEFAULTS = {
+        date: todayStr(),
+        get8: 'ИП ООО "БАРАКА ХОЛДИНГ", УЗБЕКИСТАН, Г. ТАШКЕНТ,',
+        plomb: "412, 412, 412",
+        inspector: "АКБАРОВ А.",
+        rep: "СУЛАЙМАНОВ К.",
+        point: "ЦТП «ОШ» ЮЗТ",
+        company: "ПТЗК «АВТОЭКСПРЕСС ИНВЕСТ»",
+        sender: "КНР",
+        gti: "ГТИ КР",
+      };
+
       const arrays = {};
       for (const f of FIELDS) arrays[f] = q.getAll(f);
 
@@ -230,7 +252,11 @@
       const acts = [];
       for (let i = 0; i < count; i++) {
         const a = {};
-        for (const f of FIELDS) a[f] = arrays[f][i] || "";
+        for (const f of FIELDS) {
+          const v = (arrays[f][i] || "").trim();
+          // If no default is registered for this field, allow it to stay empty.
+          a[f] = v || DEFAULTS[f] || "";
+        }
         acts.push(a);
       }
 
