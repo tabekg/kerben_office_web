@@ -167,7 +167,7 @@
           .replace(/"/g, "&quot;");
       }
 
-      function renderPage(idx, total, act, common) {
+      function renderPage(idx, total, act) {
         const dateText = formatActDate(act.date);
         const get8 = renderGet8(act.get8 || "");
         const pageNum = total > 1 ? `<div class="page-num">${idx + 1} / ${total}</div>` : "";
@@ -177,32 +177,32 @@
             <div class="title">АКТ<small>перегрузки товара</small></div>
             <div class="meta-row">
               <div>${esc(dateText)}</div>
-              <div class="company">${esc(common.company)}</div>
+              <div class="company">${esc(act.company || "")}</div>
             </div>
             <p class="body">
-              Мы, нижеподписавшиеся, инспектор <span class="v">${esc(common.point)}</span>
-              <span class="v">${esc(common.inspector)}</span>, представитель фирмы
-              <span class="v">${esc(common.rep)}</span>, составили настоящий акт о производстве
+              Мы, нижеподписавшиеся, инспектор <span class="v">${esc(act.point || "")}</span>
+              <span class="v">${esc(act.inspector || "")}</span>, представитель фирмы
+              <span class="v">${esc(act.rep || "")}</span>, составили настоящий акт о производстве
               перегруза с авто машин <span class="v">${esc(act.iden21 || "")}</span> на автомашины
               <span class="v">${esc(act.iden18 || "")}</span>. Отправитель —
-              <span class="v">${esc(common.sender)}</span>; получатель —
+              <span class="v">${esc(act.sender || "")}</span>; получатель —
               <span class="v wrap">${esc(get8)}</span>. Количество перегруженного груза составило:
               <span class="v">согласно инвойсу №&nbsp;${esc(act.invoice_no || "")} от&nbsp;${esc(act.invoice_date || "")}</span>.
-              Груз опломбирован <span class="v">${esc(common.gti)}&nbsp;${esc(act.plomb || "")}</span>.
+              Груз опломбирован <span class="v">${esc(act.gti || "")}&nbsp;${esc(act.plomb || "")}</span>.
             </p>
             <div class="signatures">
               <div class="sig">
                 <div class="role">Инспектор</div>
                 <div class="sign-line"></div>
                 <div></div>
-                <div class="name">${esc(common.inspector)}</div>
+                <div class="name">${esc(act.inspector || "")}</div>
                 <div class="caption">(подпись и Ф.И.О.)</div>
               </div>
               <div class="sig">
                 <div class="role">Представитель</div>
                 <div class="sign-line"></div>
                 <div></div>
-                <div class="name">${esc(common.rep)}</div>
+                <div class="name">${esc(act.rep || "")}</div>
                 <div class="caption">(подпись и Ф.И.О.)</div>
               </div>
             </div>
@@ -215,34 +215,28 @@
         window.location.replace("akt-form.html");
       }
 
-      const common = {
-        inspector: q.get("inspector") || "АКБАРОВ А.",
-        rep: q.get("rep") || "СУЛАЙМАНОВ К.",
-        point: q.get("point") || "ЦТП «ОШ» ЮЗТ",
-        company: q.get("company") || "ПТЗК «АВТОЭКСПРЕСС ИНВЕСТ»",
-        sender: q.get("sender") || "КНР",
-        gti: q.get("gti") || "ГТИ КР",
-      };
-
-      const ACT_FIELDS = ["date", "iden21", "iden18", "get8", "invoice_no", "invoice_date", "plomb"];
+      const FIELDS = [
+        "date", "iden21", "iden18", "get8", "invoice_no", "invoice_date", "plomb",
+        "inspector", "rep", "point", "company", "sender", "gti",
+      ];
       const arrays = {};
-      for (const f of ACT_FIELDS) arrays[f] = q.getAll(f);
+      for (const f of FIELDS) arrays[f] = q.getAll(f);
 
       // Determine count: max of array lengths or explicit n param.
       const declared = parseInt(q.get("n") || "0", 10) || 0;
-      const maxLen = Math.max(declared, ...ACT_FIELDS.map((f) => arrays[f].length));
+      const maxLen = Math.max(declared, ...FIELDS.map((f) => arrays[f].length));
       const count = Math.max(1, maxLen);
 
       const acts = [];
       for (let i = 0; i < count; i++) {
         const a = {};
-        for (const f of ACT_FIELDS) a[f] = arrays[f][i] || "";
+        for (const f of FIELDS) a[f] = arrays[f][i] || "";
         acts.push(a);
       }
 
       document.title = count > 1 ? `АКТЫ перегрузки товара (${count})` : "АКТ перегрузки товара";
 
-      const html = acts.map((a, i) => renderPage(i, count, a, common)).join("");
+      const html = acts.map((a, i) => renderPage(i, count, a)).join("");
       document.getElementById("pages").innerHTML = html;
     </script>
   </body>

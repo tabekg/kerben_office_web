@@ -12,19 +12,26 @@
         background: #f5f6f8;
         color: #1f2329;
       }
-      .wrap { max-width: 800px; margin: 32px auto; padding: 0 20px 80px; }
+      .wrap { max-width: 820px; margin: 32px auto; padding: 0 20px 120px; }
       h1 { margin: 0 0 4px; font-size: 22px; }
       .sub { color: #6b7280; margin-bottom: 24px; font-size: 14px; }
       .card {
         background: #fff;
         border: 1px solid #e5e7eb;
         border-radius: 12px;
-        padding: 20px 22px;
+        padding: 18px 22px 20px;
         margin-bottom: 16px;
         box-shadow: 0 1px 2px rgba(0,0,0,.03);
       }
-      .card h2 {
-        margin: 0 0 14px;
+      .card.act-card { border-left: 3px solid #2563eb; }
+      .card-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 14px;
+      }
+      .card-head h2 {
+        margin: 0;
         font-size: 14px;
         text-transform: uppercase;
         letter-spacing: .05em;
@@ -34,14 +41,38 @@
         align-items: center;
         gap: 8px;
       }
-      .card h2 .badge {
+      .card-head h2 .badge {
         background: #2563eb;
         color: #fff;
         font-size: 11px;
-        padding: 2px 8px;
+        padding: 2px 9px;
         border-radius: 999px;
-        font-weight: 600;
+        font-weight: 700;
       }
+      .remove-btn {
+        background: transparent;
+        border: 1px solid transparent;
+        color: #9ca3af;
+        cursor: pointer;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-family: inherit;
+      }
+      .remove-btn:hover {
+        background: #fee2e2;
+        color: #b91c1c;
+        border-color: #fecaca;
+      }
+      .section-label {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        color: #9ca3af;
+        margin: 12px 0 8px;
+      }
+      .section-label:first-child { margin-top: 0; }
       .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
       .row.one { grid-template-columns: 1fr; }
       .row.three { grid-template-columns: 1fr 1fr 1fr; }
@@ -69,11 +100,25 @@
       }
       textarea { min-height: 54px; resize: vertical; font-family: inherit; }
 
-      .count-row { display: flex; align-items: center; gap: 12px; }
-      .count-row input { max-width: 80px; text-align: center; font-size: 16px; font-weight: 600; }
-      .count-row .btn { padding: 8px 12px; font-size: 16px; min-width: 38px; }
-
-      .act-card { border-left: 3px solid #2563eb; }
+      .add-act-btn {
+        width: 100%;
+        padding: 14px;
+        background: #fff;
+        border: 2px dashed #cbd5e1;
+        border-radius: 12px;
+        color: #475569;
+        font: inherit;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-bottom: 16px;
+        transition: all .15s;
+      }
+      .add-act-btn:hover {
+        border-color: #2563eb;
+        color: #2563eb;
+        background: #eff6ff;
+      }
 
       .sticky-bar {
         position: sticky;
@@ -146,50 +191,11 @@
   <body>
     <div class="wrap">
       <h1>Генератор ссылки на АКТ</h1>
-      <p class="sub">Заполните поля и нажмите кнопку — одна ссылка на все акты сразу.</p>
+      <p class="sub">Заполните акт, нажмите «+ Добавить акт», чтобы дублировать его и поправить только нужное.</p>
 
       <form id="form">
-        <div class="card">
-          <h2>Общие реквизиты <span class="hint" style="text-transform:none;letter-spacing:0;color:#9ca3af;font-weight:400;font-size:11px;">для всех актов</span></h2>
-          <div class="row">
-            <div>
-              <label>Инспектор</label>
-              <input type="text" name="inspector" value="АКБАРОВ А." />
-            </div>
-            <div>
-              <label>Представитель</label>
-              <input type="text" name="rep" value="СУЛАЙМАНОВ К." />
-            </div>
-            <div>
-              <label>Пункт</label>
-              <input type="text" name="point" value="ЦТП «ОШ» ЮЗТ" />
-            </div>
-            <div>
-              <label>Транспортная компания</label>
-              <input type="text" name="company" value="ПТЗК «АВТОЭКСПРЕСС ИНВЕСТ»" />
-            </div>
-            <div>
-              <label>Отправитель</label>
-              <input type="text" name="sender" value="КНР" />
-            </div>
-            <div>
-              <label>Орган пломбирования</label>
-              <input type="text" name="gti" value="ГТИ КР" />
-            </div>
-          </div>
-        </div>
-
-        <div class="card">
-          <h2>Количество актов</h2>
-          <div class="count-row">
-            <button type="button" class="btn secondary" id="decBtn">−</button>
-            <input type="number" id="count" min="1" max="50" value="1" />
-            <button type="button" class="btn secondary" id="incBtn">+</button>
-            <span style="color:#6b7280;font-size:13px;">актов</span>
-          </div>
-        </div>
-
         <div id="acts"></div>
+        <button type="button" class="add-act-btn" id="addBtn">+ Добавить акт</button>
 
         <div class="sticky-bar">
           <button type="submit" class="btn primary">Скопировать ссылку</button>
@@ -206,12 +212,23 @@
 
     <script>
       const LS_KEY = "akt";
-      const COMMON_FIELDS = ["inspector", "rep", "point", "company", "sender", "gti"];
-      const ACT_FIELDS = ["date", "iden21", "iden18", "get8", "invoice_no", "invoice_date", "plomb"];
+      const FIELDS = [
+        "date", "iden21", "iden18", "get8", "invoice_no", "invoice_date", "plomb",
+        "inspector", "rep", "point", "company", "sender", "gti",
+      ];
+
+      const DEFAULTS = {
+        inspector: "АКБАРОВ А.",
+        rep: "СУЛАЙМАНОВ К.",
+        point: "ЦТП «ОШ» ЮЗТ",
+        company: "ПТЗК «АВТОЭКСПРЕСС ИНВЕСТ»",
+        sender: "КНР",
+        gti: "ГТИ КР",
+      };
 
       const form = document.getElementById("form");
       const actsContainer = document.getElementById("acts");
-      const countInput = document.getElementById("count");
+      const addBtn = document.getElementById("addBtn");
       const linkBox = document.getElementById("linkBox");
       const openLink = document.getElementById("openLink");
       const toast = document.getElementById("toast");
@@ -222,33 +239,36 @@
         return pad(d.getDate()) + "." + pad(d.getMonth() + 1) + "." + d.getFullYear();
       }
 
+      function freshAct() {
+        return { ...DEFAULTS, date: todayStr() };
+      }
+
+      function esc(s) {
+        return String(s == null ? "" : s)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+
       function readState() {
         try {
           const s = JSON.parse(localStorage.getItem(LS_KEY) || "{}") || {};
-          if (!s.acts) s.acts = [];
-          if (!s.count) s.count = 1;
+          if (!Array.isArray(s.acts) || s.acts.length === 0) s.acts = [freshAct()];
           return s;
         } catch {
-          return { acts: [], count: 1 };
+          return { acts: [freshAct()] };
         }
       }
       function writeState(obj) {
         localStorage.setItem(LS_KEY, JSON.stringify(obj));
       }
 
-      function readCommon() {
-        const o = {};
-        for (const f of COMMON_FIELDS) {
-          const el = form.elements[f];
-          if (el) o[f] = el.value;
-        }
-        return o;
-      }
-      function readActs() {
+      function readActsFromDom() {
         const acts = [];
         for (const card of actsContainer.querySelectorAll(".act-card")) {
           const a = {};
-          for (const f of ACT_FIELDS) {
+          for (const f of FIELDS) {
             const el = card.querySelector(`[data-field="${f}"]`);
             if (el) a[f] = el.value;
           }
@@ -256,25 +276,16 @@
         }
         return acts;
       }
-      function readAll() {
-        return {
-          ...readCommon(),
-          count: +countInput.value || 1,
-          acts: readActs(),
-        };
-      }
 
-      function renderActs(count, data) {
-        actsContainer.innerHTML = "";
-        const existing = data && data.acts ? data.acts : [];
-        for (let i = 0; i < count; i++) {
-          const a = existing[i] || {};
-          if (!a.date) a.date = todayStr();
-          const card = document.createElement("div");
-          card.className = "card act-card";
-          card.dataset.i = i;
-          card.innerHTML = `
-            <h2>Акт <span class="badge">#${i + 1}</span></h2>
+      function actCardHtml(idx, a) {
+        return `
+          <div class="card act-card" data-i="${idx}">
+            <div class="card-head">
+              <h2>Акт <span class="badge">#${idx + 1}</span></h2>
+              <button type="button" class="remove-btn" data-action="remove">× Удалить</button>
+            </div>
+
+            <div class="section-label">Данные акта</div>
             <div class="row one">
               <div>
                 <label>Дата акта <span class="hint">ДД.ММ.ГГГГ</span></label>
@@ -313,58 +324,85 @@
                 <input type="text" data-field="plomb" value="${esc(a.plomb)}" placeholder="412,412,412" />
               </div>
             </div>
-          `;
-          actsContainer.appendChild(card);
-        }
+
+            <div class="section-label">Подписанты и реквизиты</div>
+            <div class="row">
+              <div>
+                <label>Инспектор</label>
+                <input type="text" data-field="inspector" value="${esc(a.inspector)}" />
+              </div>
+              <div>
+                <label>Представитель</label>
+                <input type="text" data-field="rep" value="${esc(a.rep)}" />
+              </div>
+              <div>
+                <label>Пункт</label>
+                <input type="text" data-field="point" value="${esc(a.point)}" />
+              </div>
+              <div>
+                <label>Транспортная компания</label>
+                <input type="text" data-field="company" value="${esc(a.company)}" />
+              </div>
+              <div>
+                <label>Отправитель</label>
+                <input type="text" data-field="sender" value="${esc(a.sender)}" />
+              </div>
+              <div>
+                <label>Орган пломбирования</label>
+                <input type="text" data-field="gti" value="${esc(a.gti)}" />
+              </div>
+            </div>
+          </div>
+        `;
       }
 
-      function esc(s) {
-        return String(s == null ? "" : s)
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;")
-          .replace(/"/g, "&quot;");
+      function renderAll(acts) {
+        actsContainer.innerHTML = acts.map((a, i) => actCardHtml(i, a)).join("");
       }
 
-      function applyCommon(state) {
-        for (const f of COMMON_FIELDS) {
-          if (state[f] !== undefined && form.elements[f]) form.elements[f].value = state[f];
-        }
+      function persist() {
+        const acts = readActsFromDom();
+        writeState({ acts });
       }
 
-      function init() {
+      // Init
+      (function init() {
         const saved = readState();
-        countInput.value = saved.count || 1;
-        applyCommon(saved);
-        renderActs(saved.count || 1, saved);
-        writeState(readAll());
-      }
-      init();
+        renderAll(saved.acts);
+        persist();
+      })();
 
-      countInput.addEventListener("input", () => {
-        let n = +countInput.value || 1;
-        if (n < 1) n = 1;
-        if (n > 50) n = 50;
-        countInput.value = n;
-        const cur = readAll();
-        renderActs(n, cur);
-        writeState(readAll());
-      });
-      document.getElementById("decBtn").addEventListener("click", () => {
-        let n = +countInput.value || 1;
-        if (n > 1) n--;
-        countInput.value = n;
-        countInput.dispatchEvent(new Event("input"));
-      });
-      document.getElementById("incBtn").addEventListener("click", () => {
-        let n = +countInput.value || 1;
-        if (n < 50) n++;
-        countInput.value = n;
-        countInput.dispatchEvent(new Event("input"));
+      // Add: duplicate the last act
+      addBtn.addEventListener("click", () => {
+        const acts = readActsFromDom();
+        const last = acts[acts.length - 1] || freshAct();
+        acts.push({ ...last });
+        renderAll(acts);
+        persist();
+        // Scroll to the new card
+        const cards = actsContainer.querySelectorAll(".act-card");
+        cards[cards.length - 1].scrollIntoView({ behavior: "smooth", block: "start" });
       });
 
-      form.addEventListener("input", () => writeState(readAll()));
-      form.addEventListener("change", () => writeState(readAll()));
+      // Remove (event delegation)
+      actsContainer.addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-action='remove']");
+        if (!btn) return;
+        const acts = readActsFromDom();
+        if (acts.length <= 1) {
+          alert("Нельзя удалить единственный акт.");
+          return;
+        }
+        const card = btn.closest(".act-card");
+        const idx = +card.dataset.i;
+        acts.splice(idx, 1);
+        renderAll(acts);
+        persist();
+      });
+
+      // Live persist on any input
+      form.addEventListener("input", persist);
+      form.addEventListener("change", persist);
 
       function showToast(text) {
         toast.textContent = text;
@@ -373,15 +411,21 @@
       }
 
       function buildUrl() {
-        const state = readAll();
+        const acts = readActsFromDom();
         const params = new URLSearchParams();
-        for (const f of COMMON_FIELDS) if (state[f]) params.set(f, state[f]);
-        params.set("n", String(state.acts.length));
-        for (const act of state.acts) {
-          for (const f of ACT_FIELDS) params.append(f, act[f] || "");
+        params.set("n", String(acts.length));
+        for (const a of acts) {
+          for (const f of FIELDS) params.append(f, a[f] || "");
         }
         const base = window.location.href.replace(/\/akt-form\.html.*$/, "/akt.html");
         return base + "?" + params.toString();
+      }
+
+      function plural(n) {
+        const mod10 = n % 10, mod100 = n % 100;
+        if (mod10 === 1 && mod100 !== 11) return "акт";
+        if ([2, 3, 4].includes(mod10) && ![12, 13, 14].includes(mod100)) return "акта";
+        return "актов";
       }
 
       form.addEventListener("submit", async function (e) {
@@ -392,9 +436,12 @@
         openLink.href = url;
         openLink.style.display = "inline-block";
 
+        const n = readActsFromDom().length;
+        const label = `Ссылка скопирована (${n} ${plural(n)})`;
+
         try {
           await navigator.clipboard.writeText(url);
-          showToast(`Ссылка скопирована (${countInput.value} акт${countInput.value == 1 ? "" : countInput.value < 5 ? "а" : "ов"})`);
+          showToast(label);
         } catch {
           const ta = document.createElement("textarea");
           ta.value = url;
@@ -402,7 +449,7 @@
           ta.select();
           try {
             document.execCommand("copy");
-            showToast("Ссылка скопирована");
+            showToast(label);
           } catch {
             showToast("Не удалось скопировать — выделите ссылку вручную");
           }
@@ -411,7 +458,7 @@
       });
 
       document.getElementById("reset").addEventListener("click", function () {
-        if (!confirm("Очистить все поля?")) return;
+        if (!confirm("Очистить все акты?")) return;
         localStorage.removeItem(LS_KEY);
         location.reload();
       });
