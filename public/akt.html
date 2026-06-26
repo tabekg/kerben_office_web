@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>АКТ перегрузки товара</title>
+    <style>
+      * { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; background: #e9ebee; }
+      body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+
+      .toolbar {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        padding: 12px 20px;
+        background: #fff;
+        border-bottom: 1px solid #e5e7eb;
+        box-shadow: 0 1px 2px rgba(0,0,0,.04);
+      }
+      .toolbar a, .toolbar button {
+        font: inherit;
+        font-size: 14px;
+        font-weight: 500;
+        padding: 8px 14px;
+        border-radius: 8px;
+        border: 1px solid #d1d5db;
+        background: #fff;
+        color: #1f2329;
+        cursor: pointer;
+        text-decoration: none;
+      }
+      .toolbar button.primary { background: #2563eb; color: #fff; border-color: #2563eb; }
+      .toolbar button.primary:hover { background: #1d4ed8; }
+      .toolbar .spacer { flex: 1; }
+
+      /* The Act page — geometry matches ResultContainer.tsx second block */
+      .page {
+        background: #fff;
+        margin: 24px auto;
+        font-family: "Times New Roman", Times, serif;
+        font-size: 27px;
+        padding: 100px;
+        padding-top: 45px;
+        padding-bottom: 0;
+        width: 960px;   /* 1160 - 200 */
+        height: 1630px; /* 1685 - 55 */
+        box-shadow: 0 2px 8px rgba(0,0,0,.08);
+      }
+      .title {
+        display: block;
+        text-align: center;
+        font-weight: bold;
+      }
+      .top-row {
+        margin-top: 54px;
+        margin-bottom: 54px;
+        display: flex;
+        justify-content: space-between;
+      }
+      .body { word-wrap: break-word; line-height: 1.7; }
+      .body u { text-decoration: underline; }
+      .sign-block { line-height: 1.5; }
+      .sign-name { margin-left: 100px; font-size: inherit; }
+      .sign-name-2 { margin-left: 50px; font-size: inherit; }
+      .inspector-label { font-size: inherit; margin-right: 30px; }
+
+      @media print {
+        body { background: #fff; }
+        .toolbar { display: none; }
+        .page {
+          margin: 0;
+          box-shadow: none;
+          page-break-after: always;
+        }
+        @page { size: A4; margin: 0; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="toolbar">
+      <a href="akt-form.html">← Назад к форме</a>
+      <div class="spacer"></div>
+      <button onclick="window.print()" class="primary">Печать</button>
+    </div>
+
+    <div class="page">
+      <strong class="title">
+        АКТ
+        <br />
+        перегрузки товара
+      </strong>
+      <div class="top-row">
+        <span id="dateText"></span>
+        <span id="companyText"></span>
+      </div>
+      <div class="body">
+        Мы, нижеподписавшиеся, инспектор <span id="pointText"></span>
+        <br />
+        <u id="inspectorText"></u
+        ><u>____________________________________________</u>
+        <br />
+        представитель фирмы:<u id="repText"></u
+        ><u>______________</u>
+        <br />
+        составили настоящий акт о производстве перегруза с авто машин:______ <span id="iden21Text"></span>
+        <u>
+          __________________________________________________________________________________________________________________________________________________
+        </u>
+        <br />
+        на
+        <br />
+        автомашины_<u>__<span id="iden18Text"></span>______</u>
+        ________________________________________________________________________________________
+        <br />
+        отправитель: _<u id="senderText"></u>_________________________________________________________________
+        <br />
+        получатель: <u id="get8Text"></u>
+        <br />
+        количество перегруженного груза составило:_СОГЛАСНО ИНВОЙСУ
+        <u>__________</u>
+        <br />_
+        <u>
+          ___№<span id="invoiceNoText"></span> от <span id="invoiceDateText"></span>_________________________________________________
+        </u>
+        <br />
+        груз опломбирован ГТИ КР <u>____<span id="plombText"></span>__________</u>
+        <br />
+        _______________________________________________________________________
+        <br />
+        <br />
+        <div class="sign-block">
+          <span class="inspector-label">Инспектор </span>
+          _______________________ <u class="sign-name" id="inspectorSignText"></u>
+          <br />
+          (Ф.И.О)
+        </div>
+        <br />
+        Представитель ______________________ <u class="sign-name-2" id="repSignText"></u>
+      </div>
+    </div>
+
+    <script>
+      function fmtMonthYear(dateStr) {
+        // "27.03.2025" -> «__27__»___03______ 2025
+        if (!dateStr) return "";
+        const m = dateStr.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
+        if (!m) return dateStr;
+        return "«__" + m[1] + "__»___" + m[2] + "______ " + m[3];
+      }
+
+      function setText(id, value) {
+        document.getElementById(id).textContent = value || "";
+      }
+
+      const q = new URLSearchParams(window.location.search);
+
+      // Required from declaration
+      const iden21 = q.get("iden21") || "";
+      const iden18 = q.get("iden18") || "";
+      const get8 = q.get("get8") || "";
+      const invoiceNo = q.get("invoice_no") || "";
+      const invoiceDate = q.get("invoice_date") || "";
+      const plomb = q.get("plomb") || "";
+      const dateStr = q.get("date") || "";
+
+      // Customizable
+      const inspector = q.get("inspector") || "АКБАРОВ А.";
+      const rep = q.get("rep") || "СУЛАЙМАНОВ К.";
+      const point = q.get("point") || "ЦТП «ОШ» ЮЗТ";
+      const company = q.get("company") || "ПТЗК «АВТОЭКСПРЕСС ИНВЕСТ»";
+      const sender = q.get("sender") || "КНР";
+
+      // Get8 special-case (mirror of ResultContainer logic)
+      const get8Render = get8.startsWith('ИП ООО "БАРАКА ХОЛДИНГ", УЗБЕКИСТАН')
+        ? 'ИП ООО "БАРАКА ХОЛДИНГ", УЗБЕКИСТАН___________________'
+        : get8;
+
+      // iden21/iden18: keep raw — user enters plates directly
+      setText("iden21Text", iden21);
+      setText("iden18Text", iden18);
+
+      setText("dateText", "от " + fmtMonthYear(dateStr) + "г.");
+      setText("companyText", company);
+      setText("pointText", point);
+      setText("inspectorText", "_" + inspector);
+      setText("repText", "____" + rep);
+      setText("senderText", sender);
+      setText("get8Text", get8Render);
+      setText("invoiceNoText", invoiceNo);
+      setText("invoiceDateText", invoiceDate);
+      setText("plombText", plomb);
+      setText("inspectorSignText", "__" + inspector);
+      setText("repSignText", rep);
+
+      // If page opened with no params — bounce to form
+      if (![...q.keys()].length) {
+        window.location.replace("akt-form.html");
+      }
+    </script>
+  </body>
+</html>

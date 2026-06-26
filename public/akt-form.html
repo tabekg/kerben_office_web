@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>АКТ перегрузки — заполнение</title>
+    <style>
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: #f5f6f8;
+        color: #1f2329;
+      }
+      .wrap { max-width: 760px; margin: 32px auto; padding: 0 20px 60px; }
+      h1 { margin: 0 0 4px; font-size: 22px; }
+      .sub { color: #6b7280; margin-bottom: 24px; font-size: 14px; }
+      .card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 22px 24px;
+        margin-bottom: 18px;
+        box-shadow: 0 1px 2px rgba(0,0,0,.03);
+      }
+      .card h2 {
+        margin: 0 0 16px;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        color: #6b7280;
+        font-weight: 600;
+      }
+      .row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+      .row.one { grid-template-columns: 1fr; }
+      label {
+        display: block;
+        font-size: 13px;
+        font-weight: 500;
+        margin-bottom: 6px;
+        color: #374151;
+      }
+      label .hint { color: #9ca3af; font-weight: 400; margin-left: 6px; font-size: 12px; }
+      input, textarea {
+        width: 100%;
+        font: inherit;
+        font-size: 14px;
+        padding: 9px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        background: #fff;
+        color: inherit;
+        transition: border-color .15s, box-shadow .15s;
+      }
+      input:focus, textarea:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37,99,235,.15);
+      }
+      textarea { min-height: 64px; resize: vertical; font-family: inherit; }
+      .actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        margin-top: 8px;
+      }
+      button {
+        font: inherit;
+        font-size: 14px;
+        font-weight: 600;
+        padding: 10px 20px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        transition: background .15s;
+      }
+      button.primary { background: #2563eb; color: #fff; }
+      button.primary:hover { background: #1d4ed8; }
+      button.ghost { background: transparent; color: #4b5563; }
+      button.ghost:hover { background: #e5e7eb; }
+      .field-full { grid-column: 1 / -1; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>АКТ перегрузки товара</h1>
+      <p class="sub">Заполните поля и нажмите «Открыть акт» — откроется готовая печатная форма.</p>
+
+      <form id="form">
+        <div class="card">
+          <h2>Данные из декларации</h2>
+          <div class="row one">
+            <div>
+              <label>Дата акта <span class="hint">формат: ДД.ММ.ГГГГ</span></label>
+              <input type="text" name="date" id="date" placeholder="27.03.2025" />
+            </div>
+          </div>
+          <div class="row">
+            <div>
+              <label>Авто отправления (iden21) <span class="hint">с каких машин</span></label>
+              <input type="text" name="iden21" placeholder="06KG245AС/06KG242PA" required />
+            </div>
+            <div>
+              <label>Авто прибытия (iden18) <span class="hint">на какие машины</span></label>
+              <input type="text" name="iden18" placeholder="1: 01M005432/3724AA" required />
+            </div>
+          </div>
+          <div class="row one">
+            <div>
+              <label>Получатель (get8)</label>
+              <textarea name="get8" placeholder='ИП ООО "БАРАКА ХОЛДИНГ", УЗБЕКИСТАН, Г. ТАШКЕНТ,' required></textarea>
+            </div>
+          </div>
+          <div class="row">
+            <div>
+              <label>Инвойс № <span class="hint">номер</span></label>
+              <input type="text" name="invoice_no" placeholder="9980" required />
+            </div>
+            <div>
+              <label>Инвойс от <span class="hint">дата</span></label>
+              <input type="text" name="invoice_date" placeholder="19.03.2025" required />
+            </div>
+          </div>
+          <div class="row one">
+            <div>
+              <label>Номера пломб <span class="hint">через запятую</span></label>
+              <input type="text" name="plomb" placeholder="412,412,412" required />
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Подписанты и реквизиты</h2>
+          <div class="row">
+            <div>
+              <label>Инспектор</label>
+              <input type="text" name="inspector" value="АКБАРОВ А." />
+            </div>
+            <div>
+              <label>Представитель фирмы</label>
+              <input type="text" name="rep" value="СУЛАЙМАНОВ К." />
+            </div>
+            <div>
+              <label>Пункт</label>
+              <input type="text" name="point" value="ЦТП «ОШ» ЮЗТ" />
+            </div>
+            <div>
+              <label>Транспортная компания</label>
+              <input type="text" name="company" value="ПТЗК «АВТОЭКСПРЕСС ИНВЕСТ»" />
+            </div>
+            <div>
+              <label>Отправитель</label>
+              <input type="text" name="sender" value="КНР" />
+            </div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button type="button" class="ghost" id="reset">Сбросить</button>
+          <button type="submit" class="primary">Открыть акт →</button>
+        </div>
+      </form>
+    </div>
+
+    <script>
+      // Default date = today
+      (function () {
+        const d = new Date();
+        const pad = (n) => String(n).padStart(2, "0");
+        document.getElementById("date").value =
+          pad(d.getDate()) + "." + pad(d.getMonth() + 1) + "." + d.getFullYear();
+      })();
+
+      document.getElementById("form").addEventListener("submit", function (e) {
+        e.preventDefault();
+        const fd = new FormData(this);
+        const params = new URLSearchParams();
+        for (const [k, v] of fd.entries()) {
+          if (v) params.set(k, v);
+        }
+        window.location.href = "akt.html?" + params.toString();
+      });
+
+      document.getElementById("reset").addEventListener("click", function () {
+        if (confirm("Очистить все поля?")) document.getElementById("form").reset();
+      });
+    </script>
+  </body>
+</html>
