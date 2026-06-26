@@ -8,8 +8,8 @@
       :root {
         --page-w: 210mm;
         --page-h: 297mm;
-        --pad-x: 22mm;
-        --pad-y: 16mm;
+        --pad-x: 25mm;
+        --pad-y: 20mm;
       }
 
       *, *::before, *::after { box-sizing: border-box; }
@@ -28,21 +28,23 @@
         font-family: "Times New Roman", Times, serif;
         font-size: 14pt;
         color: #000;
-        line-height: 1.4;
+        line-height: 1.6;
         box-shadow: 0 4px 14px rgba(0,0,0,.10);
       }
 
       .title {
         text-align: center;
         font-weight: bold;
-        font-size: 20pt;
-        line-height: 1.1;
-        margin-bottom: 4mm;
+        font-size: 18pt;
+        line-height: 1.15;
+        letter-spacing: .03em;
+        margin-bottom: 2mm;
       }
       .title small {
         display: block;
-        font-size: 14pt;
+        font-size: 13pt;
         font-weight: bold;
+        letter-spacing: 0;
         margin-top: 1mm;
       }
 
@@ -50,44 +52,39 @@
         display: flex;
         justify-content: space-between;
         align-items: baseline;
-        gap: 8mm;
-        margin: 8mm 0 8mm;
+        margin: 10mm 0 8mm;
+        font-size: 13pt;
       }
-      .meta-row .company { font-weight: 600; white-space: nowrap; }
+      .meta-row .company { font-weight: 700; white-space: nowrap; }
 
-      /* The core building block: a line with label + underlined fill.
-         Multiple labels and fills can sit on the same row. */
-      .line {
-        display: flex;
-        align-items: baseline;
-        gap: .35em;
-        margin: 0 0 3mm;
+      /* Body is one long justified paragraph that flows naturally.
+         The underlined "fill" is just an inline span with a bottom border.
+         Word breaks happen at spaces, no flex weirdness. */
+      .body {
+        text-align: justify;
+        text-justify: inter-word;
+        text-indent: 12mm;
       }
-      .line .label { white-space: nowrap; }
-      .line .fill {
-        flex: 1;
-        min-width: 2em;
+      .body .v {
+        display: inline-block;
         border-bottom: 1px solid #000;
         padding: 0 .25em 1pt;
-        line-height: 1.25;
+        line-height: 1.2;
+        white-space: nowrap;
+        max-width: 100%;
       }
-      .line .fill.shrink { flex: 0 1 auto; }
-      .line .fill.fixed-sm { flex: 0 0 14mm; text-align: center; }
-      .line .fill.fixed-md { flex: 0 0 28mm; text-align: center; }
-      .line .fill.fixed-lg { flex: 0 0 55mm; text-align: center; }
-
-      .body { margin-top: 6mm; }
+      .body .v.wrap { white-space: normal; }
 
       /* Signatures */
-      .signatures { margin-top: 14mm; }
+      .signatures { margin-top: 18mm; }
       .sig {
         display: grid;
-        grid-template-columns: 38mm 1fr 6mm 70mm;
+        grid-template-columns: 40mm 1fr 8mm 60mm;
         gap: 6mm;
         align-items: end;
-        margin-bottom: 10mm;
+        margin-bottom: 12mm;
       }
-      .sig .role { font-weight: 500; line-height: 1; }
+      .sig .role { line-height: 1; }
       .sig .sign-line {
         border-bottom: 1px solid #000;
         height: 0;
@@ -101,9 +98,8 @@
       .sig .caption {
         grid-column: 4 / 5;
         text-align: center;
-        font-size: 10pt;
+        font-size: 9.5pt;
         margin-top: 1mm;
-        color: #333;
       }
 
       .print-btn {
@@ -145,58 +141,23 @@
 
       <div class="meta-row">
         <div>
-          от&nbsp;«<span id="dayText"></span>»&nbsp;<span id="monthText"></span>&nbsp;<span id="yearText"></span>&nbsp;г.
+          г.&nbsp;Ош, &laquo;<span id="dayText"></span>&raquo;&nbsp;<span id="monthText"></span>&nbsp;<span id="yearText"></span>&nbsp;г.
         </div>
         <div class="company" id="companyText"></div>
       </div>
 
-      <div class="body">
-        <div class="line">
-          <span class="label">Мы, нижеподписавшиеся, инспектор</span>
-          <span class="fill" id="pointText"></span>
-        </div>
-
-        <div class="line">
-          <span class="fill" id="inspectorText"></span>
-          <span class="label">,</span>
-          <span class="label">представитель&nbsp;фирмы:</span>
-          <span class="fill" id="repText"></span>
-          <span class="label">,</span>
-        </div>
-
-        <div class="line">
-          <span class="label">составили настоящий акт о производстве перегруза с авто машин:</span>
-          <span class="fill" id="iden21Text"></span>
-        </div>
-
-        <div class="line">
-          <span class="label">на автомашины:</span>
-          <span class="fill" id="iden18Text"></span>
-        </div>
-
-        <div class="line">
-          <span class="label">отправитель:</span>
-          <span class="fill" id="senderText"></span>
-          <span class="label">; получатель:</span>
-          <span class="fill" id="get8Text"></span>
-        </div>
-
-        <div class="line">
-          <span class="label">количество перегруженного груза составило:</span>
-          <span class="fill shrink">СОГЛАСНО ИНВОЙСУ</span>
-          <span class="label">№</span>
-          <span class="fill fixed-md" id="invoiceNoText"></span>
-          <span class="label">от</span>
-          <span class="fill fixed-md" id="invoiceDateText"></span>
-        </div>
-
-        <div class="line">
-          <span class="label">груз опломбирован</span>
-          <span class="fill shrink" id="gtiText"></span>
-          <span class="label">:</span>
-          <span class="fill" id="plombText"></span>
-        </div>
-      </div>
+      <p class="body">
+        Мы, нижеподписавшиеся, инспектор <span class="v" id="pointText"></span>
+        <span class="v" id="inspectorText"></span>, представитель фирмы
+        <span class="v" id="repText"></span>, составили настоящий акт о производстве
+        перегруза с авто машин <span class="v" id="iden21Text"></span> на автомашины
+        <span class="v" id="iden18Text"></span>. Отправитель —
+        <span class="v" id="senderText"></span>; получатель —
+        <span class="v wrap" id="get8Text"></span>. Количество перегруженного груза
+        составило: <span class="v">согласно инвойсу №&nbsp;<span id="invoiceNoText"></span>
+        от&nbsp;<span id="invoiceDateText"></span></span>. Груз опломбирован
+        <span class="v"><span id="gtiText"></span>&nbsp;<span id="plombText"></span></span>.
+      </p>
 
       <div class="signatures">
         <div class="sig">
@@ -204,7 +165,7 @@
           <div class="sign-line"></div>
           <div></div>
           <div class="name" id="inspectorSignText"></div>
-          <div class="caption">(Ф.И.О.)</div>
+          <div class="caption">(подпись и Ф.И.О.)</div>
         </div>
 
         <div class="sig">
@@ -212,7 +173,7 @@
           <div class="sign-line"></div>
           <div></div>
           <div class="name" id="repSignText"></div>
-          <div class="caption">(Ф.И.О.)</div>
+          <div class="caption">(подпись и Ф.И.О.)</div>
         </div>
       </div>
     </div>
