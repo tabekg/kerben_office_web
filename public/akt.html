@@ -140,9 +140,7 @@
       </div>
 
       <div class="meta-row">
-        <div>
-          г.&nbsp;Ош, &laquo;<span id="dayText"></span>&raquo;&nbsp;<span id="monthText"></span>&nbsp;<span id="yearText"></span>&nbsp;г.
-        </div>
+        <div id="dateText"></div>
         <div class="company" id="companyText"></div>
       </div>
 
@@ -186,11 +184,15 @@
       }
       function pad(n) { return String(n).padStart(2, "0"); }
 
-      function splitDate(dateStr) {
-        if (!dateStr) return { day: "", month: "", year: "" };
+      // Original backend format: moment().format('«__DD__»___MM______ YYYY')
+      function formatActDate(dateStr) {
+        if (!dateStr) return "";
         const m = dateStr.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
-        if (!m) return { day: dateStr, month: "", year: "" };
-        return { day: pad(m[1]), month: pad(m[2]), year: m[3] };
+        if (!m) return dateStr;
+        const dd = pad(m[1]);
+        const mm = pad(m[2]);
+        const yyyy = m[3];
+        return "от «__" + dd + "__»___" + mm + "______ " + yyyy + "г.";
       }
 
       const q = new URLSearchParams(window.location.search);
@@ -218,11 +220,7 @@
         ? 'ИП ООО "БАРАКА ХОЛДИНГ", УЗБЕКИСТАН'
         : get8;
 
-      const d = splitDate(dateStr);
-      setText("dayText", d.day);
-      setText("monthText", d.month);
-      setText("yearText", d.year);
-
+      setText("dateText", formatActDate(dateStr));
       setText("companyText", company);
       setText("pointText", point);
       setText("inspectorText", inspector);
