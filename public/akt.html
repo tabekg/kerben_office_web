@@ -5,33 +5,124 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>АКТ перегрузки товара</title>
     <style>
-      /* Ported 1:1 from transit_declaration_web_new/src/App.css for the .table_ context */
-      *, ::before, ::after {
-        box-sizing: content-box !important;
-      }
-      html, body { margin: 0; padding: 0; }
-      body {
-        font-family: Arial, Helvetica, sans-serif;
-        background: #e9ebee;
-      }
-      .table_ {
-        position: relative;
-        width: 1160px;
-        height: 1685px;
-        border: 1px solid black;
-        margin-left: 35px;
-        margin-top: 30px;
-        margin-bottom: 30px;
-        background: #fff;
-      }
-      span {
-        font-size: 12.5px;
-        font-weight: 500;
-        margin: 6px;
-        display: inline-block;
+      :root {
+        --page-w: 210mm;
+        --page-h: 297mm;
+        --pad-x: 22mm;
+        --pad-y: 18mm;
       }
 
-      /* Floating print button (non-print only) */
+      *, *::before, *::after { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; }
+      body {
+        background: #e9ebee;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      }
+
+      .page {
+        width: var(--page-w);
+        min-height: var(--page-h);
+        margin: 24px auto;
+        padding: var(--pad-y) var(--pad-x);
+        background: #fff;
+        font-family: "Times New Roman", Times, serif;
+        font-size: 15pt;
+        color: #000;
+        line-height: 1.55;
+        box-shadow: 0 4px 14px rgba(0,0,0,.10);
+      }
+
+      /* Title block */
+      .title {
+        text-align: center;
+        font-weight: bold;
+        font-size: 22pt;
+        letter-spacing: .02em;
+        line-height: 1.2;
+        margin-bottom: 18mm;
+      }
+      .title small {
+        display: block;
+        font-size: 14pt;
+        font-weight: bold;
+        margin-top: 2mm;
+        letter-spacing: 0;
+      }
+
+      /* Header row: date and company */
+      .meta-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 12mm;
+      }
+      .meta-row .date-block {
+        white-space: nowrap;
+      }
+      .meta-row .company {
+        text-align: right;
+        font-weight: 600;
+      }
+
+      /* Inline "fill" — text with bottom border (replaces the old underscores) */
+      .fill {
+        display: inline-block;
+        min-width: 4em;
+        padding: 0 .2em;
+        border-bottom: 1px solid #000;
+        line-height: 1.2;
+      }
+      .fill.grow { flex: 1; min-width: 6em; }
+      .fill.short { min-width: 3em; }
+      .fill.empty {
+        min-width: 9em;
+      }
+
+      /* Body paragraphs */
+      .body p { margin: 0 0 4mm; }
+      .row-line {
+        display: flex;
+        align-items: baseline;
+        gap: .5em;
+        margin-bottom: 4mm;
+      }
+      .row-line .label {
+        white-space: nowrap;
+      }
+
+      /* Signatures */
+      .signatures {
+        margin-top: 18mm;
+      }
+      .sig {
+        display: grid;
+        grid-template-columns: 32mm 1fr 2mm 70mm;
+        gap: 8mm;
+        align-items: end;
+        margin-bottom: 12mm;
+      }
+      .sig .role {
+        font-weight: 500;
+      }
+      .sig .sign-line {
+        border-bottom: 1px solid #000;
+        height: 1em;
+      }
+      .sig .name {
+        text-align: center;
+        border-bottom: 1px solid #000;
+        padding: 0 .3em;
+        line-height: 1.4;
+      }
+      .sig .caption {
+        grid-column: 4 / 5;
+        text-align: center;
+        font-size: 11pt;
+        margin-top: 1mm;
+        color: #333;
+      }
+
+      /* Floating print button (non-print) */
       .print-btn {
         position: fixed;
         right: 24px;
@@ -52,9 +143,10 @@
 
       @media print {
         body { background: #fff; }
-        .table_ {
+        .page {
           margin: 0;
-          border: none !important;
+          box-shadow: none;
+          min-height: auto;
         }
         .print-btn { display: none; }
         @page { size: A4; margin: 0; }
@@ -62,87 +154,87 @@
     </style>
   </head>
   <body>
-    <!--
-      Структура и инлайн-стили строго повторяют ResultContainer.tsx, лист "АКТ" (lines 128–212).
-      Inline override: border:none, fontSize:27, paddingTop:45, padding:100, paddingBottom:0,
-      width:1160-200=960, height:1685-55=1630, fontFamily:'Times New Roman'.
-    -->
-    <div
-      class="table_"
-      style="
-        font-family: 'Times New Roman';
-        border: none;
-        font-size: 27px;
-        padding-top: 45px;
-        padding: 100px;
-        padding-bottom: 0;
-        width: 960px;
-        height: 1630px;
-      "
-    >
-      <strong style="display: block; text-align: center;">
+    <div class="page">
+      <div class="title">
         АКТ
-        <br />
-        перегрузки товара
-      </strong>
-      <div style="margin-top: 54px; display: flex; justify-content: space-between; margin-bottom: 54px;">
-        <span style="font-size: inherit; margin: 0; font-weight: normal; display: inline;">от <span id="dateText" style="font-size: inherit; margin: 0; font-weight: normal; display: inline;"></span>г.</span>
-        <div id="companyText"></div>
+        <small>перегрузки товара</small>
       </div>
-      <div style="word-wrap: break-word; line-height: 1.7;">
-        Мы, нижеподписавшиеся, инспектор <span id="pointText" style="font-size: inherit; margin: 0; font-weight: normal; display: inline;"></span>
-        <br />
-        <u id="inspectorText"></u>
-        <br />
-        представитель фирмы:<u id="repText"></u>
-        <br />
-        составили настоящий акт о производстве перегруза с авто машин:______ <span id="iden21Text" style="font-size: inherit; margin: 0; font-weight: normal; display: inline;"></span>
-        <u>__________________________________________________________________________________________________________________________________________________</u>
-        <br />
-        на
-        <br />
-        автомашины_<u>__<span id="iden18Text" style="font-size: inherit; margin: 0; font-weight: normal; display: inline;"></span>______</u>________________________________________________________________________________________
-        <br />
-        отправитель: _<u id="senderText"></u>_________________________________________________________________
-        <br />
-        получатель: <u id="get8Text"></u>
-        <br />
-        количество перегруженного груза составило:_СОГЛАСНО ИНВОЙСУ
-        <u>__________</u>
-        <br />_<u>___№<span id="invoiceNoText" style="font-size: inherit; margin: 0; font-weight: normal; display: inline;"></span> от <span id="invoiceDateText" style="font-size: inherit; margin: 0; font-weight: normal; display: inline;"></span>_________________________________________________</u>
-        <br />
-        груз опломбирован ГТИ КР <u>____<span id="plombText" style="font-size: inherit; margin: 0; font-weight: normal; display: inline;"></span>__________</u>
-        <br />
-        _______________________________________________________________________
-        <br /><br />
-        <div style="line-height: 1.5;">
-          <span style="font-size: inherit; margin-right: 30px;">Инспектор </span>
-          _______________________ <u id="inspectorSignText" style="margin-left: 100px; font-size: inherit;"></u>
-          <br />
-          (Ф.И.О)
+
+      <div class="meta-row">
+        <div class="date-block">
+          от&nbsp;«<span id="dayText" class="fill short"></span>»&nbsp;<span id="monthText" class="fill short"></span>&nbsp;<span id="yearText" class="fill short"></span>&nbsp;г.
         </div>
-        <br />
-        Представитель ______________________ <u id="repSignText" style="margin-left: 50px; font-size: inherit;"></u>
+        <div class="company" id="companyText"></div>
+      </div>
+
+      <div class="body">
+        <p>
+          Мы, нижеподписавшиеся, инспектор <span id="pointText"></span>
+        </p>
+        <p>
+          <span id="inspectorText" class="fill empty"></span>,
+        </p>
+        <p>
+          представитель фирмы: <span id="repText" class="fill empty"></span>,
+        </p>
+        <p>
+          составили настоящий акт о производстве перегруза с авто машин:
+          <span id="iden21Text" class="fill empty"></span>
+        </p>
+        <p>
+          на автомашины: <span id="iden18Text" class="fill empty"></span>
+        </p>
+        <p>
+          отправитель: <span id="senderText" class="fill"></span>;
+          получатель: <span id="get8Text" class="fill grow"></span>
+        </p>
+        <p>
+          количество перегруженного груза составило: <span class="fill">СОГЛАСНО ИНВОЙСУ</span>
+          № <span id="invoiceNoText" class="fill short"></span>
+          от <span id="invoiceDateText" class="fill short"></span>
+        </p>
+        <p>
+          груз опломбирован <span id="gtiText"></span>: <span id="plombText" class="fill grow"></span>
+        </p>
+      </div>
+
+      <div class="signatures">
+        <div class="sig">
+          <div class="role">Инспектор</div>
+          <div class="sign-line"></div>
+          <div></div>
+          <div class="name" id="inspectorSignText"></div>
+          <div class="caption">(Ф.И.О.)</div>
+        </div>
+
+        <div class="sig">
+          <div class="role">Представитель</div>
+          <div class="sign-line"></div>
+          <div></div>
+          <div class="name" id="repSignText"></div>
+          <div class="caption">(Ф.И.О.)</div>
+        </div>
       </div>
     </div>
 
     <button class="print-btn" onclick="window.print()">Печать</button>
 
     <script>
-      function fmtMonthYear(dateStr) {
-        // "27.03.2025" -> «__27__»___03______ 2025  (mirrors moment format from original)
-        if (!dateStr) return "";
-        const m = dateStr.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
-        if (!m) return dateStr;
-        return "«__" + m[1] + "__»___" + m[2] + "______ " + m[3];
-      }
       function setText(id, value) {
         document.getElementById(id).textContent = value || "";
+      }
+      function pad(n) { return String(n).padStart(2, "0"); }
+
+      function splitDate(dateStr) {
+        // "27.03.2025" -> {day:"27", month:"03", year:"2025"}
+        if (!dateStr) return {day: "", month: "", year: ""};
+        const m = dateStr.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
+        if (!m) return {day: dateStr, month: "", year: ""};
+        return {day: pad(m[1]), month: pad(m[2]), year: m[3]};
       }
 
       const q = new URLSearchParams(window.location.search);
 
-      // Empty params -> bounce to form
       if (![...q.keys()].length) {
         window.location.replace("akt-form.html");
       }
@@ -160,25 +252,31 @@
       const point = q.get("point") || "ЦТП «ОШ» ЮЗТ";
       const company = q.get("company") || "ПТЗК «АВТОЭКСПРЕСС ИНВЕСТ»";
       const sender = q.get("sender") || "КНР";
+      const gti = q.get("gti") || "ГТИ КР";
 
       const get8Render = get8.startsWith('ИП ООО "БАРАКА ХОЛДИНГ", УЗБЕКИСТАН')
-        ? 'ИП ООО "БАРАКА ХОЛДИНГ", УЗБЕКИСТАН___________________'
+        ? 'ИП ООО "БАРАКА ХОЛДИНГ", УЗБЕКИСТАН'
         : get8;
 
-      setText("dateText", fmtMonthYear(dateStr));
+      const d = splitDate(dateStr);
+      setText("dayText", d.day);
+      setText("monthText", d.month);
+      setText("yearText", d.year);
+
       setText("companyText", company);
       setText("pointText", point);
-      setText("inspectorText", "_" + inspector + "____________________________________________");
-      setText("repText", "____" + rep + "______________");
+      setText("inspectorText", inspector);
+      setText("repText", rep);
       setText("iden21Text", iden21);
       setText("iden18Text", iden18);
       setText("senderText", sender);
       setText("get8Text", get8Render);
       setText("invoiceNoText", invoiceNo);
       setText("invoiceDateText", invoiceDate);
+      setText("gtiText", gti);
       setText("plombText", plomb);
-      setText("inspectorSignText", "__" + inspector);
-      setText("repSignText", rep + "_");
+      setText("inspectorSignText", inspector);
+      setText("repSignText", rep);
     </script>
   </body>
 </html>
