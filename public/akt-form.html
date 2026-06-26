@@ -226,6 +226,31 @@
         gti: "ГТИ КР",
       };
 
+      // Pool of vehicle plates to randomly populate iden21.
+      // Deduplicated automatically; each number used at most once across the form.
+      const IDEN21_POOL = [...new Set([
+        "P18595/P6411", "P19562/P6158", "P14906/P6019", "P19053/P6350",
+        "P14143/P6492", "P19473/P6832", "P14006/P6640", "P18029/P6921",
+        "P14906/P6019", "P19418/P6723", "P14205/P6400", "P14617/P6173",
+        "P14006/P6640", "P16038/P5500", "P14143/P6492", "P16038/P5500",
+        "P16823/P5286", "P16180/A4H89", "P19747/P6376", "P18637/P6237",
+        "P16888/P5237", "P18569/P6969", "P14006/P6640", "P14340/P2624",
+        "P18976/P6461", "P14423/P6206", "P18569/P6969", "P14906/P6019",
+        "P12476/P6235", "P18637/P6237", "P17073/P5765", "P14906/P6019",
+        "P16888/P5237", "P18976/P6461", "P17073/P5765", "P14478/P6187",
+        "P17141/P6382", "P19593/P6655", "P19562/P6158", "P19473/P6832",
+        "P12476/P6235", "P16222/P6952", "P17453/P6962", "P18976/P6461",
+        "P16050/P6092", "P14617/P6173", "P12476/P6235", "P16446/P6742",
+        "P16446/P6742", "P14340/P2624", "P16966/P6106", "P14262/P6525",
+        "P17453/P6962", "P17200/P6907", "P19053/P6350", "P19593/P6451",
+        "P16038/P5500", "P16966/P6106", "P18223/P6763", "P19053/P6350",
+        "P14006/P6640", "P16050/P6092", "P17069/P6438", "P19593/P6451",
+        "P17200/P6907", "P19451/P6419", "P18976/P6461", "P12476/P6235",
+        "P14005/P6655", "P14617/P6173", "P18447/P6449", "P14340/P2624",
+        "P19593/P6451", "P14617/P6173", "P12476/P6235", "P19473/P6832",
+        "P14143/P6492", "P19053/P6350", "P19562/P6158",
+      ])];
+
       const form = document.getElementById("form");
       const actsContainer = document.getElementById("acts");
       const addBtn = document.getElementById("addBtn");
@@ -239,8 +264,27 @@
         return pad(d.getDate()) + "." + pad(d.getMonth() + 1) + "." + d.getFullYear();
       }
 
+      // Collect iden21 values currently entered in the form.
+      function getUsedIden21() {
+        const used = new Set();
+        for (const card of actsContainer.querySelectorAll(".act-card")) {
+          const el = card.querySelector('[data-field="iden21"]');
+          if (el && el.value.trim()) used.add(el.value.trim());
+        }
+        return used;
+      }
+
+      // Pick a random plate not currently in use (plus optional extras to exclude).
+      function pickRandomIden21(extra) {
+        const used = getUsedIden21();
+        if (extra) for (const u of extra) used.add(u);
+        const available = IDEN21_POOL.filter((x) => !used.has(x));
+        if (available.length === 0) return "";
+        return available[Math.floor(Math.random() * available.length)];
+      }
+
       function freshAct() {
-        return { ...DEFAULTS, date: todayStr() };
+        return { ...DEFAULTS, date: todayStr(), iden21: pickRandomIden21() };
       }
 
       function esc(s) {
@@ -376,16 +420,17 @@
       // vehicle plates and invoice details are always unique per act.
       const UNIQUE_FIELDS = ["iden21", "iden18", "invoice_no", "invoice_date"];
 
-      // Add: duplicate the last act, except unique fields
+      // Add: duplicate the last act, except unique fields.
+      // iden21 is filled from the pool with a value not already in use.
       addBtn.addEventListener("click", () => {
         const acts = readActsFromDom();
         const last = acts[acts.length - 1] || freshAct();
         const next = { ...last };
         for (const f of UNIQUE_FIELDS) next[f] = "";
+        next.iden21 = pickRandomIden21();
         acts.push(next);
         renderAll(acts);
         persist();
-        // Scroll to the new card
         const cards = actsContainer.querySelectorAll(".act-card");
         cards[cards.length - 1].scrollIntoView({ behavior: "smooth", block: "start" });
       });
