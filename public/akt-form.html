@@ -161,15 +161,63 @@
         background: #f3f4f6;
         border: 1px solid #e5e7eb;
         border-radius: 8px;
-        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-        font-size: 11px;
-        word-break: break-all;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-size: 13px;
         color: #374151;
         display: none;
-        max-height: 100px;
+        max-height: 280px;
         overflow-y: auto;
       }
       .link-box.shown { display: block; }
+      .link-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 6px 0;
+      }
+      .link-item + .link-item { border-top: 1px solid #e5e7eb; }
+      .link-item .num {
+        flex: 0 0 auto;
+        background: #2563eb;
+        color: #fff;
+        font-weight: 700;
+        font-size: 11px;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .link-item .range {
+        flex: 0 0 auto;
+        font-size: 12px;
+        color: #6b7280;
+        white-space: nowrap;
+      }
+      .link-item a {
+        flex: 1;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 11px;
+        color: #2563eb;
+        text-decoration: none;
+        word-break: break-all;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .link-item a:hover { text-decoration: underline; }
+      .link-item .copy-one {
+        flex: 0 0 auto;
+        font-size: 12px;
+        padding: 4px 10px;
+        border-radius: 6px;
+        border: 1px solid #d1d5db;
+        background: #fff;
+        cursor: pointer;
+        font-family: inherit;
+      }
+      .link-item .copy-one:hover { background: #f3f4f6; }
       .toast {
         position: fixed;
         bottom: 100px;
@@ -461,16 +509,67 @@
         setTimeout(() => toast.classList.remove("shown"), 1800);
       }
 
-      function buildUrl() {
+      const CHUNK_SIZE = 5;
+
+      // Split all acts into URLs of up to CHUNK_SIZE acts each.
+      function buildUrls() {
         const acts = readActsFromDom();
-        const params = new URLSearchParams();
-        params.set("n", String(acts.length));
-        for (const a of acts) {
-          for (const f of FIELDS) params.append(f, a[f] || "");
-        }
         const base = window.location.href.replace(/\/akt-form\.html.*$/, "/akt.html");
-        return base + "?" + params.toString();
+        const urls = [];
+        for (let i = 0; i < acts.length; i += CHUNK_SIZE) {
+          const chunk = acts.slice(i, i + CHUNK_SIZE);
+          const params = new URLSearchParams();
+          params.set("n", String(chunk.length));
+          for (const a of chunk) {
+            for (const f of FIELDS) params.append(f, a[f] || "");
+          }
+          urls.push({
+            url: base + "?" + params.toString(),
+            from: i + 1,
+            to: i + chunk.length,
+          });
+        }
+        return urls;
       }
+
+      async function copyText(text) {
+        try {
+          await navigator.clipboard.writeText(text);
+          return true;
+        } catch {
+          const ta = document.createElement("textarea");
+          ta.value = text;
+          document.body.appendChild(ta);
+          ta.select();
+          let ok = false;
+          try { ok = document.execCommand("copy"); } catch {}
+          document.body.removeChild(ta);
+          return ok;
+        }
+      }
+
+      function renderLinkList(items) {
+        linkBox.innerHTML = items
+          .map(
+            (it, i) => `
+              <div class="link-item">
+                <span class="num">${i + 1}</span>
+                <span class="range">акты ${it.from}–${it.to}</span>
+                <a href="${esc(it.url)}" target="_blank" rel="noopener">${esc(it.url)}</a>
+                <button type="button" class="copy-one" data-url="${esc(it.url)}">Копировать</button>
+              </div>
+            `
+          )
+          .join("");
+      }
+
+      // Delegate single-link copy
+      linkBox.addEventListener("click", async (e) => {
+        const btn = e.target.closest(".copy-one");
+        if (!btn) return;
+        const ok = await copyText(btn.dataset.url);
+        showToast(ok ? "Ссылка скопирована" : "Не удалось скопировать");
+      });
 
       function plural(n) {
         const mod10 = n % 10, mod100 = n % 100;
@@ -479,32 +578,35 @@
         return "актов";
       }
 
+      function pluralLink(n) {
+        const mod10 = n % 10, mod100 = n % 100;
+        if (mod10 === 1 && mod100 !== 11) return "ссылка";
+        if ([2, 3, 4].includes(mod10) && ![12, 13, 14].includes(mod100)) return "ссылки";
+        return "ссылок";
+      }
+
       form.addEventListener("submit", async function (e) {
         e.preventDefault();
-        const url = buildUrl();
-        linkBox.textContent = url;
+        const items = buildUrls();
+        renderLinkList(items);
         linkBox.classList.add("shown");
-        openLink.href = url;
-        openLink.style.display = "inline-block";
+
+        if (items.length === 1) {
+          openLink.href = items[0].url;
+          openLink.style.display = "inline-block";
+        } else {
+          openLink.style.display = "none";
+        }
 
         const n = readActsFromDom().length;
-        const label = `Ссылка скопирована (${n} ${plural(n)})`;
-
-        try {
-          await navigator.clipboard.writeText(url);
-          showToast(label);
-        } catch {
-          const ta = document.createElement("textarea");
-          ta.value = url;
-          document.body.appendChild(ta);
-          ta.select();
-          try {
-            document.execCommand("copy");
-            showToast(label);
-          } catch {
-            showToast("Не удалось скопировать — выделите ссылку вручную");
-          }
-          document.body.removeChild(ta);
+        const joined = items.map((it) => it.url).join("\n\n");
+        const ok = await copyText(joined);
+        if (ok) {
+          showToast(
+            `Скопировано ${items.length} ${pluralLink(items.length)} (${n} ${plural(n)})`
+          );
+        } else {
+          showToast("Не удалось скопировать — выделите вручную");
         }
       });
 
